@@ -1,0 +1,81 @@
+.container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+
+  .left {
+    width: 70%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 200px;
+    color: black;
+
+    .loginHeader {
+      margin-bottom: 30px;
+      display: flex;
+    }
+
+    .emailInput,
+    .passwordInput {
+      border: none;
+      border-bottom: 1px solid gray;
+      border-radius: 0;
+      margin-bottom: 15px;
+      width: 200px;
+      padding-left: 0;
+      box-shadow: none;
+    }
+
+    .storeAccount {
+      margin-bottom: 15px;
+    }
+
+    .loginBtn {
+      width: 200px;
+      background: black;
+      color: white;
+      font-weight: bold;
+
+      &:hover,
+      &:active {
+        border: none;
+        color: white;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+      }
+    }
+  }
+
+  .right {
+    width: 30%;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    color: white;
+
+    .rightHeader {
+      height: 40px;
+      display: flex;
+      align-content: flex-start;
+      align-items: center;
+
+      .icon {
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+    .rightContent {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 30px;
+    }
+  }
+}
