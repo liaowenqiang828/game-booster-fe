@@ -5,6 +5,9 @@ import SwitchTag from "../../components/switchTag/SwitchTag";
 import { useState } from "react";
 import GameConfigBasicInfoModal from "../../components/gameConfigBasicInfoModal/GameConfigBasicInfoModal";
 import ViewPackageAndServerModal from "../../components/viewPackageAndServerModal/ViewPackageAndServerModal";
+import GameAccelerateConfigEditModal, {
+  IGameAccelerateConfig,
+} from "../../components/gameAccelerateConfigEditModal/GameAccelerateConfigEditModal";
 
 export interface IGameConfig {
   key: string;
@@ -165,14 +168,11 @@ const GameConfig = () => {
         />
       )}
       {showPackageModal && (
-        <ViewPackageAndServerModal
-          gameConfig={currentGameConfig}
-          closeModal={closePackageModal}
-        />
+        <ViewPackageAndServerModal closeModal={closePackageModal} />
       )}
       {showAccelerateConfigModal && (
-        <GameConfigBasicInfoModal
-          gameConfig={currentGameConfig}
+        <GameAccelerateConfigEditModal
+          gameAccerateConfig={{} as IGameAccelerateConfig}
           closeModal={closeAccelerateConfigModal}
         />
       )}

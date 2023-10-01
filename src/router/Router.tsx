@@ -10,7 +10,7 @@ import DnsConfig from "../pages/dnsConfig/DnsConfig";
 import GameConfig from "../pages/gameConfig/GameConfig";
 import ClientUpdateConfig from "../pages/clientUpdateConfig/ClientUpdateConfig";
 import GlobalAclConfig from "../pages/globalAclConfig/GlobalAclConfig";
-import GroupAclConfig from "../pages/groupAclConfig/GroupAclConfig";
+import AclGroupConfig from "../pages/aclGroupConfig/AclGroupConfig";
 
 const Router = () => {
   return (
@@ -27,7 +27,7 @@ const Router = () => {
           ></Route>
           <Route
             path={ROUTER_PATH.ACL_GROUP_CONFIG}
-            element={<GroupAclConfig />}
+            element={<AclGroupConfig />}
           ></Route>
         </Route>
         <Route path={ROUTER_PATH.GAME_CONGIF} element={<GameConfig />} />

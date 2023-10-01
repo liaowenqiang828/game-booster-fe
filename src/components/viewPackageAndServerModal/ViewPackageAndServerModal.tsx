@@ -2,6 +2,9 @@ import { Button, Input, Modal, Table, Tag } from "antd";
 import styles from "./index.module.less";
 import type { ColumnsType } from "antd/es/table";
 import SwitchTag from "../switchTag/SwitchTag";
+import GameConfigPackageNameEditModal from "../gameConfigPackageNameEditModal/GameConfigPackageNameEditModal";
+import { useState } from "react";
+import GameConfigRegionServerEditModal from "../gameConfigRegionServerEditModal/GameConfigRegionServerEditModal";
 
 export interface IPackageInfo {
   key: string;
@@ -84,6 +87,14 @@ const mockReginServerData: IServerInfo[] = [
 const ViewPackageAndServerModal = (props: IProps) => {
   const { packageInfo, serverInfo, closeModal } = props;
 
+  const [showcPackageNameEditModal, setShowcPackageNameEditModal] =
+    useState(false);
+  const [showcRegionServerEditModal, setShowcRegionServerEditModal] =
+    useState(false);
+  const [currentPackage, setCurrentPackage] = useState({} as IPackageInfo);
+  const [currentRegionServer, setCurrentRegionServer] = useState(
+    {} as IServerInfo
+  );
   const packageTableColumn: ColumnsType<IPackageInfo> = [
     {
       title: "包名",
@@ -176,12 +187,39 @@ const ViewPackageAndServerModal = (props: IProps) => {
   const editPackageHandler = (e: any, key: string) => {
     console.log(e);
     console.log(key);
+    setCurrentPackage(
+      mockPackageData.filter((item) => item.key === key)[0] ??
+        ({} as IPackageInfo)
+    );
+    setShowcPackageNameEditModal(true);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editReginServerHandler = (e: any, key: string) => {
     console.log(e);
     console.log(key);
+    setCurrentRegionServer(
+      mockReginServerData.filter((item) => item.key === key)[0] ??
+        ({} as IServerInfo)
+    );
+    setShowcRegionServerEditModal(true);
+  };
+
+  const closePackageNameEditModal = () => {
+    setShowcPackageNameEditModal(false);
+    setCurrentPackage({} as IPackageInfo);
+  };
+  const closeRegionServerEditModal = () => {
+    setShowcRegionServerEditModal(false);
+    setCurrentRegionServer({} as IServerInfo);
+  };
+
+  const addNewPackageNameConfig = () => {
+    setShowcPackageNameEditModal(true);
+  };
+
+  const addNewRegionServerConfig = () => {
+    setShowcRegionServerEditModal(true);
   };
 
   return (
@@ -198,17 +236,36 @@ const ViewPackageAndServerModal = (props: IProps) => {
         <div className={styles.addLine}>
           <label>游戏名</label>
           <Input />
-          <Button type="primary">新增</Button>
+          <Button type="primary" onClick={addNewPackageNameConfig}>
+            新增
+          </Button>
         </div>
         <Table dataSource={mockPackageData} columns={packageTableColumn} />
       </div>
       <div className={styles.serverTable}>
-        <Button type="primary">新增</Button>
+        <Button type="primary" onClick={addNewRegionServerConfig}>
+          新增
+        </Button>
         <Table
           dataSource={mockReginServerData}
           columns={regionServerTableColumn}
         />
       </div>
+
+      {showcPackageNameEditModal && (
+        <GameConfigPackageNameEditModal
+          gameName=""
+          packageInfo={currentPackage}
+          closeModal={closePackageNameEditModal}
+        />
+      )}
+      {showcRegionServerEditModal && (
+        <GameConfigRegionServerEditModal
+          gameName=""
+          regionServer={currentRegionServer}
+          closeModal={closeRegionServerEditModal}
+        />
+      )}
     </Modal>
   );
 };
