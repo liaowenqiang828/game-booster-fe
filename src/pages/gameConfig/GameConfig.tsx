@@ -4,6 +4,7 @@ import Table, { ColumnsType } from "antd/es/table";
 import SwitchTag from "../../components/switchTag/SwitchTag";
 import { useState } from "react";
 import GameConfigBasicInfoModal from "../../components/gameConfigBasicInfoModal/GameConfigBasicInfoModal";
+import ViewPackageAndServerModal from "../../components/viewPackageAndServerModal/ViewPackageAndServerModal";
 
 export interface IGameConfig {
   key: string;
@@ -164,7 +165,7 @@ const GameConfig = () => {
         />
       )}
       {showPackageModal && (
-        <GameConfigBasicInfoModal
+        <ViewPackageAndServerModal
           gameConfig={currentGameConfig}
           closeModal={closePackageModal}
         />
