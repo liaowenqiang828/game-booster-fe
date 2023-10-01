@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Button, Input, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import styles from "./index.module.less";
+import AclGroupEditModal from "../../components/aclGroupEditModal/AclGroupEditModal";
 
-interface IAclGroup {
+export interface IAclGroup {
   key: string;
   aclGroupName: string;
   comment: string;
@@ -37,6 +38,7 @@ const mockAclGroupData: IAclGroup[] = [
 const AclGroupConfig = () => {
   const [showAclGroupEditModal, setShowAclGroupEditModal] = useState(false);
 
+  const [currentAclGroup, setCurrentAclGroup] = useState({} as IAclGroup);
   const columns: ColumnsType<IAclGroup> = [
     {
       title: "ACL组名",
@@ -65,7 +67,7 @@ const AclGroupConfig = () => {
       render: (_, record) => (
         <Button
           className={styles.editBtn}
-          onClick={() => editAclGroup(e, record.key)}
+          onClick={(e) => editAclGroup(e, record.key)}
           type="primary"
         >
           编辑
@@ -74,16 +76,22 @@ const AclGroupConfig = () => {
     },
   ];
 
-  const addNewAclGroup = () => {};
+  const addNewAclGroup = () => {
+    setShowAclGroupEditModal(true);
+  };
 
   const closeModal = () => {
+    setCurrentAclGroup({} as IAclGroup);
     setShowAclGroupEditModal(false);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editAclGroup = (e: any, key: string) => {
     console.log(e, key);
-
+    setCurrentAclGroup(
+      mockAclGroupData.filter((Item) => Item.key === key)[0] ??
+        ({} as IAclGroup)
+    );
     setShowAclGroupEditModal(true);
   };
 
@@ -103,7 +111,13 @@ const AclGroupConfig = () => {
       </div>
       <Table dataSource={mockAclGroupData} columns={columns} />
 
-      {/* {showAclGroupEditModal && <AclGroupEditModal closeModal={closeModal} />} */}
+      {showAclGroupEditModal && (
+        <AclGroupEditModal
+          closeModal={closeModal}
+          aclConfig=""
+          aclGroup={currentAclGroup}
+        />
+      )}
     </div>
   );
 };
