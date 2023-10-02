@@ -2,4 +2,26 @@
   min-width: 200px;
   height: 100%;
   border-right: 1px solid lightgray;
+
+  :global {
+    .ant-menu {
+      .ant-menu-item {
+        .ant-menu-title-content {
+          text-align: start;
+        }
+      }
+
+      .ant-menu-submenu {
+        .ant-menu-submenu-title {
+          padding-right: 10px !important;
+          .ant-menu-title-content {
+            text-align: start;
+          }
+          .ant-menu-submenu-arrow {
+            left: 100px;
+          }
+        }
+      }
+    }
+  }
 }
