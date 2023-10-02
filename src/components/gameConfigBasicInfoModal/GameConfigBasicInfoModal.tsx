@@ -1,6 +1,8 @@
 import { Button, Form, Input, Modal } from "antd";
 import styles from "./index.module.less";
 import { IGameConfig } from "../../pages/gameConfig/GameConfig";
+import { useContext } from "react";
+import { LoadingContext } from "../../router/Router";
 
 interface IProps {
   gameConfig: IGameConfig;
@@ -8,7 +10,14 @@ interface IProps {
 }
 const GameConfigBasicInfoModal = (props: IProps) => {
   const { gameConfig, closeModal } = props;
-
+  const { showLoading, hideLoading } = useContext(LoadingContext);
+  const onSubmit = () => {
+    showLoading();
+    setTimeout(() => {
+      hideLoading();
+      closeModal();
+    }, 2000);
+  };
   return (
     <Modal
       centered
@@ -26,6 +35,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
           wrapperCol={{ flex: 1 }}
           colon={false}
           style={{ maxWidth: 300 }}
+          onFinish={onSubmit}
         >
           <Form.Item label="游戏名" name="gameName">
             <Input defaultValue={gameConfig.gameName} />

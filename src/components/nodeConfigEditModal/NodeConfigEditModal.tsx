@@ -3,7 +3,8 @@ import { INodeConfig } from "../../pages/nodeConfig/NodeConfig";
 import type { SelectProps } from "antd";
 import type { CustomTagProps } from "rc-select/lib/BaseSelect";
 import styles from "./index.module.less";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { LoadingContext } from "../../router/Router";
 
 interface IProps {
   nodeConfig: INodeConfig;
@@ -12,6 +13,7 @@ interface IProps {
 const NodeConfigEditModal = (props: IProps) => {
   const { nodeConfig, closeModal } = props;
   const [isStart, setIsStart] = useState(nodeConfig.isStart);
+  const { showLoading, hideLoading } = useContext(LoadingContext);
   const options: SelectProps["options"] = [
     {
       label: "高速",
@@ -51,6 +53,11 @@ const NodeConfigEditModal = (props: IProps) => {
   const onSubmit = (fieldsValue: any) => {
     console.log({ ...fieldsValue, isStart });
     // todo update api call
+    showLoading();
+    setTimeout(() => {
+      hideLoading();
+      closeModal();
+    }, 2000);
   };
   return (
     <Modal

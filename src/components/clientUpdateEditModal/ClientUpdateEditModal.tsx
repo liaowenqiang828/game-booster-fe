@@ -1,6 +1,8 @@
 import { Button, Form, Input, Modal } from "antd";
 import styles from "./index.module.less";
 import { IClientUpdateConfig } from "../../pages/clientUpdateConfig/ClientUpdateConfig";
+import { useContext } from "react";
+import { LoadingContext } from "../../router/Router";
 
 interface IProps {
   clientUpdateConfig: IClientUpdateConfig;
@@ -9,9 +11,15 @@ interface IProps {
 const ClientUpdateEditModal = (props: IProps) => {
   const { clientUpdateConfig, closeModal } = props;
 
+  const { showLoading, hideLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
     console.log(fieldsValue);
+    showLoading();
+    setTimeout(() => {
+      hideLoading();
+      closeModal();
+    }, 2000);
   };
 
   return (

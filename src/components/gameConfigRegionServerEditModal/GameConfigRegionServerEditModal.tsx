@@ -1,6 +1,8 @@
 import { Button, Form, Input, Modal, Switch } from "antd";
 import styles from "./index.module.less";
 import { IServerInfo } from "../viewPackageAndServerModal/ViewPackageAndServerModal";
+import { useContext } from "react";
+import { LoadingContext } from "../../router/Router";
 
 interface IProps {
   regionServer: IServerInfo;
@@ -9,6 +11,14 @@ interface IProps {
 }
 const GameConfigRegionServerEditModal = (props: IProps) => {
   const { closeModal, regionServer, gameName } = props;
+  const { showLoading, hideLoading } = useContext(LoadingContext);
+  const onSubmit = () => {
+    showLoading();
+    setTimeout(() => {
+      hideLoading();
+      closeModal();
+    }, 2000);
+  };
   return (
     <Modal
       centered
@@ -26,6 +36,7 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
           wrapperCol={{ flex: 1 }}
           colon={false}
           style={{ maxWidth: 300 }}
+          onFinish={onSubmit}
         >
           <Form.Item label="游戏名" name="gameName" className={styles.formItem}>
             <Input disabled defaultValue={gameName} />

@@ -1,6 +1,8 @@
 import { Button, Form, Input, Modal, Switch } from "antd";
 import styles from "./index.module.less";
 import { ILineConfig } from "../../pages/lineConfig/LineConfig";
+import { useContext } from "react";
+import { LoadingContext } from "../../router/Router";
 
 interface IProps {
   lineConfig: ILineConfig;
@@ -8,10 +10,15 @@ interface IProps {
 }
 const LineConfigEditModal = (props: IProps) => {
   const { lineConfig, closeModal } = props;
-
+  const { hideLoading, showLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
     console.log(fieldsValue);
+    showLoading();
+    setTimeout(() => {
+      hideLoading();
+      closeModal();
+    }, 2000);
   };
 
   return (

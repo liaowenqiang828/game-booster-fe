@@ -1,7 +1,9 @@
 import { Button, Form, Input, Modal } from "antd";
 import styles from "./index.module.less";
 import { IAclGroup } from "../../pages/aclGroupConfig/AclGroupConfig";
-import { useState } from "react";
+import { useContext, useState } from "react";
+
+import { LoadingContext } from "../../router/Router";
 
 interface IProps {
   aclGroup: IAclGroup;
@@ -10,6 +12,7 @@ interface IProps {
 }
 const AclGroupEditModal = (props: IProps) => {
   const { closeModal, aclGroup, aclConfig } = props;
+  const { showLoading, hideLoading } = useContext(LoadingContext);
   const [currentAclConfig, setCurrentAclConfig] = useState(aclConfig);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
@@ -18,6 +21,11 @@ const AclGroupEditModal = (props: IProps) => {
       aclConfig: currentAclConfig,
     };
     console.log(submitObj);
+    showLoading();
+    setTimeout(() => {
+      hideLoading();
+      closeModal();
+    }, 2000);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

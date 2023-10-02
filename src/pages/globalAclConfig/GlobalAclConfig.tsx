@@ -1,14 +1,20 @@
 import { Form, Input, Switch, Button } from "antd";
 import styles from "./index.module.less";
 import PlatformSelector from "../../components/platformSelect/PlatformSelector";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { LoadingContext } from "../../router/Router";
 
 const GlobalAclConfig = () => {
   const [selectPlatform, setSelectPlatform] = useState("Android");
+  const { showLoading, hideLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
     const submitObj = { ...fieldsValue, platform: selectPlatform };
     console.log(submitObj);
+    showLoading();
+    setTimeout(() => {
+      hideLoading();
+    }, 2000);
   };
 
   const onPlatformSelect = (platform: string) => {

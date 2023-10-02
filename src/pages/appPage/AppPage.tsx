@@ -6,9 +6,6 @@ import styles from "./index.module.less";
 const AppPage = () => {
   return (
     <div className={styles.container}>
-      {/* <div className={styles.header}>
-        <Header />
-      </div> */}
       <Header />
       <div className={styles.content}>
         <Navigator />
