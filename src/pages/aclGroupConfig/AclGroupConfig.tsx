@@ -106,7 +106,6 @@ const AclGroupConfig = () => {
           <Button type="primary" onClick={addNewAclGroup}>
             新增ACL组
           </Button>
-          ``
         </div>
       </div>
       <Table dataSource={mockAclGroupData} columns={columns} />

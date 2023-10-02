@@ -28,7 +28,7 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
           style={{ maxWidth: 300 }}
         >
           <Form.Item label="游戏名" name="gameName" className={styles.formItem}>
-            <Input defaultValue={gameName} />
+            <Input disabled defaultValue={gameName} />
           </Form.Item>
 
           <Form.Item label="区服名" name="regionServerName">
@@ -47,10 +47,10 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
             <Input defaultValue="" />
           </Form.Item>
           <Form.Item label="启动时间" name="startTime">
-            <Input defaultValue="" />
+            <Input disabled defaultValue="" />
           </Form.Item>
           <Form.Item label="更新时间" name="updateTime">
-            <Input defaultValue="" />
+            <Input disabled defaultValue="" />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

@@ -9,6 +9,11 @@ interface IProps {
 const ClientUpdateEditModal = (props: IProps) => {
   const { clientUpdateConfig, closeModal } = props;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onSubmit = (fieldsValue: any) => {
+    console.log(fieldsValue);
+  };
+
   return (
     <Modal
       centered
@@ -26,22 +31,39 @@ const ClientUpdateEditModal = (props: IProps) => {
           wrapperCol={{ flex: 1 }}
           colon={false}
           style={{ maxWidth: 300 }}
+          onFinish={onSubmit}
         >
-          <Form.Item label="版本号" name="version">
-            <Input defaultValue={clientUpdateConfig.version} />
+          <Form.Item
+            label="版本号"
+            name="version"
+            initialValue={clientUpdateConfig.version}
+          >
+            <Input />
           </Form.Item>
 
-          <Form.Item label="系统" name="system">
-            <Input defaultValue={clientUpdateConfig.system} />
+          <Form.Item
+            label="系统"
+            name="system"
+            initialValue={clientUpdateConfig.system}
+          >
+            <Input />
           </Form.Item>
           <Form.Item label="安装包" name="package">
             <Input />
           </Form.Item>
-          <Form.Item label="标题" name="title">
-            <Input defaultValue={clientUpdateConfig.title} />
+          <Form.Item
+            label="标题"
+            name="title"
+            initialValue={clientUpdateConfig.title}
+          >
+            <Input />
           </Form.Item>
-          <Form.Item label="内容" name="content">
-            <Input defaultValue={clientUpdateConfig.content} />
+          <Form.Item
+            label="内容"
+            name="content"
+            initialValue={clientUpdateConfig.content}
+          >
+            <Input />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

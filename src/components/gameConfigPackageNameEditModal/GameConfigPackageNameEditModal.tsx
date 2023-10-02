@@ -28,7 +28,7 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
           style={{ maxWidth: 300 }}
         >
           <Form.Item label="游戏名" name="gameName" className={styles.formItem}>
-            <Input defaultValue={gameName} />
+            <Input disabled defaultValue={gameName} />
           </Form.Item>
 
           <Form.Item label="包名" name="packageName">
@@ -44,10 +44,10 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
             <Input defaultValue={packageInfo.signature} />
           </Form.Item>
           <Form.Item label="启动时间" name="startTime">
-            <Input defaultValue={packageInfo.startTime} />
+            <Input disabled defaultValue={packageInfo.startTime} />
           </Form.Item>
           <Form.Item label="更新时间" name="updateTime">
-            <Input defaultValue={packageInfo.updateTime} />
+            <Input disabled defaultValue={packageInfo.updateTime} />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

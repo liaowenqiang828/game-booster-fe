@@ -9,6 +9,11 @@ interface IProps {
 const DnsEditModal = (props: IProps) => {
   const { dnsConfig, closeModal } = props;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onSubmit = (fieldsValue: any) => {
+    console.log(fieldsValue);
+  };
+
   return (
     <Modal
       centered
@@ -26,19 +31,33 @@ const DnsEditModal = (props: IProps) => {
           wrapperCol={{ flex: 1 }}
           colon={false}
           style={{ maxWidth: 300 }}
+          onFinish={onSubmit}
         >
-          <Form.Item label="名称" name="dnsName" className={styles.formItem}>
-            <Input defaultValue={dnsConfig.dnsName} />
-          </Form.Item>
-
-          <Form.Item label="内容" name="content">
+          <Form.Item
+            label="名称"
+            name="dnsName"
+            className={styles.formItem}
+            initialValue={dnsConfig.dnsName}
+          >
             <Input />
           </Form.Item>
-          <Form.Item label="创建时间" name="createTime">
-            <Input defaultValue={dnsConfig.createTime} />
+
+          <Form.Item label="内容" name="content" initialValue="">
+            <Input />
           </Form.Item>
-          <Form.Item label="更新时间" name="updateTime">
-            <Input defaultValue={dnsConfig.updateTime} />
+          <Form.Item
+            label="创建时间"
+            name="createTime"
+            initialValue={dnsConfig.createTime}
+          >
+            <Input disabled />
+          </Form.Item>
+          <Form.Item
+            label="更新时间"
+            name="updateTime"
+            initialValue={dnsConfig.updateTime}
+          >
+            <Input disabled />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

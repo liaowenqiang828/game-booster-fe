@@ -2,10 +2,11 @@ import { Button, Input, Table, Tag } from "antd";
 import styles from "./index.module.less";
 import SwitchTag from "../../components/switchTag/SwitchTag";
 import { ColumnsType } from "antd/es/table";
+import LineConfigEditModal from "../../components/lineConfigEditModal/LineConfigEditModal";
+import { useState } from "react";
 
-interface ILineConfig {
+export interface ILineConfig {
   key: string;
-
   lineName: string;
   isStart: boolean;
   country: string;
@@ -56,6 +57,8 @@ const mockDataSource: ILineConfig[] = [
   },
 ];
 const LineConfig = () => {
+  const [showModal, setShowModal] = useState(false);
+  const [currentLineConfig, setCurrentLineConfig] = useState({} as ILineConfig);
   const columns: ColumnsType<ILineConfig> = [
     {
       title: "线路名",
@@ -128,10 +131,21 @@ const LineConfig = () => {
   const editLineConfigItemHandler = (e: any, key: string) => {
     console.log(e);
     console.log(key);
+    setCurrentLineConfig(
+      mockDataSource.filter((item) => item.key === key)[0] ??
+        ({} as ILineConfig)
+    );
+    setShowModal(true);
   };
 
   const addNewLineHandler = () => {
     console.log("add new line");
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setCurrentLineConfig({} as ILineConfig);
+    setShowModal(false);
   };
 
   return (
@@ -152,6 +166,12 @@ const LineConfig = () => {
         dataSource={mockDataSource}
         className={styles.table}
       />
+      {showModal && (
+        <LineConfigEditModal
+          lineConfig={currentLineConfig}
+          closeModal={closeModal}
+        />
+      )}
     </div>
   );
 };
