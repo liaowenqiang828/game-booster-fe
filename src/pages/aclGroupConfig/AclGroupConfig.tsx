@@ -96,16 +96,21 @@ const AclGroupConfig = () => {
   };
 
   return (
-    <div>
-      <div>面包屑</div>
-      <div className={styles.titleSection}>
-        <div className={styles.title}>ACL 组配置</div>
-        <div className={styles.desc}>
-          <div>通用的ACL组，用来简化配置，如Google Facebook等通用组</div>
-          <Input.Search placeholder="在此搜索ACL组名" />
-          <Button type="primary" onClick={addNewAclGroup}>
-            新增ACL组
-          </Button>
+    <div className={styles.container}>
+      <div className={styles.headerSection}>
+        <div>面包屑</div>
+        <div className={styles.titleSection}>
+          <div className={styles.title}>ACL 组配置</div>
+          <div className={styles.descSection}>
+            <div>通用的ACL组，用来简化配置，如Google Facebook等通用组</div>
+            <Input.Search
+              placeholder="在此搜索ACL组名"
+              style={{ width: "200px" }}
+            />
+            <Button type="primary" onClick={addNewAclGroup}>
+              新增ACL组
+            </Button>
+          </div>
         </div>
       </div>
       <Table dataSource={mockAclGroupData} columns={columns} />

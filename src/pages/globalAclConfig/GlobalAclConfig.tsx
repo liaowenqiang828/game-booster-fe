@@ -1,4 +1,4 @@
-import { Form, Input, Switch, Button } from "antd";
+import { Form, Input, Button } from "antd";
 import styles from "./index.module.less";
 import PlatformSelector from "../../components/platformSelect/PlatformSelector";
 import { useContext, useState } from "react";
