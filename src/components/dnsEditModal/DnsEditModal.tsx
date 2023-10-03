@@ -3,13 +3,15 @@ import styles from "./index.module.less";
 import { IDnsConfig } from "../../pages/dnsConfig/DnsConfig";
 import { useContext } from "react";
 import { LoadingContext } from "../../router/Router";
+import { generateDateTimeForCurrentOperation } from "../../utils/dataTime";
 
 interface IProps {
   dnsConfig: IDnsConfig;
   closeModal: () => void;
+  editMode: boolean;
 }
 const DnsEditModal = (props: IProps) => {
-  const { dnsConfig, closeModal } = props;
+  const { dnsConfig, closeModal, editMode } = props;
   const { showLoading, hideLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
@@ -55,14 +57,22 @@ const DnsEditModal = (props: IProps) => {
           <Form.Item
             label="创建时间"
             name="createTime"
-            initialValue={dnsConfig.createTime}
+            initialValue={
+              editMode
+                ? dnsConfig.createTime
+                : generateDateTimeForCurrentOperation()
+            }
           >
             <Input disabled />
           </Form.Item>
           <Form.Item
             label="更新时间"
             name="updateTime"
-            initialValue={dnsConfig.updateTime}
+            initialValue={
+              editMode
+                ? dnsConfig.updateTime
+                : generateDateTimeForCurrentOperation()
+            }
           >
             <Input disabled />
           </Form.Item>

@@ -58,6 +58,7 @@ const mockDataSource: ILineConfig[] = [
 ];
 const LineConfig = () => {
   const [showModal, setShowModal] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [currentLineConfig, setCurrentLineConfig] = useState({} as ILineConfig);
   const columns: ColumnsType<ILineConfig> = [
     {
@@ -135,11 +136,13 @@ const LineConfig = () => {
       mockDataSource.filter((item) => item.key === key)[0] ??
         ({} as ILineConfig)
     );
+    setEditMode(true);
     setShowModal(true);
   };
 
   const addNewLineHandler = () => {
     console.log("add new line");
+    setEditMode(false);
     setShowModal(true);
   };
 
@@ -170,6 +173,7 @@ const LineConfig = () => {
         <LineConfigEditModal
           lineConfig={currentLineConfig}
           closeModal={closeModal}
+          editMode={editMode}
         />
       )}
     </div>

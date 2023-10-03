@@ -34,6 +34,7 @@ const mockDataSource: IDnsConfig[] = [
 
 const DnsConfig = () => {
   const [showModal, setShowModal] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [currentDnsConfig, setCurrentNodeConfig] = useState({} as IDnsConfig);
   const columns: ColumnsType<IDnsConfig> = [
     {
@@ -70,6 +71,7 @@ const DnsConfig = () => {
   const editDnsConfigItemHandler = (e: any, key: string) => {
     console.log(e);
     console.log(key);
+    setEditMode(true);
     setShowModal(true);
     setCurrentNodeConfig(
       mockDataSource.filter((item) => item.key === key)[0] ?? {}
@@ -77,6 +79,7 @@ const DnsConfig = () => {
   };
 
   const addNewDnsHandler = () => {
+    setEditMode(false);
     setShowModal(true);
   };
 
@@ -105,7 +108,11 @@ const DnsConfig = () => {
       />
 
       {showModal && (
-        <DnsEditModal dnsConfig={currentDnsConfig} closeModal={closeModal} />
+        <DnsEditModal
+          dnsConfig={currentDnsConfig}
+          closeModal={closeModal}
+          editMode={editMode}
+        />
       )}
     </div>
   );

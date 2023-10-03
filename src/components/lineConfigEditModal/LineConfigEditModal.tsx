@@ -3,10 +3,12 @@ import styles from "./index.module.less";
 import { ILineConfig } from "../../pages/lineConfig/LineConfig";
 import { useContext } from "react";
 import { LoadingContext } from "../../router/Router";
+import { generateDateTimeForCurrentOperation } from "../../utils/dataTime";
 
 interface IProps {
   lineConfig: ILineConfig;
   closeModal: () => void;
+  editMode: boolean;
 }
 
 const countryOptions = [
@@ -38,7 +40,7 @@ const nodeAddressOptions = [
 ];
 
 const LineConfigEditModal = (props: IProps) => {
-  const { lineConfig, closeModal } = props;
+  const { lineConfig, closeModal, editMode } = props;
   const { hideLoading, showLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
@@ -82,7 +84,7 @@ const LineConfigEditModal = (props: IProps) => {
             name="isStart"
             initialValue={lineConfig.isStart}
           >
-            <Switch checked={lineConfig.isStart} />
+            <Switch defaultChecked={lineConfig.isStart} />
           </Form.Item>
           <Form.Item
             label="国家"
@@ -112,19 +114,31 @@ const LineConfigEditModal = (props: IProps) => {
             <Input />
           </Form.Item>
           <Form.Item label="节点地址" name="nodeAddress" initialValue={[]}>
-            <Select options={nodeAddressOptions} mode="multiple" />
+            <Select
+              options={nodeAddressOptions}
+              mode="multiple"
+              style={{ width: "190px" }}
+            />
           </Form.Item>
           <Form.Item
             label="创建时间"
             name="startTime"
-            initialValue={lineConfig.startTime}
+            initialValue={
+              editMode
+                ? lineConfig.startTime
+                : generateDateTimeForCurrentOperation()
+            }
           >
             <Input disabled />
           </Form.Item>
           <Form.Item
             label="更新时间"
             name="updateTime"
-            initialValue={lineConfig.updateTime}
+            initialValue={
+              editMode
+                ? lineConfig.updateTime
+                : generateDateTimeForCurrentOperation()
+            }
           >
             <Input disabled />
           </Form.Item>
