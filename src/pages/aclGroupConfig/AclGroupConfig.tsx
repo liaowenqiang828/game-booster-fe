@@ -3,62 +3,61 @@ import { Button, Input, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import styles from "./index.module.less";
 import AclGroupEditModal from "../../components/aclGroupEditModal/AclGroupEditModal";
-
-export interface IAclGroup {
-  key: string;
-  aclGroupName: string;
-  comment: string;
-  addTime: string;
-  updateTime: string;
-}
+import { IAclGroup } from "../../types";
+import { convertTimestampToStr } from "../../utils/dataTime";
 
 const mockAclGroupData: IAclGroup[] = [
   {
-    key: "1",
-    aclGroupName: "Google组",
-    comment: "主要包含Google常用登录、API等域名",
-    addTime: "2023-06-02 10:00:00",
-    updateTime: "2023-06-02 10:00:00",
+    id: 1,
+    name: "Google组",
+    desc: "主要包含Google常用登录、API等域名",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    content: "content value",
   },
   {
-    key: "2",
-    aclGroupName: "Facebook组",
-    comment: "主要包含Google常用登录、API等域名",
-    addTime: "2023-06-02 10:00:00",
-    updateTime: "2023-06-02 10:00:00",
+    id: 2,
+    name: "Facebook组",
+    desc: "主要包含Google常用登录、API等域名",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    content: "content value",
   },
   {
-    key: "3",
-    aclGroupName: "Google组",
-    comment: "主要包含Google常用登录、API等域名",
-    addTime: "2023-06-02 10:00:00",
-    updateTime: "2023-06-02 10:00:00",
+    id: 3,
+    name: "Google组",
+    desc: "主要包含Google常用登录、API等域名",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    content: "content value",
   },
 ];
 const AclGroupConfig = () => {
   const [showAclGroupEditModal, setShowAclGroupEditModal] = useState(false);
 
   const [currentAclGroup, setCurrentAclGroup] = useState({} as IAclGroup);
-  const columns: ColumnsType<IAclGroup> = [
+  const columns: ColumnsType<Omit<IAclGroup, "content">> = [
     {
       title: "ACL组名",
-      dataIndex: "aclGroupName",
+      dataIndex: "name",
       key: "aclGroupName",
     },
     {
       title: "备注",
-      dataIndex: "comment",
+      dataIndex: "desc",
       key: "comment",
     },
     {
       title: "添加时间",
-      dataIndex: "addTime",
+      dataIndex: "created_at",
       key: "addTime",
+      render: (created_at) => convertTimestampToStr(created_at),
     },
     {
       title: "更新时间",
-      dataIndex: "updateTime",
+      dataIndex: "updated_at",
       key: "updateTime",
+      render: (updated_at) => convertTimestampToStr(updated_at),
     },
     {
       title: "操作",
@@ -67,7 +66,7 @@ const AclGroupConfig = () => {
       render: (_, record) => (
         <Button
           className={styles.editBtn}
-          onClick={(e) => editAclGroup(e, record.key)}
+          onClick={(e) => editAclGroup(e, record.id)}
           type="primary"
         >
           编辑
@@ -86,11 +85,10 @@ const AclGroupConfig = () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editAclGroup = (e: any, key: string) => {
+  const editAclGroup = (e: any, key: number) => {
     console.log(e, key);
     setCurrentAclGroup(
-      mockAclGroupData.filter((Item) => Item.key === key)[0] ??
-        ({} as IAclGroup)
+      mockAclGroupData.filter((Item) => Item.id === key)[0] ?? ({} as IAclGroup)
     );
     setShowAclGroupEditModal(true);
   };
@@ -116,11 +114,7 @@ const AclGroupConfig = () => {
       <Table dataSource={mockAclGroupData} columns={columns} />
 
       {showAclGroupEditModal && (
-        <AclGroupEditModal
-          closeModal={closeModal}
-          aclConfig=""
-          aclGroup={currentAclGroup}
-        />
+        <AclGroupEditModal closeModal={closeModal} aclGroup={currentAclGroup} />
       )}
     </div>
   );

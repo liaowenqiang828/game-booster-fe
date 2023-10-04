@@ -1,11 +1,11 @@
 import { Button, Form, Input, Modal } from "antd";
 import styles from "./index.module.less";
-import { IClientUpdateConfig } from "../../pages/clientUpdateConfig/ClientUpdateConfig";
 import { useContext } from "react";
 import { LoadingContext } from "../../router/Router";
+import { IClientUpdate } from "../../types";
 
 interface IProps {
-  clientUpdateConfig: IClientUpdateConfig;
+  clientUpdateConfig: IClientUpdate;
   closeModal: () => void;
 }
 const ClientUpdateEditModal = (props: IProps) => {
@@ -44,7 +44,7 @@ const ClientUpdateEditModal = (props: IProps) => {
           <Form.Item
             label="版本号"
             name="version"
-            initialValue={clientUpdateConfig.version}
+            initialValue={clientUpdateConfig.ver}
           >
             <Input />
           </Form.Item>
@@ -52,7 +52,7 @@ const ClientUpdateEditModal = (props: IProps) => {
           <Form.Item
             label="系统"
             name="system"
-            initialValue={clientUpdateConfig.system}
+            initialValue={clientUpdateConfig.os}
           >
             <Input />
           </Form.Item>
@@ -69,7 +69,7 @@ const ClientUpdateEditModal = (props: IProps) => {
           <Form.Item
             label="内容"
             name="content"
-            initialValue={clientUpdateConfig.content}
+            initialValue={clientUpdateConfig.change_log}
           >
             <Input />
           </Form.Item>

@@ -1,12 +1,15 @@
 import { Button, Form, Input, Modal } from "antd";
 import styles from "./index.module.less";
-import { IDnsConfig } from "../../pages/dnsConfig/DnsConfig";
 import { useContext } from "react";
 import { LoadingContext } from "../../router/Router";
-import { generateDateTimeForCurrentOperation } from "../../utils/dataTime";
+import {
+  convertTimestampToStr,
+  generateDateTimeForCurrentOperation,
+} from "../../utils/dataTime";
+import { IDnsGroup } from "../../types";
 
 interface IProps {
-  dnsConfig: IDnsConfig;
+  dnsConfig: IDnsGroup;
   closeModal: () => void;
   editMode: boolean;
 }
@@ -46,12 +49,12 @@ const DnsEditModal = (props: IProps) => {
             label="名称"
             name="dnsName"
             className={styles.formItem}
-            initialValue={dnsConfig.dnsName}
+            initialValue={dnsConfig.name}
           >
             <Input />
           </Form.Item>
 
-          <Form.Item label="内容" name="content" initialValue="">
+          <Form.Item label="内容" name="content" initialValue={dnsConfig.dns}>
             <Input />
           </Form.Item>
           <Form.Item
@@ -59,7 +62,7 @@ const DnsEditModal = (props: IProps) => {
             name="createTime"
             initialValue={
               editMode
-                ? dnsConfig.createTime
+                ? convertTimestampToStr(dnsConfig.created_at)
                 : generateDateTimeForCurrentOperation()
             }
           >
@@ -70,7 +73,7 @@ const DnsEditModal = (props: IProps) => {
             name="updateTime"
             initialValue={
               editMode
-                ? dnsConfig.updateTime
+                ? convertTimestampToStr(dnsConfig.updated_at)
                 : generateDateTimeForCurrentOperation()
             }
           >

@@ -4,73 +4,70 @@ import SwitchTag from "../../components/switchTag/SwitchTag";
 import { ColumnsType } from "antd/es/table";
 import LineConfigEditModal from "../../components/lineConfigEditModal/LineConfigEditModal";
 import { useState } from "react";
+import { IBoostZone } from "../../types";
+import { convertTimestampToStr } from "../../utils/dataTime";
 
-export interface ILineConfig {
-  key: string;
-  lineName: string;
-  isStart: boolean;
-  country: string;
-  region: string;
-  entry: string;
-  exit: string;
-  speedTestAddress: string;
-  startTime: string;
-  updateTime: string;
-}
+export type IBoostZoneModel = Omit<IBoostZone, "desc" | "nodes">;
 
-const mockDataSource: ILineConfig[] = [
+const mockDataSource: IBoostZone[] = [
   {
-    key: "1",
-    lineName: "上海日本一区",
-    isStart: true,
+    id: 1,
+    name: "上海日本一区",
+    enabled: true,
     country: "中国",
     region: "上海",
-    entry: "CN",
-    exit: "JP",
-    speedTestAddress: "101.202.55.44:10000",
-    startTime: "2023-09-17 15:00:00",
-    updateTime: "2023-09-17 15:00:00",
+    inbound_country_code: "CN",
+    outbound_country_code: "JP",
+    ping_addr: "101.202.55.44:10000",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    desc: "desc for boost zone",
+    nodes: ["1.1.1.1", "2.2.2.2"],
   },
   {
-    key: "2",
-    lineName: "广州日本一区",
-    isStart: false,
+    id: 2,
+    name: "广州日本一区",
+    enabled: false,
     country: "中国",
     region: "广州",
-    entry: "CN",
-    exit: "JP",
-    speedTestAddress: "101.202.55.44:10000",
-    startTime: "2023-09-17 15:00:00",
-    updateTime: "2023-09-17 15:00:00",
+    inbound_country_code: "CN",
+    outbound_country_code: "JP",
+    ping_addr: "101.202.55.44:10000",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    desc: "desc for boost zone",
+    nodes: ["1.1.1.1", "2.2.2.2"],
   },
   {
-    key: "3",
-    lineName: "香港日本一区",
-    isStart: true,
+    id: 3,
+    name: "香港日本一区",
+    enabled: true,
     country: "香港",
     region: "九龙",
-    entry: "HK",
-    exit: "JP",
-    speedTestAddress: "101.202.55.44:10000",
-    startTime: "2023-09-17 15:00:00",
-    updateTime: "2023-09-17 15:00:00",
+    inbound_country_code: "HK",
+    outbound_country_code: "JP",
+    ping_addr: "101.202.55.44:10000",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    desc: "desc for boost zone",
+    nodes: ["1.1.1.1", "2.2.2.2"],
   },
 ];
 const LineConfig = () => {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [currentLineConfig, setCurrentLineConfig] = useState({} as ILineConfig);
-  const columns: ColumnsType<ILineConfig> = [
+  const [currentLineConfig, setCurrentLineConfig] = useState({} as IBoostZone);
+  const columns: ColumnsType<IBoostZoneModel> = [
     {
       title: "线路名",
-      dataIndex: "lineName",
+      dataIndex: "name",
       key: "lineName",
     },
     {
       title: "是否启用",
-      dataIndex: "isStart",
+      dataIndex: "enabled",
       key: "isStart",
-      render: (isStart: boolean) => <SwitchTag check={isStart} />,
+      render: (enabled: boolean) => <SwitchTag check={enabled} />,
     },
     {
       title: "国家",
@@ -87,30 +84,36 @@ const LineConfig = () => {
     },
     {
       title: "入口",
-      dataIndex: "entry",
+      dataIndex: "inbound_country_code",
       key: "entry",
-      render: (entry: string) => entry && <Tag color="black">{entry}</Tag>,
+      render: (inbound_country_code: string) =>
+        inbound_country_code && <Tag color="black">{inbound_country_code}</Tag>,
     },
     {
       title: "出口",
-      dataIndex: "exit",
+      dataIndex: "outbound_country_code",
       key: "exit",
-      render: (exit: string) => exit && <Tag color="black">{exit}</Tag>,
+      render: (outbound_country_code: string) =>
+        outbound_country_code && (
+          <Tag color="black">{outbound_country_code}</Tag>
+        ),
     },
     {
       title: "测速地址",
-      dataIndex: "speedTestAddress",
+      dataIndex: "ping_addr",
       key: "speedTestAddress",
     },
     {
       title: "启动时间",
-      dataIndex: "startTime",
+      dataIndex: "created_at",
       key: "startTime",
+      render: (created_at) => convertTimestampToStr(created_at),
     },
     {
       title: "更新时间",
-      dataIndex: "updateTime",
+      dataIndex: "updated_at",
       key: "updateTime",
+      render: (updated_at) => convertTimestampToStr(updated_at),
     },
     {
       title: "操作",
@@ -120,7 +123,7 @@ const LineConfig = () => {
         <Button
           type="primary"
           className={styles.editBtn}
-          onClick={(e) => editLineConfigItemHandler(e, record.key)}
+          onClick={(e) => editLineConfigItemHandler(e, record.id)}
         >
           编辑
         </Button>
@@ -129,12 +132,11 @@ const LineConfig = () => {
   ];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editLineConfigItemHandler = (e: any, key: string) => {
+  const editLineConfigItemHandler = (e: any, key: number) => {
     console.log(e);
     console.log(key);
     setCurrentLineConfig(
-      mockDataSource.filter((item) => item.key === key)[0] ??
-        ({} as ILineConfig)
+      mockDataSource.filter((item) => item.id === key)[0] ?? ({} as IBoostZone)
     );
     setEditMode(true);
     setShowModal(true);
@@ -147,7 +149,7 @@ const LineConfig = () => {
   };
 
   const closeModal = () => {
-    setCurrentLineConfig({} as ILineConfig);
+    setCurrentLineConfig({} as IBoostZone);
     setShowModal(false);
   };
 

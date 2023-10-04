@@ -3,74 +3,67 @@ import styles from "./index.module.less";
 import Table, { ColumnsType } from "antd/es/table";
 import { useState } from "react";
 import ClientUpdateEditModal from "../../components/clientUpdateEditModal/ClientUpdateEditModal";
+import { IClientUpdate } from "../../types";
 
-export interface IClientUpdateConfig {
-  key: string;
-  version: string;
-  system: string;
-  downloadAddress: string;
-  md5: string;
-  size: string;
-  isForceUpdate: boolean;
-  title: string;
-  content: string;
-  releaseTime: string;
-}
-
-const mockDataSource: IClientUpdateConfig[] = [
+const mockDataSource: IClientUpdate[] = [
   {
-    key: "1",
-    version: "v1.0.1",
-    system: "Android",
-    downloadAddress: "/upd/android/beta",
+    id: 1,
+    ver: "v1.0.1",
+    os: 0,
+    url: "/upd/android/beta",
     md5: "9482307293859",
-    size: "543264853267",
-    isForceUpdate: true,
+    size: 5432648,
+    must_upd: true,
     title: "v0.1.1更新",
-    content: "修复了137个bug",
-    releaseTime: "2023-09-17 15:00:00",
+    change_log: "修复了137个bug",
+    release_date: new Date().getTime(),
   },
   {
-    key: "2",
-    version: "v1.0.1",
-    system: "Android",
-    downloadAddress: "/upd/android/beta",
+    id: 2,
+    ver: "v1.0.1",
+    os: 1,
+    url: "/upd/android/beta",
     md5: "9482307293859",
-    size: "543264853267",
-    isForceUpdate: true,
+    size: 5432648,
+    must_upd: true,
     title: "v1.0.1更新",
-    content: "杀死了一个程序员祭天",
-    releaseTime: "2023-09-17 15:00:00",
+    change_log: "杀死了一个程序员祭天",
+    release_date: new Date().getTime(),
   },
   {
-    key: "3",
-    version: "v1.0.1",
-    system: "Android",
-    downloadAddress: "/upd/android/beta",
+    id: 3,
+    ver: "v1.0.1",
+    os: 2,
+    url: "/upd/android/beta",
     md5: "9482307293859",
-    size: "543264853267",
-    isForceUpdate: false,
+    size: 5432648,
+    must_upd: false,
     title: "v1.0.1更新",
-    content: "裁了一个运营当炮灰",
-    releaseTime: "2023-09-17 15:00:00",
+    change_log: "裁了一个运营当炮灰",
+    release_date: new Date().getTime(),
   },
 ];
 
 const ClientUpdateConfig = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentClientUpdateConfig, setCurrentClientUpdateConfig] = useState(
-    {} as IClientUpdateConfig
+    {} as IClientUpdate
   );
-  const columns: ColumnsType<IClientUpdateConfig> = [
+  const columns: ColumnsType<IClientUpdate> = [
     {
       title: "版本号",
-      dataIndex: "version",
+      dataIndex: "ver",
       key: "version",
     },
     {
       title: "系统",
-      dataIndex: "system",
+      dataIndex: "os",
       key: "system",
+    },
+    {
+      title: "下载地址",
+      dataIndex: "url",
+      key: "url",
     },
     {
       title: "MD5",
@@ -84,9 +77,9 @@ const ClientUpdateConfig = () => {
     },
     {
       title: "是否强更",
-      dataIndex: "isForceUpdate",
+      dataIndex: "must_upd",
       key: "isForceUpdate",
-      render: (isForceUpdate: boolean) => (isForceUpdate ? "是" : "否"),
+      render: (must_upd: boolean) => (must_upd ? "是" : "否"),
     },
     {
       title: "标题",
@@ -95,8 +88,13 @@ const ClientUpdateConfig = () => {
     },
     {
       title: "内容",
-      dataIndex: "content",
+      dataIndex: "change_log",
       key: "content",
+    },
+    {
+      title: "上线时间",
+      dataIndex: "release_date",
+      key: "release_date",
     },
     {
       title: "操作",
@@ -105,7 +103,7 @@ const ClientUpdateConfig = () => {
         <Button
           type="primary"
           className={styles.editBtn}
-          onClick={(e) => editClientUpdateConfigHandler(e, record.key)}
+          onClick={(e) => editClientUpdateConfigHandler(e, record.id)}
         >
           编辑
         </Button>
@@ -114,11 +112,11 @@ const ClientUpdateConfig = () => {
   ];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editClientUpdateConfigHandler = (e: any, key: string) => {
+  const editClientUpdateConfigHandler = (e: any, key: number) => {
     console.log(e);
     console.log(key);
     setCurrentClientUpdateConfig(
-      mockDataSource.filter((item) => item.key === key)[0] ?? {}
+      mockDataSource.filter((item) => item.id === key)[0] ?? {}
     );
     setShowModal(true);
   };
@@ -130,7 +128,7 @@ const ClientUpdateConfig = () => {
 
   const closeModal = () => {
     setShowModal(false);
-    setCurrentClientUpdateConfig({} as IClientUpdateConfig);
+    setCurrentClientUpdateConfig({} as IClientUpdate);
   };
 
   return (

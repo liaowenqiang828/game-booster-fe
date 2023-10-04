@@ -4,86 +4,81 @@ import type { ColumnsType } from "antd/es/table";
 import SwitchTag from "../../components/switchTag/SwitchTag";
 import { useState } from "react";
 import NodeConfigEditModal from "../../components/nodeConfigEditModal/NodeConfigEditModal";
+import { IBoostNode } from "../../types";
+import { convertTimestampToStr } from "../../utils/dataTime";
+import { Mode } from "../../constant";
 
-export interface INodeConfig {
-  key: string;
-  nodeAddress: string;
-  nodeName: string;
-  isStart: boolean;
-  version: string;
-  accelerateMode: string[];
-  onLinePeopleNumber: number;
-  startTime: string;
-  updateTime: string;
-}
+export type IBoostNodeModel = Omit<
+  IBoostNode,
+  "bandwidth" | "cur_in_bandwidth" | "cur_out_bandwidth" | "created_at"
+>;
 
-const mockDataSource = [
+const mockDataSource: IBoostNodeModel[] = [
   {
-    key: "1",
-    nodeAddress: "101.202.55.44",
-    nodeName: "SH- JP001",
-    isStart: true,
-    version: "V1.0.1",
-    accelerateMode: ["高速", "下载"],
-    onLinePeopleNumber: 500,
-    startTime: "2023-09-17 15:00:00",
-    updateTime: "2023-09-17 15:00:00",
+    id: 1,
+    public_addr: "101.202.55.44",
+    name: "SH- JP001",
+    enabled: true,
+    ver: "V1.0.1",
+    modes: 3,
+    online_cnt: 500,
+    started_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
   },
   {
-    key: "2",
-    nodeAddress: "202.101.44.55",
-    nodeName: "SH- JP002",
-    isStart: false,
-    version: "V1.0.1",
-    accelerateMode: ["下载"],
-    onLinePeopleNumber: 499,
-    startTime: "2023-09-17 15:00:00",
-    updateTime: "2023-09-17 15:00:00",
+    id: 2,
+    public_addr: "202.101.44.55",
+    name: "SH- JP002",
+    enabled: false,
+    ver: "V1.0.1",
+    modes: 1,
+    online_cnt: 499,
+    started_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
   },
   {
-    key: "3",
-    nodeAddress: "192.168.131.1",
-    nodeName: "SH- JP003",
-    isStart: true,
-    version: "V1.0.1",
-    accelerateMode: ["高速"],
-    onLinePeopleNumber: 498,
-    startTime: "2023-09-17 15:00:00",
-    updateTime: "2023-09-17 15:00:00",
+    id: 3,
+    public_addr: "192.168.131.1",
+    name: "SH- JP003",
+    enabled: true,
+    ver: "V1.0.1",
+    modes: 2,
+    online_cnt: 498,
+    started_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
   },
 ];
 
 const NodeConfig = () => {
   const [openModal, setOpenModal] = useState(false);
-  const columns: ColumnsType<INodeConfig> = [
+  const columns: ColumnsType<IBoostNodeModel> = [
     {
       title: "节点地址",
-      dataIndex: "nodeAddress",
-      key: "nodeAddress",
+      dataIndex: "public_addr",
+      key: "public_addr",
     },
     {
       title: "节点名",
-      dataIndex: "nodeName",
-      key: "anodeNamege",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "是否启动",
-      dataIndex: "isStart",
-      key: "isStart",
-      render: (isStart: boolean) => <SwitchTag check={isStart} />,
+      dataIndex: "enabled",
+      key: "enabled",
+      render: (enabled: boolean) => <SwitchTag check={enabled} />,
     },
     {
       title: "程序版本",
-      dataIndex: "version",
-      key: "version",
+      dataIndex: "ver",
+      key: "ver",
     },
     {
       title: "加速模式",
-      dataIndex: "accelerateMode",
-      key: "accelerateMode",
-      render: (accelerateMode: string[]) =>
-        accelerateMode.length &&
-        accelerateMode.map((item) => (
+      dataIndex: "modes",
+      key: "modes",
+      render: (modes: number) =>
+        Mode[modes].map((item: string) => (
           <Tag key={item} color="black">
             {item}
           </Tag>
@@ -91,18 +86,20 @@ const NodeConfig = () => {
     },
     {
       title: "当前在线人数",
-      dataIndex: "onLinePeopleNumber",
-      key: "onLinePeopleNumber",
+      dataIndex: "online_cnt",
+      key: "online_cnt",
     },
     {
       title: "启动时间",
-      dataIndex: "startTime",
-      key: "startTime",
+      dataIndex: "started_at",
+      key: "started_at",
+      render: (started_at) => convertTimestampToStr(started_at),
     },
     {
       title: "更新时间",
-      dataIndex: "updateTime",
-      key: "updateTime",
+      dataIndex: "updated_at",
+      key: "updated_at",
+      render: (updated_at) => convertTimestampToStr(updated_at),
     },
     {
       title: "操作",
@@ -112,22 +109,25 @@ const NodeConfig = () => {
         <Button
           type="primary"
           className={styles.editBtn}
-          onClick={(e) => editNodeConfigItemHandler(e, record.key)}
+          onClick={(e) => editNodeConfigItemHandler(e, record.id)}
         >
           编辑
         </Button>
       ),
     },
   ];
-  const [currentNodeConfig, setCurrentNodeConfig] = useState({} as INodeConfig);
+  const [currentNodeConfig, setCurrentNodeConfig] = useState(
+    {} as IBoostNodeModel
+  );
 
   const closeModal = () => setOpenModal(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editNodeConfigItemHandler = (e: any, key: string) => {
+  const editNodeConfigItemHandler = (e: any, key: number) => {
     console.log(e);
     console.log(key);
     setCurrentNodeConfig(
-      mockDataSource.filter((item) => item.key === key)[0] ?? {}
+      mockDataSource.filter((item) => item.id === key)[0] ??
+        ({} as IBoostNodeModel)
     );
     setOpenModal(true);
   };

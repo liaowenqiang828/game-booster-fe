@@ -1,18 +1,20 @@
 import { Button, Form, Input, Modal, Select, Switch, Tag } from "antd";
-import { INodeConfig } from "../../pages/nodeConfig/NodeConfig";
+import { IBoostNodeModel } from "../../pages/nodeConfig/NodeConfig";
 import type { SelectProps } from "antd";
 import type { CustomTagProps } from "rc-select/lib/BaseSelect";
 import styles from "./index.module.less";
 import { useContext, useState } from "react";
 import { LoadingContext } from "../../router/Router";
+import { Mode } from "../../constant";
+import { convertTimestampToStr } from "../../utils/dataTime";
 
 interface IProps {
-  nodeConfig: INodeConfig;
+  nodeConfig: IBoostNodeModel;
   closeModal: () => void;
 }
 const NodeConfigEditModal = (props: IProps) => {
   const { nodeConfig, closeModal } = props;
-  const [isStart, setIsStart] = useState(nodeConfig.isStart);
+  const [isStart, setIsStart] = useState(nodeConfig.enabled);
   const { showLoading, hideLoading } = useContext(LoadingContext);
   const options: SelectProps["options"] = [
     {
@@ -82,7 +84,7 @@ const NodeConfigEditModal = (props: IProps) => {
             label="节点地址"
             name="nodeAddress"
             className={styles.formItem}
-            initialValue={nodeConfig.nodeAddress}
+            initialValue={nodeConfig.public_addr}
           >
             <Input disabled />
           </Form.Item>
@@ -90,7 +92,7 @@ const NodeConfigEditModal = (props: IProps) => {
           <Form.Item
             label="节点名"
             name="nodeNameValue"
-            initialValue={nodeConfig.nodeName}
+            initialValue={nodeConfig.name}
           >
             <Input />
           </Form.Item>
@@ -102,20 +104,19 @@ const NodeConfigEditModal = (props: IProps) => {
           <Form.Item
             label="程序版本"
             name="version"
-            initialValue={nodeConfig.version}
+            initialValue={nodeConfig.ver}
           >
             <Input disabled />
           </Form.Item>
           <Form.Item
             label="加速模式"
             name="accelerateMode"
-            initialValue={nodeConfig.accelerateMode || []}
+            initialValue={Mode[nodeConfig.modes]}
           >
             <Select
               mode="multiple"
               style={{ width: "100%" }}
               placeholder="选择加速模式"
-              // defaultValue={nodeConfig.accelerateMode || []}
               onChange={handleAccelerateModeChange}
               options={options}
               tagRender={tagRender}
@@ -124,21 +125,21 @@ const NodeConfigEditModal = (props: IProps) => {
           <Form.Item
             label="当前在线人数"
             name="onLinePeopleNumber"
-            initialValue={nodeConfig.onLinePeopleNumber}
+            initialValue={nodeConfig.online_cnt}
           >
             <Input disabled />
           </Form.Item>
           <Form.Item
             label="创建时间"
             name="startTime"
-            initialValue={nodeConfig.startTime}
+            initialValue={convertTimestampToStr(nodeConfig.started_at)}
           >
             <Input disabled />
           </Form.Item>
           <Form.Item
             label="更新时间"
             name="updateTime"
-            initialValue={nodeConfig.updateTime}
+            initialValue={convertTimestampToStr(nodeConfig.updated_at)}
           >
             <Input disabled />
           </Form.Item>

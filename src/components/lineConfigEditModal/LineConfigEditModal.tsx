@@ -3,7 +3,10 @@ import styles from "./index.module.less";
 import { ILineConfig } from "../../pages/lineConfig/LineConfig";
 import { useContext } from "react";
 import { LoadingContext } from "../../router/Router";
-import { generateDateTimeForCurrentOperation } from "../../utils/dataTime";
+import {
+  convertTimestampToStr,
+  generateDateTimeForCurrentOperation,
+} from "../../utils/dataTime";
 
 interface IProps {
   lineConfig: ILineConfig;
@@ -74,7 +77,7 @@ const LineConfigEditModal = (props: IProps) => {
           <Form.Item
             label="线路名"
             name="lineName"
-            initialValue={lineConfig.lineName}
+            initialValue={lineConfig.name}
           >
             <Input />
           </Form.Item>
@@ -82,9 +85,9 @@ const LineConfigEditModal = (props: IProps) => {
           <Form.Item
             label="是否启用"
             name="isStart"
-            initialValue={lineConfig.isStart}
+            initialValue={lineConfig.enabled}
           >
-            <Switch defaultChecked={lineConfig.isStart} />
+            <Switch defaultChecked={lineConfig.enabled} />
           </Form.Item>
           <Form.Item
             label="国家"
@@ -100,20 +103,32 @@ const LineConfigEditModal = (props: IProps) => {
           >
             <Select options={regionOptions} />
           </Form.Item>
-          <Form.Item label="入口" name="entry" initialValue={lineConfig.entry}>
+          <Form.Item
+            label="入口"
+            name="entry"
+            initialValue={lineConfig.inbound_country_code}
+          >
             <Select options={entryOptions} />
           </Form.Item>
-          <Form.Item label="出口" name="exit" initialValue={lineConfig.exit}>
+          <Form.Item
+            label="出口"
+            name="exit"
+            initialValue={lineConfig.outbound_country_code}
+          >
             <Select options={exitOptions} />
           </Form.Item>
           <Form.Item
             label="测速地址"
             name="speedTestAddress"
-            initialValue={lineConfig.speedTestAddress}
+            initialValue={lineConfig.ping_addr}
           >
             <Input />
           </Form.Item>
-          <Form.Item label="节点地址" name="nodeAddress" initialValue={[]}>
+          <Form.Item
+            label="节点地址"
+            name="nodeAddress"
+            initialValue={lineConfig.nodes}
+          >
             <Select
               options={nodeAddressOptions}
               mode="multiple"
@@ -125,7 +140,7 @@ const LineConfigEditModal = (props: IProps) => {
             name="startTime"
             initialValue={
               editMode
-                ? lineConfig.startTime
+                ? convertTimestampToStr(lineConfig.created_at)
                 : generateDateTimeForCurrentOperation()
             }
           >
@@ -136,7 +151,7 @@ const LineConfigEditModal = (props: IProps) => {
             name="updateTime"
             initialValue={
               editMode
-                ? lineConfig.updateTime
+                ? convertTimestampToStr(lineConfig.updated_at)
                 : generateDateTimeForCurrentOperation()
             }
           >

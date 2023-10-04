@@ -3,54 +3,54 @@ import styles from "./index.module.less";
 import Table, { ColumnsType } from "antd/es/table";
 import DnsEditModal from "../../components/dnsEditModal/DnsEditModal";
 import { useState } from "react";
+import { IDnsGroup } from "../../types";
+import { convertTimestampToStr } from "../../utils/dataTime";
 
-export interface IDnsConfig {
-  key: string;
-  dnsName: string;
-  createTime: string;
-  updateTime: string;
-}
-
-const mockDataSource: IDnsConfig[] = [
+const mockDataSource: IDnsGroup[] = [
   {
-    key: "1",
-    dnsName: "114",
-    createTime: "2023-09-16 16:00:00",
-    updateTime: "2023-09-17 15:00:00",
+    id: 1,
+    name: "114",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    dns: ["1.1.1.1", "9.9.9.9"],
   },
   {
-    key: "2",
-    dnsName: "google",
-    createTime: "2023-09-16 16:00:00",
-    updateTime: "2023-09-17 15:00:00",
+    id: 2,
+    name: "google",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    dns: ["1.1.1.1", "9.9.9.9"],
   },
   {
-    key: "3",
-    dnsName: "baidu",
-    createTime: "2023-09-16 16:00:00",
-    updateTime: "2023-09-17 15:00:00",
+    id: 3,
+    name: "baidu",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    dns: ["1.1.1.1", "9.9.9.9"],
   },
 ];
 
 const DnsConfig = () => {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [currentDnsConfig, setCurrentNodeConfig] = useState({} as IDnsConfig);
-  const columns: ColumnsType<IDnsConfig> = [
+  const [currentDnsConfig, setCurrentNodeConfig] = useState({} as IDnsGroup);
+  const columns: ColumnsType<Omit<IDnsGroup, "dns">> = [
     {
       title: "DNS名称",
-      dataIndex: "dnsName",
+      dataIndex: "name",
       key: "dnsName",
     },
     {
       title: "创建时间",
-      dataIndex: "createTime",
+      dataIndex: "created_at",
       key: "createTime",
+      render: (created_at) => convertTimestampToStr(created_at),
     },
     {
       title: "更新时间",
-      dataIndex: "updateTime",
+      dataIndex: "updated_at",
       key: "updateTime",
+      render: (updated_at) => convertTimestampToStr(updated_at),
     },
     {
       title: "操作",
@@ -59,7 +59,7 @@ const DnsConfig = () => {
         <Button
           type="primary"
           className={styles.editBtn}
-          onClick={(e) => editDnsConfigItemHandler(e, record.key)}
+          onClick={(e) => editDnsConfigItemHandler(e, record.id)}
         >
           编辑
         </Button>
@@ -68,13 +68,13 @@ const DnsConfig = () => {
   ];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editDnsConfigItemHandler = (e: any, key: string) => {
+  const editDnsConfigItemHandler = (e: any, key: number) => {
     console.log(e);
     console.log(key);
     setEditMode(true);
     setShowModal(true);
     setCurrentNodeConfig(
-      mockDataSource.filter((item) => item.key === key)[0] ?? {}
+      mockDataSource.filter((item) => item.id === key)[0] ?? {}
     );
   };
 
@@ -85,7 +85,7 @@ const DnsConfig = () => {
 
   const closeModal = () => {
     setShowModal(false);
-    setCurrentNodeConfig({} as IDnsConfig);
+    setCurrentNodeConfig({} as IDnsGroup);
   };
 
   return (

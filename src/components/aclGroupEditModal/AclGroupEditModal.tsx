@@ -1,24 +1,21 @@
 import { Button, Form, Input, Modal } from "antd";
 import styles from "./index.module.less";
-import { IAclGroup } from "../../pages/aclGroupConfig/AclGroupConfig";
 import { useContext, useState } from "react";
 
 import { LoadingContext } from "../../router/Router";
+import { IAclGroup } from "../../types";
 
 interface IProps {
   aclGroup: IAclGroup;
   closeModal: () => void;
-  aclConfig: string;
 }
 const AclGroupEditModal = (props: IProps) => {
-  const { closeModal, aclGroup, aclConfig } = props;
+  const { closeModal, aclGroup } = props;
   const { showLoading, hideLoading } = useContext(LoadingContext);
-  const [currentAclConfig, setCurrentAclConfig] = useState(aclConfig);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
     const submitObj = {
       ...fieldsValue,
-      aclConfig: currentAclConfig,
     };
     console.log(submitObj);
     showLoading();
@@ -28,10 +25,6 @@ const AclGroupEditModal = (props: IProps) => {
     }, 2000);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onAclConfigChange = (e: any) => {
-    setCurrentAclConfig(e.target.value);
-  };
   return (
     <Modal
       centered
@@ -53,23 +46,20 @@ const AclGroupEditModal = (props: IProps) => {
           <Form.Item
             label="ACL组名"
             name="aclGroupName"
-            initialValue={aclGroup.aclGroupName}
+            initialValue={aclGroup.name}
           >
             <Input style={{ width: "50%" }} />
           </Form.Item>
 
-          <Form.Item
-            label="备注"
-            name="comment"
-            initialValue={aclGroup.comment}
-          >
+          <Form.Item label="备注" name="comment" initialValue={aclGroup.desc}>
             <Input style={{ width: "50%" }} />
           </Form.Item>
-          <Form.Item label="ACL配置" name="aclConfig">
-            <Input.TextArea
-              autoSize={{ minRows: 15 }}
-              onChange={onAclConfigChange}
-            />
+          <Form.Item
+            label="ACL配置"
+            name="aclConfig"
+            initialValue={aclGroup.content}
+          >
+            <Input.TextArea autoSize={{ minRows: 15 }} />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">
