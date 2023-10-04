@@ -2,11 +2,13 @@ import { Button, Input, Table, Tag } from "antd";
 import styles from "./index.module.less";
 import type { ColumnsType } from "antd/es/table";
 import SwitchTag from "../../components/switchTag/SwitchTag";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NodeConfigEditModal from "../../components/nodeConfigEditModal/NodeConfigEditModal";
 import { IBoostNode } from "../../types";
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { Mode } from "../../constant";
+import { IListBoostNodesResponse } from "../../types/response";
+import { getBoostNodesList, searchBoostNodes } from "../../api/boostNode";
 
 export type IBoostNodeModel = Omit<
   IBoostNode,
@@ -51,6 +53,7 @@ const mockDataSource: IBoostNodeModel[] = [
 
 const NodeConfig = () => {
   const [openModal, setOpenModal] = useState(false);
+  const [boostNodes, setBoostNodes] = useState([] as IBoostNode[]);
   const columns: ColumnsType<IBoostNodeModel> = [
     {
       title: "节点地址",
@@ -120,6 +123,17 @@ const NodeConfig = () => {
     {} as IBoostNodeModel
   );
 
+  useEffect(() => {
+    const getBoostNodesListAsync = async () => {
+      const res: IListBoostNodesResponse = await getBoostNodesList({
+        start_id: 0,
+        cnt: 20,
+      });
+      setBoostNodes(res.nodes);
+    };
+    getBoostNodesListAsync();
+  }, []);
+
   const closeModal = () => setOpenModal(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editNodeConfigItemHandler = (e: any, key: number) => {
@@ -131,6 +145,14 @@ const NodeConfig = () => {
     );
     setOpenModal(true);
   };
+
+  const onSearchBoostNodes = async (value: string) => {
+    // type 0 匹配节点地址，1 匹配节点名称
+    const res = await searchBoostNodes({ type: 0, val: value });
+    // search error handler
+    setBoostNodes(res.nodes);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -138,6 +160,7 @@ const NodeConfig = () => {
         <Input.Search
           placeholder="在此搜索节点地址"
           className={styles.search}
+          onSearch={onSearchBoostNodes}
         />
       </div>
       <Table

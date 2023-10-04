@@ -1,43 +1,39 @@
 import { Button } from "antd";
 import styles from "./index.module.less";
 import { useState } from "react";
+import { PLATFORMENUM } from "../../types";
 
 interface IProps {
-  platform: string;
-  onSelect: (value: string) => void;
+  platform: number;
+  onSelect: (value: number) => void;
 }
-
-const PLATFORM = {
-  ANDROID: "Android",
-  IOS: "iOS",
-};
 
 const PlatformSelector = (props: IProps) => {
   const { platform, onSelect } = props;
   const [currentPlatform, setCurrentPlatform] = useState(platform);
 
   const selectAndroid = () => {
-    setCurrentPlatform(PLATFORM.ANDROID);
-    onSelect(PLATFORM.ANDROID);
+    setCurrentPlatform(PLATFORMENUM.Android);
+    onSelect(PLATFORMENUM.Android);
   };
 
   const selectIos = () => {
-    setCurrentPlatform(PLATFORM.IOS);
-    onSelect(PLATFORM.IOS);
+    setCurrentPlatform(PLATFORMENUM.iOS);
+    onSelect(PLATFORMENUM.iOS);
   };
   return (
     <div className={styles.container}>
       <Button
-        type={currentPlatform === PLATFORM.ANDROID ? "primary" : "text"}
+        type={currentPlatform === PLATFORMENUM.Android ? "primary" : "text"}
         onClick={selectAndroid}
       >
-        {PLATFORM.ANDROID}
+        {PLATFORMENUM[PLATFORMENUM.Android]}
       </Button>
       <Button
-        type={currentPlatform === PLATFORM.IOS ? "primary" : "text"}
+        type={currentPlatform === PLATFORMENUM.iOS ? "primary" : "text"}
         onClick={selectIos}
       >
-        {PLATFORM.IOS}
+        {PLATFORMENUM[PLATFORMENUM.iOS]}
       </Button>
     </div>
   );

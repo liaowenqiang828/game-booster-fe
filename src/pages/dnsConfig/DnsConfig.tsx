@@ -2,9 +2,11 @@ import { Button, Input } from "antd";
 import styles from "./index.module.less";
 import Table, { ColumnsType } from "antd/es/table";
 import DnsEditModal from "../../components/dnsEditModal/DnsEditModal";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { IDnsGroup } from "../../types";
 import { convertTimestampToStr } from "../../utils/dataTime";
+import { LoadingContext } from "../../router/Router";
+import { getDnsList } from "../../api/dns";
 
 const mockDataSource: IDnsGroup[] = [
   {
@@ -34,6 +36,17 @@ const DnsConfig = () => {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentDnsConfig, setCurrentNodeConfig] = useState({} as IDnsGroup);
+  const { showLoading, hideLoading } = useContext(LoadingContext);
+  const [dnsGroup, setDnsGroup] = useState([] as IDnsGroup[]);
+  useEffect(() => {
+    const getDnsListAsync = async () => {
+      showLoading();
+      const res = await getDnsList().finally(() => hideLoading());
+      setDnsGroup(res.groups);
+    };
+
+    getDnsListAsync();
+  }, []);
   const columns: ColumnsType<Omit<IDnsGroup, "dns">> = [
     {
       title: "DNS名称",

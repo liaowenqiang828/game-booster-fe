@@ -7,6 +7,8 @@ import {
   convertTimestampToStr,
   generateDateTimeForCurrentOperation,
 } from "../../utils/dataTime";
+import { addBoostZone, editBoostZone } from "../../api/boostZones";
+import { IEditBoostZoneRequest } from "../../types/request";
 
 interface IProps {
   lineConfig: ILineConfig;
@@ -46,13 +48,35 @@ const LineConfigEditModal = (props: IProps) => {
   const { lineConfig, closeModal, editMode } = props;
   const { hideLoading, showLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = (fieldsValue: any) => {
+  const onSubmit = async (fieldsValue: any) => {
     console.log(fieldsValue);
+    if (editMode) {
+      await editBoostZoneHandler(fieldsValue);
+      return;
+    }
+
+    await addBoostZoneHandler(fieldsValue);
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const editBoostZoneHandler = async (fieldsValue: any) => {
     showLoading();
-    setTimeout(() => {
-      hideLoading();
-      closeModal();
-    }, 2000);
+    delete fieldsValue.id;
+    await editBoostZone(fieldsValue)
+      .then(() => {
+        closeModal();
+      })
+      .finally(() => hideLoading());
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const addBoostZoneHandler = async (fieldsValue: any) => {
+    showLoading();
+    await addBoostZone(fieldsValue)
+      .then(() => {
+        closeModal();
+      })
+      .finally(() => hideLoading());
   };
 
   return (

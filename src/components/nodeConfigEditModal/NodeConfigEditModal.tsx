@@ -7,6 +7,7 @@ import { useContext, useState } from "react";
 import { LoadingContext } from "../../router/Router";
 import { Mode } from "../../constant";
 import { convertTimestampToStr } from "../../utils/dataTime";
+import { editBoostNode } from "../../api/boostNode";
 
 interface IProps {
   nodeConfig: IBoostNodeModel;
@@ -54,12 +55,15 @@ const NodeConfigEditModal = (props: IProps) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
     console.log({ ...fieldsValue, isStart });
-    // todo update api call
     showLoading();
-    setTimeout(() => {
-      hideLoading();
-      closeModal();
-    }, 2000);
+    editBoostNode({ ...fieldsValue, enabled: isStart })
+      .then(() => {
+        closeModal();
+        // reload nodes
+      })
+      .finally(() => {
+        hideLoading();
+      });
   };
   return (
     <Modal

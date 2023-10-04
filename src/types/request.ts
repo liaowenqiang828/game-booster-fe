@@ -1,3 +1,5 @@
+import { PLATFORMENUM } from ".";
+
 export interface ILoginRequest {
   name: string;
   password: string;
@@ -30,7 +32,25 @@ export interface IListBoostZonesRequest {
   cnt: number;
 }
 
+export interface ISearchBoostZonesRequest {
+  id: number; // 不为0时，按ID搜索，ID为0时，按名称搜索
+  name: string;
+}
+
 export interface IAddBoostZoneRequest {
+  name: string;
+  enabled: boolean;
+  ping_addr: string;
+  country: string;
+  region: string;
+  inbound_country_code: string;
+  putbound_country_code: string;
+  nodes: string[];
+  desc: string;
+}
+
+export interface IEditBoostZoneRequest {
+  id: number;
   name: string;
   enabled: boolean;
   ping_addr: string;
@@ -53,7 +73,7 @@ export interface IEditDnsGroupRequest {
 }
 
 export interface IEditGlobalAclRequest {
-  os: number;
+  os: PLATFORMENUM;
   acl: string;
 }
 

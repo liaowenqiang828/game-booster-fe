@@ -1,23 +1,47 @@
 import { Button, Form, Input, Modal, Switch } from "antd";
 import styles from "./index.module.less";
-import { IServerInfo } from "../viewPackageAndServerModal/ViewPackageAndServerModal";
 import { useContext } from "react";
 import { LoadingContext } from "../../router/Router";
+import { IGameRegion } from "../../types";
+import {
+  IAddGameRegionRequest,
+  IEditGameRegionRequest,
+} from "../../types/request";
+import { addGameRegion, editGameRegion } from "../../api/game";
+import { convertTimestampToStr } from "../../utils/dataTime";
 
 interface IProps {
-  regionServer: IServerInfo;
+  regionServer: IGameRegion;
   gameName: string;
   closeModal: () => void;
+  editMode: boolean;
 }
 const GameConfigRegionServerEditModal = (props: IProps) => {
-  const { closeModal, regionServer, gameName } = props;
+  const { closeModal, regionServer, gameName, editMode } = props;
   const { showLoading, hideLoading } = useContext(LoadingContext);
-  const onSubmit = () => {
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onSubmit = (fieldsValue: any) => {
+    if (editMode) {
+      editGameRegionHandler(fieldsValue);
+      return;
+    }
+
+    addGameRegionHandler(fieldsValue);
+  };
+
+  const addGameRegionHandler = (request: IAddGameRegionRequest) => {
     showLoading();
-    setTimeout(() => {
-      hideLoading();
-      closeModal();
-    }, 2000);
+    addGameRegion(request)
+      .then(() => closeModal())
+      .finally(() => hideLoading());
+  };
+
+  const editGameRegionHandler = (request: IEditGameRegionRequest) => {
+    showLoading();
+    editGameRegion(request)
+      .then(() => closeModal())
+      .finally(() => hideLoading());
   };
   return (
     <Modal
@@ -42,25 +66,57 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
             <Input disabled defaultValue={gameName} />
           </Form.Item>
 
-          <Form.Item label="区服名" name="regionServerName">
-            <Input defaultValue={regionServer.regionServerName} />
+          <Form.Item
+            label="区服名"
+            name="regionServerName"
+            initialValue={regionServer.name}
+          >
+            <Input />
           </Form.Item>
-          <Form.Item label="是否启用" name="isStart">
-            <Switch checked={regionServer.isStart} />
+          <Form.Item
+            label="是否启用"
+            name="isStart"
+            initialValue={regionServer.enabled}
+          >
+            <Switch defaultChecked={regionServer.enabled} />
           </Form.Item>
-          <Form.Item label="DNS" name="dns">
-            <Input defaultValue="" />
+          <Form.Item
+            label="DNS"
+            name="dns"
+            initialValue={regionServer.dns_group}
+          >
+            <Input />
           </Form.Item>
-          <Form.Item label="加速网络" name="accelerateLine">
-            <Input defaultValue={regionServer.accelerateLine} />
+          <Form.Item
+            label="加速网络"
+            name="accelerateLine"
+            initialValue={regionServer.boost_zones}
+          >
+            <Input />
           </Form.Item>
           <Form.Item label="签名" name="signature">
-            <Input defaultValue="" />
+            <Input />
           </Form.Item>
-          <Form.Item label="启动时间" name="startTime">
-            <Input disabled defaultValue="" />
+          <Form.Item
+            label="启动时间"
+            name="startTime"
+            initialValue={
+              editMode
+                ? convertTimestampToStr(regionServer.created_at)
+                : convertTimestampToStr(new Date().getTime())
+            }
+          >
+            <Input />
           </Form.Item>
-          <Form.Item label="更新时间" name="updateTime">
+          <Form.Item
+            label="更新时间"
+            name="updateTime"
+            initialValue={
+              editMode
+                ? convertTimestampToStr(regionServer.updated_at)
+                : convertTimestampToStr(new Date().getTime())
+            }
+          >
             <Input disabled defaultValue="" />
           </Form.Item>
           <Form.Item label="">

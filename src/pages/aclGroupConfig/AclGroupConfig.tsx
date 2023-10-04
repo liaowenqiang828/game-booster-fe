@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button, Input, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import styles from "./index.module.less";
 import AclGroupEditModal from "../../components/aclGroupEditModal/AclGroupEditModal";
 import { IAclGroup } from "../../types";
 import { convertTimestampToStr } from "../../utils/dataTime";
+import { getAclGroupList } from "../../api/groupAcl";
+import { LoadingContext } from "../../router/Router";
 
 const mockAclGroupData: IAclGroup[] = [
   {
@@ -34,8 +36,10 @@ const mockAclGroupData: IAclGroup[] = [
 ];
 const AclGroupConfig = () => {
   const [showAclGroupEditModal, setShowAclGroupEditModal] = useState(false);
-
+  const [aclGroups, setAclGroups] = useState([] as IAclGroup[]);
   const [currentAclGroup, setCurrentAclGroup] = useState({} as IAclGroup);
+  const { showLoading, hideLoading } = useContext(LoadingContext);
+  const [editMode, setEditMode] = useState(false);
   const columns: ColumnsType<Omit<IAclGroup, "content">> = [
     {
       title: "ACL组名",
@@ -75,7 +79,18 @@ const AclGroupConfig = () => {
     },
   ];
 
+  useEffect(() => {
+    const getAclGroupsAsync = async () => {
+      showLoading();
+      const res = await getAclGroupList().finally(() => hideLoading());
+      setAclGroups(res.groups);
+    };
+
+    getAclGroupsAsync();
+  }, []);
+
   const addNewAclGroup = () => {
+    setEditMode(false);
     setShowAclGroupEditModal(true);
   };
 
@@ -87,10 +102,15 @@ const AclGroupConfig = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editAclGroup = (e: any, key: number) => {
     console.log(e, key);
+    setEditMode(true);
     setCurrentAclGroup(
       mockAclGroupData.filter((Item) => Item.id === key)[0] ?? ({} as IAclGroup)
     );
     setShowAclGroupEditModal(true);
+  };
+
+  const onSearch = (value: string) => {
+    console.log(value);
   };
 
   return (
@@ -104,6 +124,7 @@ const AclGroupConfig = () => {
             <Input.Search
               placeholder="在此搜索ACL组名"
               style={{ width: "200px" }}
+              onSearch={onSearch}
             />
             <Button type="primary" onClick={addNewAclGroup}>
               新增ACL组
@@ -114,7 +135,11 @@ const AclGroupConfig = () => {
       <Table dataSource={mockAclGroupData} columns={columns} />
 
       {showAclGroupEditModal && (
-        <AclGroupEditModal closeModal={closeModal} aclGroup={currentAclGroup} />
+        <AclGroupEditModal
+          editMode={editMode}
+          closeModal={closeModal}
+          aclGroup={currentAclGroup}
+        />
       )}
     </div>
   );

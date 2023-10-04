@@ -1,29 +1,45 @@
-import { Button, Form, Input, Modal, Switch } from "antd";
+import { Button, Form, Input, Modal, Select, Switch } from "antd";
 import styles from "./index.module.less";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { LoadingContext } from "../../router/Router";
+import { IGameBoostConfig, PLATFORMENUM } from "../../types";
+import { editGameBoostConfig, getGameBoostConfigList } from "../../api/game";
+import PlatformSelector from "../platformSelect/PlatformSelector";
 
-export interface IGameAccelerateConfig {
-  gameName: string;
-  acceratePackageName: string;
-  system: string;
-  applyAclGroup: string[];
-  content: string;
-}
 interface IProps {
-  gameAccerateConfig: IGameAccelerateConfig;
+  gameId: number;
+  gameName: string;
   closeModal: () => void;
 }
 const GameAccelerateConfigEditModal = (props: IProps) => {
-  const { closeModal, gameAccerateConfig } = props;
+  const { closeModal, gameId, gameName } = props;
+  const [gameBoostConfig, setGameBoostConfig] = useState(
+    {} as IGameBoostConfig
+  );
   const { showLoading, hideLoading } = useContext(LoadingContext);
-  const onSubmit = () => {
+  const [os, setOs] = useState(PLATFORMENUM.Android);
+
+  useEffect(() => {
     showLoading();
-    setTimeout(() => {
-      hideLoading();
-      closeModal();
-    }, 2000);
+    getGameBoostConfigList({ game_id: gameId })
+      .then((res) => {
+        setGameBoostConfig(res.cfg);
+      })
+      .finally(() => hideLoading());
+  }, []);
+
+  const onPlatformChange = (osValue: number) => {
+    setOs(osValue);
   };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onSubmit = (fieldsValue: any) => {
+    showLoading();
+    editGameBoostConfig(fieldsValue)
+      .then(() => closeModal())
+      .finally(() => hideLoading());
+  };
+
   return (
     <Modal
       centered
@@ -43,21 +59,46 @@ const GameAccelerateConfigEditModal = (props: IProps) => {
           style={{ maxWidth: 300 }}
           onFinish={onSubmit}
         >
-          <Form.Item label="游戏名" name="gameName" className={styles.formItem}>
-            <Input defaultValue={gameAccerateConfig.gameName} />
-          </Form.Item>
-
-          <Form.Item label="加速包名" name="acceratePackageName">
+          <Form.Item
+            label="游戏名"
+            name="gameName"
+            className={styles.formItem}
+            initialValue={gameName}
+          >
             <Input />
           </Form.Item>
+
+          <Form.Item
+            label="加速包名"
+            name="acceratePackageName"
+            initialValue={gameBoostConfig.boost_pkgs}
+          >
+            <Input.TextArea autoSize={{ minRows: 5 }} />
+          </Form.Item>
           <Form.Item label="" name="system">
-            <Switch />
+            <PlatformSelector platform={os} onSelect={onPlatformChange} />
           </Form.Item>
           <Form.Item label="调用ACL组(可多选)" name="applyAclGroup">
-            <Input defaultValue={gameAccerateConfig.applyAclGroup} />
+            <Select
+              // todo options from ?
+              // options={}
+              defaultValue={
+                os === PLATFORMENUM.Android
+                  ? gameBoostConfig.android_acl_groups
+                  : gameBoostConfig.ios_acl_groups
+              }
+            />
           </Form.Item>
-          <Form.Item label="内容" name="content">
-            <Input defaultValue={gameAccerateConfig.content} />
+          <Form.Item
+            label="内容"
+            name="content"
+            initialValue={
+              os === PLATFORMENUM.Android
+                ? gameBoostConfig.android_acl
+                : gameBoostConfig.ios_acl_content
+            }
+          >
+            <Input.TextArea autoSize={{ minRows: 10 }} />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

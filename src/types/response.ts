@@ -7,6 +7,7 @@ import {
   IGame,
   IGameBoostConfig,
   IGamePkg,
+  IGameRegion,
 } from ".";
 
 export interface ILoginResponse {
@@ -58,6 +59,10 @@ export interface ISearchGamesResponse {
 
 export interface IListGamePkgsResponse {
   pkgs: IGamePkg[];
+}
+
+export interface IListGameRegionResponse {
+  regions: IGameRegion[];
 }
 
 export interface IListGameBoostConfigResponse {

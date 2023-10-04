@@ -7,6 +7,7 @@ import {
   generateDateTimeForCurrentOperation,
 } from "../../utils/dataTime";
 import { IDnsGroup } from "../../types";
+import { addDnsGroup, editDnsGroup } from "../../api/dns";
 
 interface IProps {
   dnsConfig: IDnsGroup;
@@ -18,12 +19,31 @@ const DnsEditModal = (props: IProps) => {
   const { showLoading, hideLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
-    console.log(fieldsValue);
+    if (editMode) {
+      editDnsGroupHandler(fieldsValue);
+      return;
+    }
+    addDnsGroupHandler(fieldsValue);
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const addDnsGroupHandler = async (fieldsValue: any) => {
     showLoading();
-    setTimeout(() => {
-      hideLoading();
-      closeModal();
-    }, 2000);
+    await addDnsGroup({ name: fieldsValue.name, dns: fieldsValue.dns })
+      .then(() => closeModal)
+      .finally(() => hideLoading());
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const editDnsGroupHandler = async (fieldsValue: any) => {
+    showLoading();
+    await editDnsGroup({
+      id: fieldsValue.id,
+      name: fieldsValue.name,
+      dns: fieldsValue.dns,
+    })
+      .then(() => closeModal())
+      .finally(() => hideLoading());
   };
 
   return (

@@ -3,22 +3,25 @@ import styles from "./index.module.less";
 import PlatformSelector from "../../components/platformSelect/PlatformSelector";
 import { useContext, useState } from "react";
 import { LoadingContext } from "../../router/Router";
+import { editGloablAcl } from "../../api/globalAcl";
+import { PLATFORMENUM } from "../../types";
 
 const GlobalAclConfig = () => {
-  const [selectPlatform, setSelectPlatform] = useState("Android");
+  const [selectPlatform, setSelectPlatform] = useState(PLATFORMENUM.Android);
   const { showLoading, hideLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = (fieldsValue: any) => {
+  const onSubmit = async (fieldsValue: any) => {
     const submitObj = { ...fieldsValue, platform: selectPlatform };
     console.log(submitObj);
     showLoading();
-    setTimeout(() => {
-      hideLoading();
-    }, 2000);
+    await editGloablAcl({
+      os: selectPlatform,
+      acl: fieldsValue.content,
+    }).finally(() => hideLoading());
   };
 
-  const onPlatformSelect = (platform: string) => {
-    setSelectPlatform(platform);
+  const onPlatformSelect = (os: number) => {
+    setSelectPlatform(os);
   };
   return (
     <div className={styles.container}>
@@ -32,7 +35,10 @@ const GlobalAclConfig = () => {
       <div className={styles.formWrapper}>
         <Form onFinish={onSubmit}>
           <Form.Item name="platform">
-            <PlatformSelector platform="Android" onSelect={onPlatformSelect} />
+            <PlatformSelector
+              platform={PLATFORMENUM.Android}
+              onSelect={onPlatformSelect}
+            />
           </Form.Item>
           <Form.Item name="content">
             <Input.TextArea autoSize={{ minRows: 15 }} />

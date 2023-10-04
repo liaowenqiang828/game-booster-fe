@@ -1,23 +1,43 @@
 import { Button, Form, Input, Modal } from "antd";
 import styles from "./index.module.less";
-import { IGameConfig } from "../../pages/gameConfig/GameConfig";
 import { useContext } from "react";
 import { LoadingContext } from "../../router/Router";
+import { IGame } from "../../types";
+import { addGame, editGame } from "../../api/game";
 
 interface IProps {
-  gameConfig: IGameConfig;
+  gameConfig: IGame;
   closeModal: () => void;
+  editMode: boolean;
 }
 const GameConfigBasicInfoModal = (props: IProps) => {
-  const { gameConfig, closeModal } = props;
+  const { gameConfig, closeModal, editMode } = props;
   const { showLoading, hideLoading } = useContext(LoadingContext);
-  const onSubmit = () => {
-    showLoading();
-    setTimeout(() => {
-      hideLoading();
-      closeModal();
-    }, 2000);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onSubmit = (fieldsValue: any) => {
+    if (editMode) {
+      editGameHandler(fieldsValue);
+      return;
+    }
+    addGameHandler(fieldsValue);
   };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const addGameHandler = (fieldsValue: any) => {
+    showLoading();
+    addGame(fieldsValue)
+      .then(() => closeModal())
+      .finally(() => hideLoading());
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const editGameHandler = (fieldsValue: any) => {
+    showLoading();
+    editGame(fieldsValue)
+      .then(() => closeModal())
+      .finally(() => hideLoading());
+  };
+
   return (
     <Modal
       centered
@@ -38,12 +58,12 @@ const GameConfigBasicInfoModal = (props: IProps) => {
           onFinish={onSubmit}
         >
           <Form.Item label="游戏名" name="gameName">
-            <Input defaultValue={gameConfig.gameName} />
+            <Input defaultValue={gameConfig.title} />
             <span>(该名称将在APP游戏卡中实际展示)</span>
           </Form.Item>
 
           <Form.Item label="简介" name="description">
-            <Input defaultValue={gameConfig.description} />
+            <Input defaultValue={gameConfig.summary} />
           </Form.Item>
           <Form.Item label="icon" name="icon">
             <Input />

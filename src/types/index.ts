@@ -105,3 +105,8 @@ export interface IClientUpdate {
   change_log: string;
   release_date: number;
 }
+
+export enum PLATFORMENUM {
+  "Android" = 0,
+  "iOS" = 1,
+}

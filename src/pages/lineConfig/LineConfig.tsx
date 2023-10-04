@@ -3,9 +3,11 @@ import styles from "./index.module.less";
 import SwitchTag from "../../components/switchTag/SwitchTag";
 import { ColumnsType } from "antd/es/table";
 import LineConfigEditModal from "../../components/lineConfigEditModal/LineConfigEditModal";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { IBoostZone } from "../../types";
 import { convertTimestampToStr } from "../../utils/dataTime";
+import { getListBoostZones, searchBoostZones } from "../../api/boostZones";
+import { LoadingContext } from "../../router/Router";
 
 export type IBoostZoneModel = Omit<IBoostZone, "desc" | "nodes">;
 
@@ -56,6 +58,7 @@ const mockDataSource: IBoostZone[] = [
 const LineConfig = () => {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [boostZones, setBoostZones] = useState([] as IBoostZone[]);
   const [currentLineConfig, setCurrentLineConfig] = useState({} as IBoostZone);
   const columns: ColumnsType<IBoostZoneModel> = [
     {
@@ -131,6 +134,20 @@ const LineConfig = () => {
     },
   ];
 
+  const { showLoading, hideLoading } = useContext(LoadingContext);
+  useEffect(() => {
+    const getListBoostZonesAsync = async () => {
+      showLoading();
+      const res = await getListBoostZones({
+        start_id: 0,
+        cnt: 10,
+      }).finally(() => hideLoading());
+      setBoostZones(res.zones);
+    };
+
+    getListBoostZonesAsync();
+  }, []);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editLineConfigItemHandler = (e: any, key: number) => {
     console.log(e);
@@ -153,11 +170,25 @@ const LineConfig = () => {
     setShowModal(false);
   };
 
+  const onSearchBoostZones = async (value: string) => {
+    showLoading();
+    await searchBoostZones({ id: 0, name: value })
+      .then((res) => {
+        setBoostZones(res.zones);
+        closeModal();
+      })
+      .finally(() => hideLoading());
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.text}>线路配置</div>
-        <Input.Search placeholder="在此搜索线路名" className={styles.search} />
+        <Input.Search
+          placeholder="在此搜索线路名"
+          className={styles.search}
+          onSearch={onSearchBoostZones}
+        />
         <Button
           onClick={addNewLineHandler}
           type="primary"

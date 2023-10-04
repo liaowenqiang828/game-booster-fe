@@ -4,6 +4,7 @@ import styles from "./index.module.less";
 import alienIcon from "../../assets/images/alien_icon.svg";
 import { useNavigate } from "react-router-dom";
 import ROUTER_PATH from "../../constant/routerPath";
+import { login } from "../../api/login";
 
 const Login = () => {
   const navigator = useNavigate();
@@ -22,16 +23,14 @@ const Login = () => {
   };
 
   const loginHandler = () => {
-    // login api call
-    // success
-    navigator(ROUTER_PATH.HOME);
-
-    // error
-
-    // messageApi.open({
-    //   type: "error",
-    //   content: "账号或密码错误，请重试",
-    // });
+    login({ name: emailValue, password: passwordValue })
+      .then(() => navigator(ROUTER_PATH.HOME))
+      .catch(() => {
+        messageApi.open({
+          type: "error",
+          content: "账号或密码错误，请重试",
+        });
+      });
   };
 
   return (

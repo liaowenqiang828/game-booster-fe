@@ -2,7 +2,7 @@ import { Button, Input } from "antd";
 import styles from "./index.module.less";
 import Table, { ColumnsType } from "antd/es/table";
 import SwitchTag from "../../components/switchTag/SwitchTag";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import GameConfigBasicInfoModal from "../../components/gameConfigBasicInfoModal/GameConfigBasicInfoModal";
 import ViewPackageAndServerModal from "../../components/viewPackageAndServerModal/ViewPackageAndServerModal";
 import GameAccelerateConfigEditModal, {
@@ -10,6 +10,8 @@ import GameAccelerateConfigEditModal, {
 } from "../../components/gameAccelerateConfigEditModal/GameAccelerateConfigEditModal";
 import { IGame } from "../../types";
 import { convertTimestampToStr } from "../../utils/dataTime";
+import { LoadingContext } from "../../router/Router";
+import { getGameList } from "../../api/game";
 
 const mockDataSource: IGame[] = [
   {
@@ -52,6 +54,10 @@ const GameConfig = () => {
   const [showPackageModal, setPackageModal] = useState(false);
   const [showAccelerateConfigModal, setAccelerateConfigModal] = useState(false);
   const [currentGameConfig, setCurrentGameConfig] = useState({} as IGame);
+  const [games, setGames] = useState([] as IGame[]);
+  const [gameAmount, setGameAmount] = useState(0);
+  const { showLoading, hideLoading } = useContext(LoadingContext);
+  const [basicInfoEditMode, setBasicInfoEditMode] = useState(false);
   const columns: ColumnsType<Omit<IGame, "icon" | "banner" | "character_pic">> =
     [
       {
@@ -114,10 +120,24 @@ const GameConfig = () => {
       },
     ];
 
+  useEffect(() => {
+    const getGamesListAsync = async () => {
+      showLoading();
+      const res = await getGameList({ start_id: 0, cnt: 10 }).finally(() =>
+        hideLoading()
+      );
+      setGames(res.games);
+      setGameAmount(res.total);
+    };
+
+    getGamesListAsync();
+  }, []);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editBasicInfoHandler = (e: any, key: number) => {
     console.log(e);
     console.log(key);
+    setBasicInfoEditMode(true);
     setCurrentGameConfig(
       mockDataSource.filter((item) => item.id === key)[0] ?? {}
     );
@@ -146,6 +166,7 @@ const GameConfig = () => {
 
   const addNewGameHandler = () => {
     console.log("add new line");
+    setBasicInfoEditMode(false);
     setShowBasicInfoModal(true);
   };
 
@@ -175,14 +196,19 @@ const GameConfig = () => {
         <GameConfigBasicInfoModal
           gameConfig={currentGameConfig}
           closeModal={closeBasicInfoModal}
+          editMode={basicInfoEditMode}
         />
       )}
       {showPackageModal && (
-        <ViewPackageAndServerModal closeModal={closePackageModal} />
+        <ViewPackageAndServerModal
+          gameId={currentGameConfig.id}
+          closeModal={closePackageModal}
+        />
       )}
       {showAccelerateConfigModal && (
         <GameAccelerateConfigEditModal
-          gameAccerateConfig={{} as IGameAccelerateConfig}
+          gameId={currentGameConfig.id}
+          gameName={currentGameConfig.title}
           closeModal={closeAccelerateConfigModal}
         />
       )}

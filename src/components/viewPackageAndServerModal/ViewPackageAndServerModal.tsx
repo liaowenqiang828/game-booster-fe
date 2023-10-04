@@ -3,109 +3,117 @@ import styles from "./index.module.less";
 import type { ColumnsType } from "antd/es/table";
 import SwitchTag from "../switchTag/SwitchTag";
 import GameConfigPackageNameEditModal from "../gameConfigPackageNameEditModal/GameConfigPackageNameEditModal";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import GameConfigRegionServerEditModal from "../gameConfigRegionServerEditModal/GameConfigRegionServerEditModal";
-
-export interface IPackageInfo {
-  key: string;
-  packageName: string;
-  isStart: boolean;
-  channel: string;
-  signature: string;
-  startTime: string;
-  updateTime: string;
-}
-
-export interface IServerInfo {
-  key: string;
-  regionServerName: string;
-  isStart: boolean;
-  dns: string;
-  accelerateLine: string[];
-}
+import { IGamePkg, IGameRegion } from "../../types";
+import { getGamePkgsList, getGameRegionList } from "../../api/game";
+import { LoadingContext } from "../../router/Router";
+import { convertTimestampToStr } from "../../utils/dataTime";
 
 interface IProps {
-  packageInfo?: IPackageInfo;
-  serverInfo?: IServerInfo;
+  gameId: number;
   closeModal: () => void;
 }
 
-const mockPackageData: IPackageInfo[] = [
+const mockPackageData: IGamePkg[] = [
   {
-    key: "1",
-    packageName: "com.beast.mi",
-    isStart: true,
+    name: "com.beast.mi0",
+    enabled: true,
     channel: "小米",
-    signature: "xxyabsad",
-    startTime: "2023-09-16 16:00:00",
-    updateTime: "2023-09-16 16:00:00",
+    sign: "xxyabsad",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
   },
   {
-    key: "2",
-    packageName: "com.beast.mi",
-    isStart: false,
+    name: "com.beast.mi1",
+    enabled: false,
     channel: "小米",
-    signature: "xxyabsad",
-    startTime: "2023-09-16 16:00:00",
-    updateTime: "2023-09-16 16:00:00",
+    sign: "xxyabsad",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
   },
   {
-    key: "3",
-    packageName: "com.beast.mi",
-    isStart: true,
+    name: "com.beast.mi2",
+    enabled: true,
     channel: "小米",
-    signature: "xxyabsad",
-    startTime: "2023-09-16 16:00:00",
-    updateTime: "2023-09-16 16:00:00",
+    sign: "xxyabsad",
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
   },
 ];
 
-const mockReginServerData: IServerInfo[] = [
+const mockReginServerData: IGameRegion[] = [
   {
-    key: "1",
-    regionServerName: "日服",
-    isStart: true,
-    dns: "google",
-    accelerateLine: ["上海日本一区", "广东日本一区"],
+    id: 1,
+    name: "日服",
+    enabled: true,
+    dns_group: 2,
+    boost_zones: [1, 2, 3],
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
   },
   {
-    key: "2",
-    regionServerName: "日服",
-    isStart: false,
-    dns: "google",
-    accelerateLine: ["上海日本一区", "广东日本一区"],
+    id: 2,
+    name: "日服",
+    enabled: false,
+    dns_group: 1,
+    boost_zones: [1, 2, 3],
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
   },
   {
-    key: "3",
-    regionServerName: "日服",
-    isStart: true,
-    dns: "google",
-    accelerateLine: ["上海日本一区", "广东日本一区"],
+    id: 3,
+    name: "日服",
+    enabled: true,
+    dns_group: 2,
+    boost_zones: [1, 2, 3],
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
   },
 ];
 
 const ViewPackageAndServerModal = (props: IProps) => {
-  const { packageInfo, serverInfo, closeModal } = props;
+  const { gameId, closeModal } = props;
 
   const [showcPackageNameEditModal, setShowcPackageNameEditModal] =
     useState(false);
   const [showcRegionServerEditModal, setShowcRegionServerEditModal] =
     useState(false);
-  const [currentPackage, setCurrentPackage] = useState({} as IPackageInfo);
-  const [currentRegionServer, setCurrentRegionServer] = useState(
-    {} as IServerInfo
-  );
-  const packageTableColumn: ColumnsType<IPackageInfo> = [
+  const [gamePkgs, setGamePkgs] = useState([] as IGamePkg[]);
+  const [currentGamePkg, setCurrentGamePkg] = useState({} as IGamePkg);
+  const [gameRegions, setGameRegions] = useState([] as IGameRegion[]);
+  const [currentGameRegion, setCurrentGameRegion] = useState({} as IGameRegion);
+  const { showLoading, hideLoading } = useContext(LoadingContext);
+  const [pkgEditMode, setPkgEditMode] = useState(false);
+  const [regionEditMode, setRegionEditMode] = useState(false);
+
+  useEffect(() => {
+    const getGamePkgsAndGameRegionsListAsync = async () => {
+      showLoading();
+      try {
+        const gamePkgsRes = await getGamePkgsList({ game_id: gameId });
+        const gameRegionsRes = await getGameRegionList({ game_id: gameId });
+        hideLoading();
+        setGamePkgs(gamePkgsRes.pkgs);
+        setGameRegions(gameRegionsRes.regions);
+      } catch (error) {
+        hideLoading();
+      }
+    };
+    getGamePkgsAndGameRegionsListAsync();
+  }, []);
+
+  const packageTableColumn: ColumnsType<IGamePkg> = [
     {
       title: "包名",
-      dataIndex: "packageName",
+      dataIndex: "name",
       key: "packageName",
     },
     {
       title: "是否启用",
-      dataIndex: "isStart",
+      dataIndex: "enabled",
       key: "isStart",
-      render: (isStart) => <SwitchTag check={isStart} />,
+      render: (enabled) => <SwitchTag check={enabled} />,
     },
     {
       title: "渠道",
@@ -114,18 +122,20 @@ const ViewPackageAndServerModal = (props: IProps) => {
     },
     {
       title: "签名",
-      dataIndex: "signature",
+      dataIndex: "sign",
       key: "signature",
     },
     {
       title: "启动时间",
-      dataIndex: "startTime",
+      dataIndex: "created_at",
       key: "startTime",
+      render: (created_at) => convertTimestampToStr(created_at),
     },
     {
       title: "更新时间",
-      dataIndex: "updateTime",
+      dataIndex: "updated_at",
       key: "updateTime",
+      render: (updated_at) => convertTimestampToStr(updated_at),
     },
     {
       title: "操作",
@@ -134,7 +144,7 @@ const ViewPackageAndServerModal = (props: IProps) => {
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={(e) => editPackageHandler(e, record.key)}
+          onClick={(e) => editPackageHandler(e, record.name)}
         >
           编辑
         </Button>
@@ -142,31 +152,30 @@ const ViewPackageAndServerModal = (props: IProps) => {
     },
   ];
 
-  const regionServerTableColumn: ColumnsType<IServerInfo> = [
+  const regionServerTableColumn: ColumnsType<IGameRegion> = [
     {
       title: "区服名",
-      dataIndex: "regionServerName",
+      dataIndex: "name",
       key: "regionServerName",
     },
     {
       title: "是否启用",
-      dataIndex: "isStart",
+      dataIndex: "enabled",
       key: "isStart",
-      render: (isStart) => <SwitchTag check={isStart} />,
+      render: (enabled) => <SwitchTag check={enabled} />,
     },
     {
       title: "DNS(单选)",
-      dataIndex: "dns",
+      dataIndex: "dns_group",
       key: "dns",
-      render: (dns) => <Tag>{dns}</Tag>,
+      render: (dns_group) => <Tag>{dns_group}</Tag>,
     },
     {
       title: "加速路线(可多选)",
-      dataIndex: "accelerateLine",
+      dataIndex: "boost_zones",
       key: "accelerateLine",
-      render: (accelerateLine) =>
-        accelerateLine &&
-        accelerateLine.map((item: string) => <Tag>{item}</Tag>),
+      render: (boost_zones) =>
+        boost_zones && boost_zones.map((item: string) => <Tag>{item}</Tag>),
     },
     {
       title: "操作",
@@ -175,7 +184,7 @@ const ViewPackageAndServerModal = (props: IProps) => {
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={(e) => editReginServerHandler(e, record.key)}
+          onClick={(e) => editReginServerHandler(e, record.id)}
         >
           编辑
         </Button>
@@ -184,41 +193,45 @@ const ViewPackageAndServerModal = (props: IProps) => {
   ];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editPackageHandler = (e: any, key: string) => {
+  const editPackageHandler = (e: any, name: string) => {
     console.log(e);
-    console.log(key);
-    setCurrentPackage(
-      mockPackageData.filter((item) => item.key === key)[0] ??
-        ({} as IPackageInfo)
+    console.log(name);
+    setPkgEditMode(true);
+    setCurrentGamePkg(
+      mockPackageData.filter((item) => item.name === name)[0] ??
+        ({} as IGamePkg)
     );
     setShowcPackageNameEditModal(true);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editReginServerHandler = (e: any, key: string) => {
+  const editReginServerHandler = (e: any, key: number) => {
     console.log(e);
     console.log(key);
-    setCurrentRegionServer(
-      mockReginServerData.filter((item) => item.key === key)[0] ??
-        ({} as IServerInfo)
+    setRegionEditMode(true);
+    setCurrentGameRegion(
+      mockReginServerData.filter((item) => item.id === key)[0] ??
+        ({} as IGameRegion)
     );
     setShowcRegionServerEditModal(true);
   };
 
   const closePackageNameEditModal = () => {
     setShowcPackageNameEditModal(false);
-    setCurrentPackage({} as IPackageInfo);
+    setCurrentGamePkg({} as IGamePkg);
   };
   const closeRegionServerEditModal = () => {
     setShowcRegionServerEditModal(false);
-    setCurrentRegionServer({} as IServerInfo);
+    setCurrentGameRegion({} as IGameRegion);
   };
 
   const addNewPackageNameConfig = () => {
+    setPkgEditMode(false);
     setShowcPackageNameEditModal(true);
   };
 
   const addNewRegionServerConfig = () => {
+    setRegionEditMode(false);
     setShowcRegionServerEditModal(true);
   };
 
@@ -255,15 +268,17 @@ const ViewPackageAndServerModal = (props: IProps) => {
       {showcPackageNameEditModal && (
         <GameConfigPackageNameEditModal
           gameName=""
-          packageInfo={currentPackage}
+          packageInfo={currentGamePkg}
           closeModal={closePackageNameEditModal}
+          editMode={pkgEditMode}
         />
       )}
       {showcRegionServerEditModal && (
         <GameConfigRegionServerEditModal
           gameName=""
-          regionServer={currentRegionServer}
+          regionServer={currentGameRegion}
           closeModal={closeRegionServerEditModal}
+          editMode={regionEditMode}
         />
       )}
     </Modal>

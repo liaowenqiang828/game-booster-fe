@@ -4,25 +4,39 @@ import { useContext, useState } from "react";
 
 import { LoadingContext } from "../../router/Router";
 import { IAclGroup } from "../../types";
+import { addAclGroup, editAclGroup } from "../../api/groupAcl";
 
 interface IProps {
   aclGroup: IAclGroup;
   closeModal: () => void;
+  editMode: boolean;
 }
 const AclGroupEditModal = (props: IProps) => {
-  const { closeModal, aclGroup } = props;
+  const { closeModal, aclGroup, editMode } = props;
   const { showLoading, hideLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
-    const submitObj = {
-      ...fieldsValue,
-    };
-    console.log(submitObj);
+    if (editMode) {
+      editAclGroupHandler(fieldsValue);
+      return;
+    }
+    addAclGroupHandler(fieldsValue);
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const addAclGroupHandler = async (fieldsValue: any) => {
     showLoading();
-    setTimeout(() => {
-      hideLoading();
-      closeModal();
-    }, 2000);
+    await addAclGroup(fieldsValue)
+      .then(() => closeModal())
+      .finally(() => hideLoading());
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const editAclGroupHandler = async (fieldsValue: any) => {
+    showLoading();
+    await editAclGroup(fieldsValue)
+      .then(() => closeModal())
+      .finally(() => hideLoading());
   };
 
   return (
