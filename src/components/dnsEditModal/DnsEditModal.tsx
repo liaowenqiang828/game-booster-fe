@@ -62,7 +62,6 @@ const DnsEditModal = (props: IProps) => {
           labelAlign="left"
           wrapperCol={{ flex: 1 }}
           colon={false}
-          style={{ maxWidth: 300 }}
           onFinish={onSubmit}
         >
           <Form.Item
@@ -70,12 +69,21 @@ const DnsEditModal = (props: IProps) => {
             name="dnsName"
             className={styles.formItem}
             initialValue={dnsConfig.name}
+            rules={[{ required: true }]}
           >
-            <Input />
+            <Input style={{ width: "190px" }} />
           </Form.Item>
 
-          <Form.Item label="内容" name="content" initialValue={dnsConfig.dns}>
-            <Input />
+          <Form.Item
+            label="内容"
+            name="content"
+            initialValue={dnsConfig.dns}
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea
+              autoSize={{ minRows: 15 }}
+              style={{ width: "80%" }}
+            />
           </Form.Item>
           <Form.Item
             label="创建时间"
@@ -86,7 +94,7 @@ const DnsEditModal = (props: IProps) => {
                 : generateDateTimeForCurrentOperation()
             }
           >
-            <Input disabled />
+            <Input disabled style={{ width: "190px" }} />
           </Form.Item>
           <Form.Item
             label="更新时间"
@@ -97,7 +105,7 @@ const DnsEditModal = (props: IProps) => {
                 : generateDateTimeForCurrentOperation()
             }
           >
-            <Input disabled />
+            <Input disabled style={{ width: "190px" }} />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

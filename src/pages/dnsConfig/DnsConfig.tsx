@@ -105,14 +105,19 @@ const DnsConfig = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.text}>线路配置</div>
-        <Input.Search placeholder="在此搜索DNS名称" className={styles.search} />
-        <Button
-          onClick={addNewDnsHandler}
-          type="primary"
-          className={styles.addNewBtn}
-        >
-          新增DNS
-        </Button>
+        <div className={styles.operator}>
+          <Input.Search
+            placeholder="在此搜索DNS名称"
+            className={styles.search}
+          />
+          <Button
+            onClick={addNewDnsHandler}
+            type="primary"
+            className={styles.addNewBtn}
+          >
+            新增DNS
+          </Button>
+        </div>
       </div>
       <Table
         columns={columns}

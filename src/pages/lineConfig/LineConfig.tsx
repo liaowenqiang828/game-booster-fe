@@ -184,18 +184,20 @@ const LineConfig = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.text}>线路配置</div>
-        <Input.Search
-          placeholder="在此搜索线路名"
-          className={styles.search}
-          onSearch={onSearchBoostZones}
-        />
-        <Button
-          onClick={addNewLineHandler}
-          type="primary"
-          className={styles.addNewBtn}
-        >
-          新增线路
-        </Button>
+        <div className={styles.operator}>
+          <Input.Search
+            placeholder="在此搜索线路名"
+            className={styles.search}
+            onSearch={onSearchBoostZones}
+          />
+          <Button
+            onClick={addNewLineHandler}
+            type="primary"
+            className={styles.addNewBtn}
+          >
+            新增线路
+          </Button>
+        </div>
       </div>
       <Table
         columns={columns}

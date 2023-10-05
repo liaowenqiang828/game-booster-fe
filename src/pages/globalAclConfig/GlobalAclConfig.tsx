@@ -1,4 +1,4 @@
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button, Breadcrumb } from "antd";
 import styles from "./index.module.less";
 import PlatformSelector from "../../components/platformSelect/PlatformSelector";
 import { useContext, useState } from "react";
@@ -26,7 +26,16 @@ const GlobalAclConfig = () => {
   return (
     <div className={styles.container}>
       <div className={styles.headerSection}>
-        <div className={styles.bread}>面包屑</div>
+        <Breadcrumb
+          items={[
+            {
+              title: "ACL配置",
+            },
+            {
+              title: "全局ACL配置",
+            },
+          ]}
+        />
         <div className={styles.title}>全局ACL配置</div>
         <div className={styles.descSection}>
           全局ACL用来控制全局的黑名单，任何游戏都会使用，非及时生效，增加时请注意校验格式

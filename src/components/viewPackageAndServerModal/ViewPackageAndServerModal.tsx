@@ -247,8 +247,10 @@ const ViewPackageAndServerModal = (props: IProps) => {
       <div className={styles.title}>游戏配置/新增&编辑游戏/包名&区服</div>
       <div className={styles.packageTable}>
         <div className={styles.addLine}>
-          <label>游戏名</label>
-          <Input />
+          <div>
+            <label>游戏名</label>
+            <Input className={styles.leftInput} />
+          </div>
           <Button type="primary" onClick={addNewPackageNameConfig}>
             新增
           </Button>

@@ -110,3 +110,9 @@ export enum PLATFORMENUM {
   "Android" = 0,
   "iOS" = 1,
 }
+
+export enum OSENUM {
+  "Android" = 0,
+  "IOS" = 1,
+  "PC" = 2,
+}

@@ -178,14 +178,19 @@ const GameConfig = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.text}>游戏配置</div>
-        <Input.Search placeholder="在此搜索游戏名" className={styles.search} />
-        <Button
-          onClick={addNewGameHandler}
-          type="primary"
-          className={styles.addNewBtn}
-        >
-          新增游戏
-        </Button>
+        <div className={styles.operator}>
+          <Input.Search
+            placeholder="在此搜索游戏名"
+            className={styles.search}
+          />
+          <Button
+            onClick={addNewGameHandler}
+            type="primary"
+            className={styles.addNewBtn}
+          >
+            新增游戏
+          </Button>
+        </div>
       </div>
       <Table
         columns={columns}

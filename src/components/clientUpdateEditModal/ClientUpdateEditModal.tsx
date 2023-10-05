@@ -1,13 +1,28 @@
-import { Button, Form, Input, Modal } from "antd";
+import { Button, Checkbox, Form, Input, Modal, Select } from "antd";
 import styles from "./index.module.less";
 import { useContext } from "react";
 import { LoadingContext } from "../../router/Router";
-import { IClientUpdate } from "../../types";
+import { IClientUpdate, OSENUM } from "../../types";
 
 interface IProps {
   clientUpdateConfig: IClientUpdate;
   closeModal: () => void;
 }
+
+const osSelectorOptions = [
+  {
+    label: OSENUM[OSENUM.Android],
+    value: OSENUM.Android,
+  },
+  {
+    label: OSENUM[OSENUM.IOS],
+    value: OSENUM.IOS,
+  },
+  {
+    label: OSENUM[OSENUM.PC],
+    value: OSENUM.PC,
+  },
+];
 const ClientUpdateEditModal = (props: IProps) => {
   const { clientUpdateConfig, closeModal } = props;
 
@@ -47,6 +62,7 @@ const ClientUpdateEditModal = (props: IProps) => {
             initialValue={clientUpdateConfig.ver}
           >
             <Input />
+            <Checkbox>勾选表“更强”</Checkbox>
           </Form.Item>
 
           <Form.Item
@@ -54,10 +70,16 @@ const ClientUpdateEditModal = (props: IProps) => {
             name="system"
             initialValue={clientUpdateConfig.os}
           >
-            <Input />
+            <Select options={osSelectorOptions} />
           </Form.Item>
           <Form.Item label="安装包" name="package">
             <Input />
+            <Button
+              type="primary"
+              style={{ position: "absolute", marginLeft: "20px" }}
+            >
+              上传
+            </Button>
           </Form.Item>
           <Form.Item
             label="标题"
@@ -71,7 +93,7 @@ const ClientUpdateEditModal = (props: IProps) => {
             name="content"
             initialValue={clientUpdateConfig.change_log}
           >
-            <Input />
+            <Input.TextArea autoSize={{ minRows: 5 }} />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

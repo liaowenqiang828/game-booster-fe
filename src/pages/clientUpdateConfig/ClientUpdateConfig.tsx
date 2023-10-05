@@ -135,14 +135,19 @@ const ClientUpdateConfig = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.text}>客户端升级配置</div>
-        <Input.Search placeholder="在此搜索版本号" className={styles.search} />
-        <Button
-          onClick={addNewClientUpdateConfigHandler}
-          type="primary"
-          className={styles.addNewBtn}
-        >
-          新增版本
-        </Button>
+        <div className={styles.operator}>
+          <Input.Search
+            placeholder="在此搜索版本号"
+            className={styles.search}
+          />
+          <Button
+            onClick={addNewClientUpdateConfigHandler}
+            type="primary"
+            className={styles.addNewBtn}
+          >
+            新增版本
+          </Button>
+        </div>
       </div>
       <Table
         columns={columns}

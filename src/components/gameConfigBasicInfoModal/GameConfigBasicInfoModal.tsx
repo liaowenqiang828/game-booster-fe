@@ -54,25 +54,39 @@ const GameConfigBasicInfoModal = (props: IProps) => {
           labelAlign="left"
           wrapperCol={{ flex: 1 }}
           colon={false}
-          style={{ maxWidth: 300 }}
+          style={{ maxWidth: 1000 }}
           onFinish={onSubmit}
         >
-          <Form.Item label="游戏名" name="gameName">
-            <Input defaultValue={gameConfig.title} />
+          <Form.Item
+            label="游戏名"
+            name="gameName"
+            initialValue={gameConfig.title}
+          >
+            <Input />
             <span>(该名称将在APP游戏卡中实际展示)</span>
           </Form.Item>
 
-          <Form.Item label="简介" name="description">
-            <Input defaultValue={gameConfig.summary} />
-          </Form.Item>
-          <Form.Item label="icon" name="icon">
+          <Form.Item
+            label="简介"
+            name="description"
+            initialValue={gameConfig.summary}
+          >
             <Input />
+          </Form.Item>
+          <Form.Item label="icon" name="icon" initialValue={gameConfig.icon}>
+            <Input type="file" />
+            <Button type="primary">上传</Button>
+            <img />
           </Form.Item>
           <Form.Item label="banner" name="banner">
             <Input />
+            <Button type="primary">上传</Button>
+            <img />
           </Form.Item>
           <Form.Item label="character" name="character">
             <Input />
+            <Button type="primary">上传</Button>
+            <img />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

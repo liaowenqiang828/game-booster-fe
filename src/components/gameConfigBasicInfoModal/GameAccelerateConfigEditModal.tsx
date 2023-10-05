@@ -49,16 +49,14 @@ const GameAccelerateConfigEditModal = (props: IProps) => {
       width={800}
       closable
     >
-      <div className={styles.formTitle}>
-        游戏配置/新增&编辑游戏/新增&编辑加速配置
-      </div>
+      <div className={styles.formTitle}>DNS配置/新增&编辑DNS配置</div>
       <div className={styles.formWrapper}>
         <Form
           labelCol={{ flex: "110px" }}
           labelAlign="left"
           wrapperCol={{ flex: 1 }}
           colon={false}
-          style={{ maxWidth: 320 }}
+          style={{ maxWidth: 300 }}
           onFinish={onSubmit}
         >
           <Form.Item
