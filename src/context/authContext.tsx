@@ -9,7 +9,9 @@ export interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<string>("");
+  const [user, setUser] = useState<string>(
+    () => window.localStorage.getItem("userName") || ""
+  );
 
   const login = (user: string) => {
     setUser(user);
@@ -17,6 +19,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setUser("");
   };
+
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
       {children}
