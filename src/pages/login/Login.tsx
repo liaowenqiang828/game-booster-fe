@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Input, Button, Checkbox, message } from "antd";
 import styles from "./index.module.less";
 import alienIcon from "../../assets/images/alien_icon.svg";
 import { useNavigate } from "react-router-dom";
 import ROUTER_PATH from "../../constant/routerPath";
-import { login } from "../../api/login";
+import { login as loginApi } from "../../api/login";
+import { AuthContext, AuthContextType } from "../../context/authContext";
 
 const Login = () => {
   const navigator = useNavigate();
+  const auth = useContext(AuthContext);
+  const { login } = auth as AuthContextType;
   const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
   const loginEnable = !!(emailValue && passwordValue);
@@ -24,8 +27,13 @@ const Login = () => {
 
   const loginHandler = () => {
     // login({ name: emailValue, password: passwordValue })
-    login({ name: "test", password: "5406232e5a7b5db9ccdd8a0b85276862" })
-      .then(() => navigator(ROUTER_PATH.HOME))
+    loginApi({ name: "test", password: "5406232e5a7b5db9ccdd8a0b85276862" })
+      .then(() => {
+        login("test");
+        navigator(ROUTER_PATH.HOME);
+        // todo replace nameValue
+        window.localStorage.setItem("userName", "test");
+      })
       .catch(() => {
         messageApi.open({
           type: "error",

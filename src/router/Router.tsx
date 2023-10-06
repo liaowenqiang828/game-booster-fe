@@ -14,6 +14,8 @@ import AclGroupConfig from "../pages/aclGroupConfig/AclGroupConfig";
 import { createContext, useState } from "react";
 import { Spin } from "antd";
 import styles from "./index.module.less";
+import AuthProvider from "../context/authContext";
+import RequireAuth from "./RequireAuth";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const LoadingContext = createContext<{
@@ -30,30 +32,86 @@ const Router = () => {
     <LoadingContext.Provider value={{ showLoading, hideLoading }}>
       <div className={styles.container}>
         <Spin tip="Loading..." size="large" spinning={isLoading}>
-          <Routes>
-            <Route path="/" element={<AppPage />}>
-              <Route path={ROUTER_PATH.HOME} element={<Home />} />
-              <Route path={ROUTER_PATH.NODE_CONFIG} element={<NodeConfig />} />
-              <Route path={ROUTER_PATH.LINE_CONFIG} element={<LineConfig />} />
-              <Route path={ROUTER_PATH.DNS_CONFIG} element={<DnsConfig />} />
-              <Route path={ROUTER_PATH.ACL_CONFIG} element={null}>
-                <Route
-                  path={ROUTER_PATH.ACL_GLOBAL_CONFIG}
-                  element={<GlobalAclConfig />}
-                ></Route>
-                <Route
-                  path={ROUTER_PATH.ACL_GROUP_CONFIG}
-                  element={<AclGroupConfig />}
-                ></Route>
-              </Route>
-              <Route path={ROUTER_PATH.GAME_CONGIF} element={<GameConfig />} />
+          <AuthProvider>
+            <Routes>
               <Route
-                path={ROUTER_PATH.CLIENT_UPDATE_CONFIG}
-                element={<ClientUpdateConfig />}
-              />
-            </Route>
-            <Route path={ROUTER_PATH.LOGIN} element={<Login />} />
-          </Routes>
+                path="/"
+                element={
+                  <RequireAuth>
+                    <AppPage />
+                  </RequireAuth>
+                }
+              >
+                <Route
+                  path={ROUTER_PATH.HOME}
+                  element={
+                    <RequireAuth>
+                      <Home />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path={ROUTER_PATH.NODE_CONFIG}
+                  element={
+                    <RequireAuth>
+                      <NodeConfig />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path={ROUTER_PATH.LINE_CONFIG}
+                  element={
+                    <RequireAuth>
+                      <LineConfig />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path={ROUTER_PATH.DNS_CONFIG}
+                  element={
+                    <RequireAuth>
+                      <DnsConfig />
+                    </RequireAuth>
+                  }
+                />
+                <Route path={ROUTER_PATH.ACL_CONFIG} element={null}>
+                  <Route
+                    path={ROUTER_PATH.ACL_GLOBAL_CONFIG}
+                    element={
+                      <RequireAuth>
+                        <GlobalAclConfig />
+                      </RequireAuth>
+                    }
+                  ></Route>
+                  <Route
+                    path={ROUTER_PATH.ACL_GROUP_CONFIG}
+                    element={
+                      <RequireAuth>
+                        <AclGroupConfig />
+                      </RequireAuth>
+                    }
+                  ></Route>
+                </Route>
+                <Route
+                  path={ROUTER_PATH.GAME_CONGIF}
+                  element={
+                    <RequireAuth>
+                      <GameConfig />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path={ROUTER_PATH.CLIENT_UPDATE_CONFIG}
+                  element={
+                    <RequireAuth>
+                      <ClientUpdateConfig />
+                    </RequireAuth>
+                  }
+                />
+              </Route>
+              <Route path={ROUTER_PATH.LOGIN} element={<Login />} />
+            </Routes>
+          </AuthProvider>
         </Spin>
       </div>
     </LoadingContext.Provider>
