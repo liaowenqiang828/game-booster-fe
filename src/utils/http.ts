@@ -8,7 +8,12 @@ const http = axios.create({
 // 请求拦截器
 http.interceptors.request.use(
   (config) => {
-    // config.headers.Authorization = ''
+    console.log(config);
+    const authorization = window.localStorage.getItem("authorization");
+    if (authorization) {
+      config.headers.authorization = authorization;
+    }
+
     // loading
     return config;
   },
@@ -22,9 +27,15 @@ http.interceptors.request.use(
 http.interceptors.response.use(
   (response) => {
     // loading disappear
-    return response;
+    return response.data;
   },
   (error) => {
+    console.log("response error", error);
+    if (error.response.status === 401) {
+      window.location.href = "/login";
+      // redirct to login page
+    }
+
     return Promise.reject(error);
   }
 );

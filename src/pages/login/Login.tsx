@@ -23,7 +23,8 @@ const Login = () => {
   };
 
   const loginHandler = () => {
-    login({ name: emailValue, password: passwordValue })
+    // login({ name: emailValue, password: passwordValue })
+    login({ name: "test", password: "5406232e5a7b5db9ccdd8a0b85276862" })
       .then(() => navigator(ROUTER_PATH.HOME))
       .catch(() => {
         messageApi.open({

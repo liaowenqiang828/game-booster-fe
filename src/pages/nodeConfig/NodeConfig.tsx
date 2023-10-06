@@ -2,13 +2,14 @@ import { Button, Input, Table, Tag } from "antd";
 import styles from "./index.module.less";
 import type { ColumnsType } from "antd/es/table";
 import SwitchTag from "../../components/switchTag/SwitchTag";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import NodeConfigEditModal from "../../components/nodeConfigEditModal/NodeConfigEditModal";
 import { IBoostNode } from "../../types";
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { Mode } from "../../constant";
 import { IListBoostNodesResponse } from "../../types/response";
 import { getBoostNodesList, searchBoostNodes } from "../../api/boostNode";
+import { LoadingContext } from "../../router/Router";
 
 export type IBoostNodeModel = Omit<
   IBoostNode,
@@ -54,6 +55,7 @@ const mockDataSource: IBoostNodeModel[] = [
 const NodeConfig = () => {
   const [openModal, setOpenModal] = useState(false);
   const [boostNodes, setBoostNodes] = useState([] as IBoostNode[]);
+  const { showLoading, hideLoading } = useContext(LoadingContext);
   const columns: ColumnsType<IBoostNodeModel> = [
     {
       title: "节点地址",
@@ -125,10 +127,13 @@ const NodeConfig = () => {
 
   useEffect(() => {
     const getBoostNodesListAsync = async () => {
+      showLoading();
       const res: IListBoostNodesResponse = await getBoostNodesList({
         start_id: 0,
-        cnt: 20,
-      });
+        cnt: 2,
+      }).finally(() => hideLoading());
+      console.log(res);
+
       setBoostNodes(res.nodes);
     };
     getBoostNodesListAsync();
@@ -165,7 +170,8 @@ const NodeConfig = () => {
       </div>
       <Table
         columns={columns}
-        dataSource={mockDataSource}
+        // dataSource={mockDataSource}
+        dataSource={boostNodes}
         className={styles.table}
       />
       {openModal && (
