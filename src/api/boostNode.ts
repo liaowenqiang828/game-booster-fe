@@ -22,7 +22,7 @@ export const getBoostNodesList = (
 export const searchBoostNodes = (
   request: ISearchBoostNodesRequest
 ): Promise<ISearchBoostNodesResponse> => {
-  return http.get("/search_boost_node", {
+  return http.get("/search_boost_nodes", {
     params: request,
   });
 };

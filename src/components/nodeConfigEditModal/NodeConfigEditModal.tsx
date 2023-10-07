@@ -20,15 +20,15 @@ const NodeConfigEditModal = (props: IProps) => {
   const options: SelectProps["options"] = [
     {
       label: "高速",
-      value: "高速",
+      value: 1,
     },
     {
       label: "下载",
-      value: "下载",
+      value: 2,
     },
   ];
 
-  const handleAccelerateModeChange = (value: string[]) => {
+  const handleAccelerateModeChange = (value: number[]) => {
     console.log(`selected ${value}`);
   };
 
@@ -54,9 +54,21 @@ const NodeConfigEditModal = (props: IProps) => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
-    console.log({ ...fieldsValue, isStart });
+    // todo prevent to change prod data
+    // todo remove when deploy to prod
+    if (nodeConfig.id !== 6 && nodeConfig.id !== 7) return;
+
     showLoading();
-    editBoostNode({ ...fieldsValue, enabled: isStart })
+    editBoostNode({
+      id: nodeConfig.id,
+      name: fieldsValue.nodeNameValue,
+      enabled: isStart,
+      modes: fieldsValue.accelerateMode.reduce(
+        (pre: number, cur: number) => pre + cur,
+        0
+      ),
+      bandwidth: nodeConfig.bandwidth,
+    })
       .then(() => {
         closeModal();
         // reload nodes
@@ -115,7 +127,7 @@ const NodeConfigEditModal = (props: IProps) => {
           <Form.Item
             label="加速模式"
             name="accelerateMode"
-            initialValue={Mode[nodeConfig.modes]}
+            initialValue={nodeConfig.modes > 2 ? [1, 2] : nodeConfig.modes}
           >
             <Select
               mode="multiple"

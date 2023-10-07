@@ -13,49 +13,52 @@ import { LoadingContext } from "../../router/Router";
 
 export type IBoostNodeModel = Omit<
   IBoostNode,
-  "bandwidth" | "cur_in_bandwidth" | "cur_out_bandwidth" | "created_at"
+  "cur_in_bandwidth" | "cur_out_bandwidth" | "created_at"
 >;
 
-const mockDataSource: IBoostNodeModel[] = [
-  {
-    id: 1,
-    public_addr: "101.202.55.44",
-    name: "SH- JP001",
-    enabled: true,
-    ver: "V1.0.1",
-    modes: 3,
-    online_cnt: 500,
-    started_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-  },
-  {
-    id: 2,
-    public_addr: "202.101.44.55",
-    name: "SH- JP002",
-    enabled: false,
-    ver: "V1.0.1",
-    modes: 1,
-    online_cnt: 499,
-    started_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-  },
-  {
-    id: 3,
-    public_addr: "192.168.131.1",
-    name: "SH- JP003",
-    enabled: true,
-    ver: "V1.0.1",
-    modes: 2,
-    online_cnt: 498,
-    started_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-  },
-];
+// const mockDataSource: IBoostNodeModel[] = [
+//   {
+//     id: 1,
+//     public_addr: "101.202.55.44",
+//     name: "SH- JP001",
+//     enabled: true,
+//     ver: "V1.0.1",
+//     modes: 3,
+//     online_cnt: 500,
+//     started_at: new Date().getTime(),
+//     updated_at: new Date().getTime(),
+//   },
+//   {
+//     id: 2,
+//     public_addr: "202.101.44.55",
+//     name: "SH- JP002",
+//     enabled: false,
+//     ver: "V1.0.1",
+//     modes: 1,
+//     online_cnt: 499,
+//     started_at: new Date().getTime(),
+//     updated_at: new Date().getTime(),
+//   },
+//   {
+//     id: 3,
+//     public_addr: "192.168.131.1",
+//     name: "SH- JP003",
+//     enabled: true,
+//     ver: "V1.0.1",
+//     modes: 2,
+//     online_cnt: 498,
+//     started_at: new Date().getTime(),
+//     updated_at: new Date().getTime(),
+//   },
+// ];
 
 const NodeConfig = () => {
   const [openModal, setOpenModal] = useState(false);
   const [boostNodes, setBoostNodes] = useState([] as IBoostNode[]);
   const { showLoading, hideLoading } = useContext(LoadingContext);
+  const [showSearchResult, setShowSearchResult] = useState(false);
+  const pageSize = 2;
+  const [total, setTotal] = useState(0);
   const columns: ColumnsType<IBoostNodeModel> = [
     {
       title: "节点地址",
@@ -132,8 +135,8 @@ const NodeConfig = () => {
         start_id: 0,
         cnt: 2,
       }).finally(() => hideLoading());
-      console.log(res);
 
+      setTotal(res.total);
       setBoostNodes(res.nodes);
     };
     getBoostNodesListAsync();
@@ -145,16 +148,39 @@ const NodeConfig = () => {
     console.log(e);
     console.log(key);
     setCurrentNodeConfig(
-      mockDataSource.filter((item) => item.id === key)[0] ??
-        ({} as IBoostNodeModel)
+      boostNodes.filter((item) => item.id === key)[0] ?? ({} as IBoostNodeModel)
     );
     setOpenModal(true);
   };
 
   const onSearchBoostNodes = async (value: string) => {
     // type 0 匹配节点地址，1 匹配节点名称
-    const res = await searchBoostNodes({ type: 0, val: value });
-    // search error handler
+    if (value === "") {
+      setShowSearchResult(false);
+      showLoading();
+      const res: IListBoostNodesResponse = await getBoostNodesList({
+        start_id: 0,
+        cnt: pageSize,
+      }).finally(() => hideLoading());
+      setBoostNodes(res.nodes);
+      setTotal(res.total);
+    } else {
+      const res = await searchBoostNodes({ type: 0, val: value });
+      // search error handler
+      setBoostNodes(res.nodes);
+      setShowSearchResult(true);
+    }
+  };
+
+  const onPageChange = async (page: number, pageSize: number) => {
+    console.log(page, pageSize);
+    showLoading();
+    const [lastBoostNode] = boostNodes.slice(-1);
+    const res: IListBoostNodesResponse = await getBoostNodesList({
+      start_id: lastBoostNode.id + 1,
+      cnt: pageSize,
+    }).finally(() => hideLoading());
+
     setBoostNodes(res.nodes);
   };
 
@@ -166,13 +192,19 @@ const NodeConfig = () => {
           placeholder="在此搜索节点地址"
           className={styles.search}
           onSearch={onSearchBoostNodes}
+          allowClear
         />
       </div>
       <Table
         columns={columns}
-        // dataSource={mockDataSource}
+        rowKey="id"
         dataSource={boostNodes}
         className={styles.table}
+        pagination={
+          showSearchResult
+            ? false
+            : { total: total, pageSize: pageSize, onChange: onPageChange }
+        }
       />
       {openModal && (
         <NodeConfigEditModal
