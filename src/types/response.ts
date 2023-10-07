@@ -32,6 +32,7 @@ export interface IEditBoostNodeResponse {}
 
 export interface IListBoostZonesResponse {
   zones: IBoostZone[];
+  total: number;
 }
 
 export interface IAddBoostZoneResponse {}

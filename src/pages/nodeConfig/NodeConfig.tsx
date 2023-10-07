@@ -7,7 +7,6 @@ import NodeConfigEditModal from "../../components/nodeConfigEditModal/NodeConfig
 import { IBoostNode } from "../../types";
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { Mode } from "../../constant";
-import { IListBoostNodesResponse } from "../../types/response";
 import { getBoostNodesList, searchBoostNodes } from "../../api/boostNode";
 import { LoadingContext } from "../../router/Router";
 
@@ -16,42 +15,6 @@ export type IBoostNodeModel = Omit<
   "cur_in_bandwidth" | "cur_out_bandwidth" | "created_at"
 >;
 
-// const mockDataSource: IBoostNodeModel[] = [
-//   {
-//     id: 1,
-//     public_addr: "101.202.55.44",
-//     name: "SH- JP001",
-//     enabled: true,
-//     ver: "V1.0.1",
-//     modes: 3,
-//     online_cnt: 500,
-//     started_at: new Date().getTime(),
-//     updated_at: new Date().getTime(),
-//   },
-//   {
-//     id: 2,
-//     public_addr: "202.101.44.55",
-//     name: "SH- JP002",
-//     enabled: false,
-//     ver: "V1.0.1",
-//     modes: 1,
-//     online_cnt: 499,
-//     started_at: new Date().getTime(),
-//     updated_at: new Date().getTime(),
-//   },
-//   {
-//     id: 3,
-//     public_addr: "192.168.131.1",
-//     name: "SH- JP003",
-//     enabled: true,
-//     ver: "V1.0.1",
-//     modes: 2,
-//     online_cnt: 498,
-//     started_at: new Date().getTime(),
-//     updated_at: new Date().getTime(),
-//   },
-// ];
-
 const NodeConfig = () => {
   const [openModal, setOpenModal] = useState(false);
   const [boostNodes, setBoostNodes] = useState([] as IBoostNode[]);
@@ -59,6 +22,7 @@ const NodeConfig = () => {
   const [showSearchResult, setShowSearchResult] = useState(false);
   const pageSize = 2;
   const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const columns: ColumnsType<IBoostNodeModel> = [
     {
       title: "节点地址",
@@ -128,25 +92,33 @@ const NodeConfig = () => {
     {} as IBoostNodeModel
   );
 
-  useEffect(() => {
-    const getBoostNodesListAsync = async () => {
-      showLoading();
-      const res: IListBoostNodesResponse = await getBoostNodesList({
-        start_id: 0,
-        cnt: 2,
-      }).finally(() => hideLoading());
+  const loadingBoostNodesByPageNumberAndPageSize = async (
+    pageSize: number,
+    pageNumber?: number
+  ) => {
+    showLoading();
+    await getBoostNodesList({
+      start_id: pageNumber ? (pageNumber - 1) * pageSize + 1 : 0,
+      cnt: pageSize,
+    })
+      .then((res) => {
+        setBoostNodes(res.nodes);
+        setTotal(res.total);
+      })
+      .finally(() => hideLoading());
+  };
 
-      setTotal(res.total);
-      setBoostNodes(res.nodes);
-    };
-    getBoostNodesListAsync();
+  useEffect(() => {
+    loadingBoostNodesByPageNumberAndPageSize(pageSize);
   }, []);
 
-  const closeModal = () => setOpenModal(false);
+  const closeModal = (needRefresh: boolean) => {
+    setOpenModal(false);
+    needRefresh &&
+      loadingBoostNodesByPageNumberAndPageSize(pageSize, currentPage);
+  };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editNodeConfigItemHandler = (e: any, key: number) => {
-    console.log(e);
-    console.log(key);
     setCurrentNodeConfig(
       boostNodes.filter((item) => item.id === key)[0] ?? ({} as IBoostNodeModel)
     );
@@ -157,13 +129,7 @@ const NodeConfig = () => {
     // type 0 匹配节点地址，1 匹配节点名称
     if (value === "") {
       setShowSearchResult(false);
-      showLoading();
-      const res: IListBoostNodesResponse = await getBoostNodesList({
-        start_id: 0,
-        cnt: pageSize,
-      }).finally(() => hideLoading());
-      setBoostNodes(res.nodes);
-      setTotal(res.total);
+      loadingBoostNodesByPageNumberAndPageSize(pageSize, currentPage);
     } else {
       const res = await searchBoostNodes({ type: 0, val: value });
       // search error handler
@@ -172,16 +138,9 @@ const NodeConfig = () => {
     }
   };
 
-  const onPageChange = async (page: number, pageSize: number) => {
-    console.log(page, pageSize);
-    showLoading();
-    const [lastBoostNode] = boostNodes.slice(-1);
-    const res: IListBoostNodesResponse = await getBoostNodesList({
-      start_id: lastBoostNode.id + 1,
-      cnt: pageSize,
-    }).finally(() => hideLoading());
-
-    setBoostNodes(res.nodes);
+  const onPageChange = (page: number, pageSize: number) => {
+    setCurrentPage(page);
+    loadingBoostNodesByPageNumberAndPageSize(pageSize, page);
   };
 
   return (
@@ -203,7 +162,12 @@ const NodeConfig = () => {
         pagination={
           showSearchResult
             ? false
-            : { total: total, pageSize: pageSize, onChange: onPageChange }
+            : {
+                total: total,
+                pageSize: pageSize,
+                onChange: onPageChange,
+                current: currentPage,
+              }
         }
       />
       {openModal && (

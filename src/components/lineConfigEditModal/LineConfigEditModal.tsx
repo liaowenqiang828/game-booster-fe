@@ -1,6 +1,5 @@
 import { Button, Form, Input, Modal, Select, Switch } from "antd";
 import styles from "./index.module.less";
-import { ILineConfig } from "../../pages/lineConfig/LineConfig";
 import { useContext } from "react";
 import { LoadingContext } from "../../router/Router";
 import {
@@ -8,11 +7,15 @@ import {
   generateDateTimeForCurrentOperation,
 } from "../../utils/dataTime";
 import { addBoostZone, editBoostZone } from "../../api/boostZones";
-import { IEditBoostZoneRequest } from "../../types/request";
+import { IBoostZone } from "../../types";
+import {
+  IAddBoostZoneRequest,
+  IEditBoostZoneRequest,
+} from "../../types/request";
 
 interface IProps {
-  lineConfig: ILineConfig;
-  closeModal: () => void;
+  lineConfig: IBoostZone;
+  closeModal: (needRefresh: boolean) => void;
   editMode: boolean;
 }
 
@@ -46,35 +49,42 @@ const nodeAddressOptions = [
 
 const LineConfigEditModal = (props: IProps) => {
   const { lineConfig, closeModal, editMode } = props;
+  console.log("lineConfig", lineConfig);
+
   const { hideLoading, showLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (fieldsValue: any) => {
-    console.log(fieldsValue);
+    delete fieldsValue.created_at;
+    delete fieldsValue.updated_at;
     if (editMode) {
-      await editBoostZoneHandler(fieldsValue);
+      await editBoostZoneHandler({
+        id: lineConfig.id,
+        ...fieldsValue,
+        desc: lineConfig.desc,
+      });
       return;
     }
 
-    await addBoostZoneHandler(fieldsValue);
+    await addBoostZoneHandler({
+      ...fieldsValue,
+      desc: "3333",
+    });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editBoostZoneHandler = async (fieldsValue: any) => {
+  const editBoostZoneHandler = async (editRequest: IEditBoostZoneRequest) => {
     showLoading();
-    delete fieldsValue.id;
-    await editBoostZone(fieldsValue)
+    await editBoostZone(editRequest)
       .then(() => {
-        closeModal();
+        closeModal(true);
       })
       .finally(() => hideLoading());
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const addBoostZoneHandler = async (fieldsValue: any) => {
+  const addBoostZoneHandler = async (addRequest: IAddBoostZoneRequest) => {
     showLoading();
-    await addBoostZone(fieldsValue)
+    await addBoostZone(addRequest)
       .then(() => {
-        closeModal();
+        closeModal(true);
       })
       .finally(() => hideLoading());
   };
@@ -84,7 +94,7 @@ const LineConfigEditModal = (props: IProps) => {
       centered
       open
       footer={null}
-      onCancel={closeModal}
+      onCancel={() => closeModal(false)}
       width={800}
       closable
     >
@@ -98,17 +108,13 @@ const LineConfigEditModal = (props: IProps) => {
           style={{ maxWidth: 300 }}
           onFinish={onSubmit}
         >
-          <Form.Item
-            label="线路名"
-            name="lineName"
-            initialValue={lineConfig.name}
-          >
+          <Form.Item label="线路名" name="name" initialValue={lineConfig.name}>
             <Input />
           </Form.Item>
 
           <Form.Item
             label="是否启用"
-            name="isStart"
+            name="enabled"
             initialValue={lineConfig.enabled}
           >
             <Switch defaultChecked={lineConfig.enabled} />
@@ -129,28 +135,28 @@ const LineConfigEditModal = (props: IProps) => {
           </Form.Item>
           <Form.Item
             label="入口"
-            name="entry"
+            name="inbound_country_code"
             initialValue={lineConfig.inbound_country_code}
           >
             <Select options={entryOptions} />
           </Form.Item>
           <Form.Item
             label="出口"
-            name="exit"
+            name="outbound_country_code"
             initialValue={lineConfig.outbound_country_code}
           >
             <Select options={exitOptions} />
           </Form.Item>
           <Form.Item
             label="测速地址"
-            name="speedTestAddress"
+            name="ping_addr"
             initialValue={lineConfig.ping_addr}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="节点地址"
-            name="nodeAddress"
+            name="nodes"
             initialValue={lineConfig.nodes}
           >
             <Select

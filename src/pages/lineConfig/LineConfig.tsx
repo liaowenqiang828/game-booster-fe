@@ -11,54 +11,14 @@ import { LoadingContext } from "../../router/Router";
 
 export type IBoostZoneModel = Omit<IBoostZone, "desc" | "nodes">;
 
-const mockDataSource: IBoostZone[] = [
-  {
-    id: 1,
-    name: "上海日本一区",
-    enabled: true,
-    country: "中国",
-    region: "上海",
-    inbound_country_code: "CN",
-    outbound_country_code: "JP",
-    ping_addr: "101.202.55.44:10000",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    desc: "desc for boost zone",
-    nodes: ["1.1.1.1", "2.2.2.2"],
-  },
-  {
-    id: 2,
-    name: "广州日本一区",
-    enabled: false,
-    country: "中国",
-    region: "广州",
-    inbound_country_code: "CN",
-    outbound_country_code: "JP",
-    ping_addr: "101.202.55.44:10000",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    desc: "desc for boost zone",
-    nodes: ["1.1.1.1", "2.2.2.2"],
-  },
-  {
-    id: 3,
-    name: "香港日本一区",
-    enabled: true,
-    country: "香港",
-    region: "九龙",
-    inbound_country_code: "HK",
-    outbound_country_code: "JP",
-    ping_addr: "101.202.55.44:10000",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    desc: "desc for boost zone",
-    nodes: ["1.1.1.1", "2.2.2.2"],
-  },
-];
 const LineConfig = () => {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [boostZones, setBoostZones] = useState([] as IBoostZone[]);
+  const [showSearchResult, setShowSearchResult] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const [currentLineConfig, setCurrentLineConfig] = useState({} as IBoostZone);
   const columns: ColumnsType<IBoostZoneModel> = [
     {
@@ -135,17 +95,25 @@ const LineConfig = () => {
   ];
 
   const { showLoading, hideLoading } = useContext(LoadingContext);
-  useEffect(() => {
-    const getListBoostZonesAsync = async () => {
-      showLoading();
-      const res = await getListBoostZones({
-        start_id: 0,
-        cnt: 10,
-      }).finally(() => hideLoading());
-      setBoostZones(res.zones);
-    };
 
-    getListBoostZonesAsync();
+  const loadingBoostZonesByPageNumberAndPageSize = async (
+    pageSize: number,
+    pageNumber?: number
+  ) => {
+    showLoading();
+    await getListBoostZones({
+      start_id: pageNumber ? (pageNumber - 1) * pageSize + 1 : 0,
+      cnt: pageSize,
+    })
+      .then((res) => {
+        setBoostZones(res.zones);
+        setTotal(res.total);
+      })
+      .finally(() => hideLoading());
+  };
+
+  useEffect(() => {
+    loadingBoostZonesByPageNumberAndPageSize(pageSize);
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -153,7 +121,7 @@ const LineConfig = () => {
     console.log(e);
     console.log(key);
     setCurrentLineConfig(
-      mockDataSource.filter((item) => item.id === key)[0] ?? ({} as IBoostZone)
+      boostZones.filter((item) => item.id === key)[0] ?? ({} as IBoostZone)
     );
     setEditMode(true);
     setShowModal(true);
@@ -165,19 +133,31 @@ const LineConfig = () => {
     setShowModal(true);
   };
 
-  const closeModal = () => {
+  const closeModal = (needRefresh: boolean) => {
     setCurrentLineConfig({} as IBoostZone);
     setShowModal(false);
+    needRefresh &&
+      loadingBoostZonesByPageNumberAndPageSize(pageSize, currentPage);
   };
 
-  const onSearchBoostZones = async (value: string) => {
+  const onSearchBoostZones = (value: string) => {
     showLoading();
-    await searchBoostZones({ id: 0, name: value })
+    if (value === "") {
+      setShowSearchResult(false);
+      loadingBoostZonesByPageNumberAndPageSize(pageSize, currentPage);
+    }
+    // todo id=0, 按照名称搜索
+    searchBoostZones({ id: 0, name: value })
       .then((res) => {
         setBoostZones(res.zones);
-        closeModal();
+        setShowSearchResult(true);
       })
       .finally(() => hideLoading());
+  };
+
+  const onPageChange = (page: number, pageSize: number) => {
+    setCurrentPage(page);
+    loadingBoostZonesByPageNumberAndPageSize(pageSize, page);
   };
 
   return (
@@ -189,6 +169,7 @@ const LineConfig = () => {
             placeholder="在此搜索线路名"
             className={styles.search}
             onSearch={onSearchBoostZones}
+            allowClear
           />
           <Button
             onClick={addNewLineHandler}
@@ -201,8 +182,19 @@ const LineConfig = () => {
       </div>
       <Table
         columns={columns}
-        dataSource={mockDataSource}
+        dataSource={boostZones}
         className={styles.table}
+        rowKey="id"
+        pagination={
+          showSearchResult
+            ? false
+            : {
+                pageSize,
+                total,
+                current: currentPage,
+                onChange: onPageChange,
+              }
+        }
       />
       {showModal && (
         <LineConfigEditModal

@@ -6,7 +6,6 @@ import AppPage from "../pages/appPage/AppPage";
 import ROUTER_PATH from "../constant/routerPath";
 import LineConfig from "../pages/lineConfig/LineConfig";
 import DnsConfig from "../pages/dnsConfig/DnsConfig";
-// import AclConfig from "../pages/aclConfig/AclConfig";
 import GameConfig from "../pages/gameConfig/GameConfig";
 import ClientUpdateConfig from "../pages/clientUpdateConfig/ClientUpdateConfig";
 import GlobalAclConfig from "../pages/globalAclConfig/GlobalAclConfig";

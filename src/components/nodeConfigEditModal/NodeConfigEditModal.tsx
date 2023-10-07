@@ -5,16 +5,17 @@ import type { CustomTagProps } from "rc-select/lib/BaseSelect";
 import styles from "./index.module.less";
 import { useContext, useState } from "react";
 import { LoadingContext } from "../../router/Router";
-import { Mode } from "../../constant";
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { editBoostNode } from "../../api/boostNode";
 
 interface IProps {
   nodeConfig: IBoostNodeModel;
-  closeModal: () => void;
+  closeModal: (needRefresh: boolean) => void;
 }
 const NodeConfigEditModal = (props: IProps) => {
   const { nodeConfig, closeModal } = props;
+  console.log(nodeConfig);
+
   const [isStart, setIsStart] = useState(nodeConfig.enabled);
   const { showLoading, hideLoading } = useContext(LoadingContext);
   const options: SelectProps["options"] = [
@@ -27,10 +28,6 @@ const NodeConfigEditModal = (props: IProps) => {
       value: 2,
     },
   ];
-
-  const handleAccelerateModeChange = (value: number[]) => {
-    console.log(`selected ${value}`);
-  };
 
   const tagRender = (props: CustomTagProps) => {
     const { label } = props;
@@ -61,17 +58,16 @@ const NodeConfigEditModal = (props: IProps) => {
     showLoading();
     editBoostNode({
       id: nodeConfig.id,
-      name: fieldsValue.nodeNameValue,
+      name: fieldsValue.name,
       enabled: isStart,
-      modes: fieldsValue.accelerateMode.reduce(
+      modes: [...fieldsValue.modes].reduce(
         (pre: number, cur: number) => pre + cur,
         0
       ),
       bandwidth: nodeConfig.bandwidth,
     })
       .then(() => {
-        closeModal();
-        // reload nodes
+        closeModal(true);
       })
       .finally(() => {
         hideLoading();
@@ -82,7 +78,7 @@ const NodeConfigEditModal = (props: IProps) => {
       centered
       open
       footer={null}
-      onCancel={closeModal}
+      onCancel={() => closeModal(false)}
       width={800}
       closable
     >
@@ -105,11 +101,7 @@ const NodeConfigEditModal = (props: IProps) => {
             <Input disabled />
           </Form.Item>
 
-          <Form.Item
-            label="节点名"
-            name="nodeNameValue"
-            initialValue={nodeConfig.name}
-          >
+          <Form.Item label="节点名" name="name" initialValue={nodeConfig.name}>
             <Input />
           </Form.Item>
           <Form.Item label="是否启动" valuePropName="isStart">
@@ -117,30 +109,25 @@ const NodeConfigEditModal = (props: IProps) => {
               <Switch onChange={changeIsStartHandler} checked={isStart} />
             </div>
           </Form.Item>
-          <Form.Item
-            label="程序版本"
-            name="version"
-            initialValue={nodeConfig.ver}
-          >
+          <Form.Item label="程序版本" name="ver" initialValue={nodeConfig.ver}>
             <Input disabled />
           </Form.Item>
           <Form.Item
             label="加速模式"
-            name="accelerateMode"
-            initialValue={nodeConfig.modes > 2 ? [1, 2] : nodeConfig.modes}
+            name="modes"
+            initialValue={nodeConfig.modes > 2 ? [1, 2] : [nodeConfig.modes]}
           >
             <Select
               mode="multiple"
               style={{ width: "100%" }}
               placeholder="选择加速模式"
-              onChange={handleAccelerateModeChange}
               options={options}
               tagRender={tagRender}
             />
           </Form.Item>
           <Form.Item
             label="当前在线人数"
-            name="onLinePeopleNumber"
+            name="online_cnt"
             initialValue={nodeConfig.online_cnt}
           >
             <Input disabled />
