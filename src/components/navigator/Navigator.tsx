@@ -2,10 +2,22 @@ import type { MenuProps } from "antd";
 import { Menu } from "antd";
 import styles from "./index.module.less";
 import ROUTER_PATH from "../../constant/routerPath";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Navigator = () => {
   const navigator = useNavigate();
+  const location = useLocation();
+  const [current, setCurrent] = useState(location.pathname);
+  const [openKeys, setOpenKeys] = useState<string[]>(() => {
+    if (
+      location.pathname === ROUTER_PATH.ACL_GLOBAL_CONFIG ||
+      location.pathname === ROUTER_PATH.ACL_GROUP_CONFIG
+    ) {
+      return [ROUTER_PATH.ACL_CONFIG];
+    }
+    return [];
+  });
 
   const items: MenuProps["items"] = [
     {
@@ -48,14 +60,32 @@ const Navigator = () => {
     },
   ];
 
-  const onClick: MenuProps["onClick"] = (e) => navigator(e.key);
+  const onClick: MenuProps["onClick"] = (e) => {
+    setCurrent(e.key);
+    console.log(e.key);
+
+    if (
+      e.key !== ROUTER_PATH.ACL_GLOBAL_CONFIG &&
+      e.key !== ROUTER_PATH.ACL_GROUP_CONFIG
+    ) {
+      setOpenKeys([]);
+    }
+    navigator(e.key);
+  };
+
+  const onSubMenuOpenChange = (openKeys: string[]) => {
+    setOpenKeys(openKeys);
+  };
+
   return (
     <div className={styles.container}>
       <Menu
         onClick={onClick}
-        // selectedKeys={[current]}
+        selectedKeys={[current]}
+        openKeys={openKeys}
         mode="inline"
         items={items}
+        onOpenChange={onSubMenuOpenChange}
       />
     </div>
   );
