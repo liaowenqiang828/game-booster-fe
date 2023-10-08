@@ -109,10 +109,6 @@ const AclGroupConfig = () => {
     setShowAclGroupEditModal(true);
   };
 
-  const onSearch = (value: string) => {
-    console.log(value);
-  };
-
   return (
     <div className={styles.container}>
       <div className={styles.headerSection}>
@@ -131,11 +127,6 @@ const AclGroupConfig = () => {
           <div className={styles.descSection}>
             <div>通用的ACL组，用来简化配置，如Google Facebook等通用组</div>
             <div className={styles.operator}>
-              <Input.Search
-                placeholder="在此搜索ACL组名"
-                style={{ width: "200px" }}
-                onSearch={onSearch}
-              />
               <Button
                 className={styles.addBtn}
                 type="primary"

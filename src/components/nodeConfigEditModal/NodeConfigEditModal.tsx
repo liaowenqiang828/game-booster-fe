@@ -81,6 +81,7 @@ const NodeConfigEditModal = (props: IProps) => {
       onCancel={() => closeModal(false)}
       width={800}
       closable
+      maskClosable={false}
     >
       <div className={styles.formTitle}>节点配置/编辑</div>
       <div className={styles.formWrapper}>

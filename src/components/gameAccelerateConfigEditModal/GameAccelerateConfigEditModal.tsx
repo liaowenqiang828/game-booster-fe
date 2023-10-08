@@ -48,6 +48,7 @@ const GameAccelerateConfigEditModal = (props: IProps) => {
       onCancel={closeModal}
       width={800}
       closable
+      maskClosable={false}
     >
       <div className={styles.formTitle}>
         游戏配置/新增&编辑游戏/新增&编辑加速配置

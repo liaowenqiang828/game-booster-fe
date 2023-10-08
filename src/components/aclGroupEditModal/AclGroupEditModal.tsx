@@ -47,6 +47,7 @@ const AclGroupEditModal = (props: IProps) => {
       onCancel={closeModal}
       width={800}
       closable
+      maskClosable={false}
     >
       <div className={styles.formTitle}>ACL配置/ACL组配置/新增&编辑ACL组</div>
       <div className={styles.formWrapper}>

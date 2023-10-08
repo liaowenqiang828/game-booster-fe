@@ -54,6 +54,7 @@ const DnsEditModal = (props: IProps) => {
       onCancel={closeModal}
       width={800}
       closable
+      maskClosable={false}
     >
       <div className={styles.formTitle}>DNS配置/新增&编辑DNS配置</div>
       <div className={styles.formWrapper}>

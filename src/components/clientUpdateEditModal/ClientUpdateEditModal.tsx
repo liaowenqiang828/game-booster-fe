@@ -45,6 +45,7 @@ const ClientUpdateEditModal = (props: IProps) => {
       onCancel={closeModal}
       width={800}
       closable
+      maskClosable={false}
     >
       <div className={styles.formTitle}>客户端升级配置/新增&编辑版本</div>
       <div className={styles.formWrapper}>

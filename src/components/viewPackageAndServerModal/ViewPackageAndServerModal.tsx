@@ -243,6 +243,7 @@ const ViewPackageAndServerModal = (props: IProps) => {
       onCancel={closeModal}
       width={1000}
       closable
+      maskClosable={false}
     >
       <div className={styles.title}>游戏配置/新增&编辑游戏/包名&区服</div>
       <div className={styles.packageTable}>

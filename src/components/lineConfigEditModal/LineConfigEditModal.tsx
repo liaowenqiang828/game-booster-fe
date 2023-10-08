@@ -84,7 +84,7 @@ const LineConfigEditModal = (props: IProps) => {
     showLoading();
     await addBoostZone(addRequest)
       .then(() => {
-        closeModal(true);
+        closeModal(false);
       })
       .finally(() => hideLoading());
   };
@@ -97,6 +97,7 @@ const LineConfigEditModal = (props: IProps) => {
       onCancel={() => closeModal(false)}
       width={800}
       closable
+      maskClosable={false}
     >
       <div className={styles.formTitle}>线路配置/新增&编辑线路</div>
       <div className={styles.formWrapper}>

@@ -53,7 +53,7 @@ const Login = () => {
         <Input.Password
           className={styles.passwordInput}
           placeholder="请输入密码"
-          iconRender={() => undefined}
+          // iconRender={() => undefined}
           value={passwordValue}
           onChange={inputPasswordValue}
         />
