@@ -1,17 +1,18 @@
 import { useState } from "react";
-import { Input, Button, Checkbox, message } from "antd";
 import styles from "./index.module.less";
+import { Input, Button, Checkbox, message } from "antd";
 import alienIcon from "../../assets/images/alien_icon.svg";
 import { useNavigate } from "react-router-dom";
 import ROUTER_PATH from "../../constant/routerPath";
 import { login as loginApi } from "../../api/login";
+import { ErrorCode } from "../../types";
 
 const Login = () => {
   const navigator = useNavigate();
   const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
   const loginEnable = !!(emailValue && passwordValue);
-  const [messageApi, contextHolder] = message.useMessage();
+  // const [messageApi, contextHolder] = message.useMessage();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inputEmailValue = (e: any) => {
@@ -30,17 +31,16 @@ const Login = () => {
         // todo replace nameValue
         window.localStorage.setItem("userName", "test");
       })
-      .catch(() => {
-        messageApi.open({
-          type: "error",
-          content: "账号或密码错误，请重试",
-        });
+      .catch((error) => {
+        if (error.code === ErrorCode.INCORRECT_USER_OR_PASSWORD) {
+          message.error("账号或密码错误，请重试");
+        }
       });
   };
 
   return (
     <div className={styles.container}>
-      {contextHolder}
+      {/* {contextHolder} */}
       <div className={styles.left}>
         <h2 className={styles.loginHeader}>账号登陆</h2>
         <Input

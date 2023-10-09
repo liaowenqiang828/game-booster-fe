@@ -116,3 +116,19 @@ export enum OSENUM {
   "IOS" = 1,
   "PC" = 2,
 }
+
+export enum ErrorCode {
+  SERVER_ERROR = 0,
+  INVALID_REQUEST = 1,
+  NOT_FOUND = 2,
+  ACCESS_DENIED = 3,
+  FORBIDDEN = 4,
+  RATE_LIMIT_EXCEEDED = 5,
+  CLIENT_CLOSED_REQUEST = 6,
+  INVALID_TIME = 7,
+  REPLAY_ATTACKS = 8,
+  INCORRECT_USER_OR_PASSWORD = 9, // 用户名或者密码不正确
+  AUTHORIZATION_EXPIRED = 10, // 登录凭证过期
+  VERIFICATION_CODE_COOL_DOWN = 1000, // 验证码请求过于频繁，需要等待 60 秒
+  INVALID_VERIFICATION_CODE = 1001, // 验证码已失效，请重新请求
+}

@@ -1,12 +1,12 @@
 import { Button } from "antd";
 import styles from "./index.module.less";
 import { useNavigate } from "react-router-dom";
+import { clearLoginInfo } from "../../utils";
 
 const Home = () => {
   const navigator = useNavigate();
   const onLogout = () => {
-    window.localStorage.removeItem("authorization");
-    window.localStorage.removeItem("userName");
+    clearLoginInfo();
     navigator("/login");
   };
   return (
