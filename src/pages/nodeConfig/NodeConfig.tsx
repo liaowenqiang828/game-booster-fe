@@ -9,6 +9,7 @@ import { convertTimestampToStr } from "../../utils/dataTime";
 import { Mode } from "../../constant";
 import { getBoostNodesList, searchBoostNodes } from "../../api/boostNode";
 import { LoadingContext } from "../../router/Router";
+import AccelerateModes from "../../components/accelerateModes/AccelerateModes";
 
 export type IBoostNodeModel = Omit<
   IBoostNode,
@@ -49,12 +50,7 @@ const NodeConfig = () => {
       title: "加速模式",
       dataIndex: "modes",
       key: "modes",
-      render: (modes: number) =>
-        Mode[modes].map((item: string) => (
-          <Tag key={item} color="black">
-            {item}
-          </Tag>
-        )),
+      render: (modes: number) => <AccelerateModes modes={modes} />,
     },
     {
       title: "当前在线人数",
