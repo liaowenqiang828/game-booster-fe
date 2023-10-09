@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import ROUTER_PATH from "../../constant/routerPath";
 import { login as loginApi } from "../../api/login";
 import { ErrorCode } from "../../types";
+import { md5 } from "js-md5";
 
 const Login = () => {
   const navigator = useNavigate();
@@ -24,12 +25,11 @@ const Login = () => {
   };
 
   const loginHandler = () => {
-    // login({ name: emailValue, password: passwordValue })
-    loginApi({ name: "test", password: "5406232e5a7b5db9ccdd8a0b85276862" })
+    loginApi({ name: emailValue, password: md5(passwordValue) })
       .then(() => {
         navigator(ROUTER_PATH.HOME);
         // todo replace nameValue
-        window.localStorage.setItem("userName", "test");
+        window.localStorage.setItem("userName", emailValue);
       })
       .catch((error) => {
         if (error.code === ErrorCode.INCORRECT_USER_OR_PASSWORD) {
