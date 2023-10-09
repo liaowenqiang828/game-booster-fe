@@ -8,43 +8,20 @@ import { convertTimestampToStr } from "../../utils/dataTime";
 import { LoadingContext } from "../../router/Router";
 import { getDnsList } from "../../api/dns";
 
-const mockDataSource: IDnsGroup[] = [
-  {
-    id: 1,
-    name: "114",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    dns: ["1.1.1.1", "9.9.9.9"],
-  },
-  {
-    id: 2,
-    name: "google",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    dns: ["1.1.1.1", "9.9.9.9"],
-  },
-  {
-    id: 3,
-    name: "baidu",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    dns: ["1.1.1.1", "9.9.9.9"],
-  },
-];
-
 const DnsConfig = () => {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentDnsConfig, setCurrentNodeConfig] = useState({} as IDnsGroup);
   const { showLoading, hideLoading } = useContext(LoadingContext);
   const [dnsGroup, setDnsGroup] = useState([] as IDnsGroup[]);
-  useEffect(() => {
-    const getDnsListAsync = async () => {
-      showLoading();
-      const res = await getDnsList().finally(() => hideLoading());
-      setDnsGroup(res.groups);
-    };
 
+  const getDnsListAsync = async () => {
+    showLoading();
+    const res = await getDnsList().finally(() => hideLoading());
+    setDnsGroup(res.groups);
+  };
+
+  useEffect(() => {
     getDnsListAsync();
   }, []);
   const columns: ColumnsType<Omit<IDnsGroup, "dns">> = [
@@ -86,9 +63,7 @@ const DnsConfig = () => {
     console.log(key);
     setEditMode(true);
     setShowModal(true);
-    setCurrentNodeConfig(
-      mockDataSource.filter((item) => item.id === key)[0] ?? {}
-    );
+    setCurrentNodeConfig(dnsGroup.filter((item) => item.id === key)[0] ?? {});
   };
 
   const addNewDnsHandler = () => {
@@ -99,6 +74,7 @@ const DnsConfig = () => {
   const closeModal = () => {
     setShowModal(false);
     setCurrentNodeConfig({} as IDnsGroup);
+    getDnsListAsync();
   };
 
   return (
@@ -120,8 +96,9 @@ const DnsConfig = () => {
         </div>
       </div>
       <Table
+        rowKey="id"
         columns={columns}
-        dataSource={mockDataSource}
+        dataSource={dnsGroup}
         className={styles.table}
       />
 

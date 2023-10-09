@@ -8,32 +8,6 @@ import { convertTimestampToStr } from "../../utils/dataTime";
 import { getAclGroupList } from "../../api/groupAcl";
 import { LoadingContext } from "../../router/Router";
 
-const mockAclGroupData: IAclGroup[] = [
-  {
-    id: 1,
-    name: "Google组",
-    desc: "主要包含Google常用登录、API等域名",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    content: "content value",
-  },
-  {
-    id: 2,
-    name: "Facebook组",
-    desc: "主要包含Google常用登录、API等域名",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    content: "content value",
-  },
-  {
-    id: 3,
-    name: "Google组",
-    desc: "主要包含Google常用登录、API等域名",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    content: "content value",
-  },
-];
 const AclGroupConfig = () => {
   const [showAclGroupEditModal, setShowAclGroupEditModal] = useState(false);
   const [aclGroups, setAclGroups] = useState([] as IAclGroup[]);
@@ -79,13 +53,13 @@ const AclGroupConfig = () => {
     },
   ];
 
-  useEffect(() => {
-    const getAclGroupsAsync = async () => {
-      showLoading();
-      const res = await getAclGroupList().finally(() => hideLoading());
-      setAclGroups(res.groups);
-    };
+  const getAclGroupsAsync = async () => {
+    showLoading();
+    const res = await getAclGroupList().finally(() => hideLoading());
+    setAclGroups(res.groups);
+  };
 
+  useEffect(() => {
     getAclGroupsAsync();
   }, []);
 
@@ -97,6 +71,7 @@ const AclGroupConfig = () => {
   const closeModal = () => {
     setCurrentAclGroup({} as IAclGroup);
     setShowAclGroupEditModal(false);
+    getAclGroupsAsync();
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -104,7 +79,7 @@ const AclGroupConfig = () => {
     console.log(e, key);
     setEditMode(true);
     setCurrentAclGroup(
-      mockAclGroupData.filter((Item) => Item.id === key)[0] ?? ({} as IAclGroup)
+      aclGroups.filter((Item) => Item.id === key)[0] ?? ({} as IAclGroup)
     );
     setShowAclGroupEditModal(true);
   };
@@ -138,7 +113,7 @@ const AclGroupConfig = () => {
           </div>
         </div>
       </div>
-      <Table dataSource={mockAclGroupData} columns={columns} />
+      <Table rowKey="id" dataSource={aclGroups} columns={columns} />
 
       {showAclGroupEditModal && (
         <AclGroupEditModal

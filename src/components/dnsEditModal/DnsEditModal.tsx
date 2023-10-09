@@ -29,18 +29,23 @@ const DnsEditModal = (props: IProps) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const addDnsGroupHandler = async (fieldsValue: any) => {
     showLoading();
-    await addDnsGroup({ name: fieldsValue.name, dns: fieldsValue.dns })
-      .then(() => closeModal)
+    await addDnsGroup({
+      name: fieldsValue.name,
+      dns: [...fieldsValue.dns.split("\n")],
+    })
+      .then(() => closeModal())
       .finally(() => hideLoading());
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editDnsGroupHandler = async (fieldsValue: any) => {
+    console.log(fieldsValue);
+
     showLoading();
     await editDnsGroup({
-      id: fieldsValue.id,
+      id: dnsConfig.id,
       name: fieldsValue.name,
-      dns: fieldsValue.dns,
+      dns: [...fieldsValue.dns.split("\n")],
     })
       .then(() => closeModal())
       .finally(() => hideLoading());
@@ -67,9 +72,9 @@ const DnsEditModal = (props: IProps) => {
         >
           <Form.Item
             label="名称"
-            name="dnsName"
+            name="name"
             className={styles.formItem}
-            initialValue={dnsConfig.name}
+            initialValue={editMode ? dnsConfig.name : ""}
             rules={[{ required: true }]}
           >
             <Input style={{ width: "190px" }} />
@@ -77,8 +82,8 @@ const DnsEditModal = (props: IProps) => {
 
           <Form.Item
             label="内容"
-            name="content"
-            initialValue={dnsConfig.dns}
+            name="dns"
+            initialValue={editMode ? dnsConfig.dns.join("\n") : ""}
             rules={[{ required: true }]}
           >
             <Input.TextArea

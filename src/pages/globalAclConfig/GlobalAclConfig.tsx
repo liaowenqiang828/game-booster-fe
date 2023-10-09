@@ -1,28 +1,39 @@
-import { Form, Input, Button, Breadcrumb } from "antd";
+import { Input, Button, Breadcrumb } from "antd";
 import styles from "./index.module.less";
 import PlatformSelector from "../../components/platformSelect/PlatformSelector";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { LoadingContext } from "../../router/Router";
-import { editGloablAcl } from "../../api/globalAcl";
+import { editGloablAcl, getGlobalAclList } from "../../api/globalAcl";
 import { PLATFORMENUM } from "../../types";
-
+const { TextArea } = Input;
 const GlobalAclConfig = () => {
   const [selectPlatform, setSelectPlatform] = useState(PLATFORMENUM.Android);
   const { showLoading, hideLoading } = useContext(LoadingContext);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (fieldsValue: any) => {
-    const submitObj = { ...fieldsValue, platform: selectPlatform };
-    console.log(submitObj);
+  const [androidAcl, setAndroidAcl] = useState("");
+  const [iosAcl, setIosAcl] = useState("");
+
+  useEffect(() => {
+    const getGlobalAclAsync = async () => {
+      const res = await getGlobalAclList();
+      setAndroidAcl(res.android_acl);
+      setIosAcl(res.ios_acl);
+    };
+
+    getGlobalAclAsync();
+  }, []);
+
+  const onSubmit = async () => {
     showLoading();
     await editGloablAcl({
       os: selectPlatform,
-      acl: fieldsValue.content,
+      acl: selectPlatform === PLATFORMENUM.Android ? androidAcl : iosAcl,
     }).finally(() => hideLoading());
   };
 
   const onPlatformSelect = (os: number) => {
     setSelectPlatform(os);
   };
+
   return (
     <div className={styles.container}>
       <div className={styles.headerSection}>
@@ -42,22 +53,29 @@ const GlobalAclConfig = () => {
         </div>
       </div>
       <div className={styles.formWrapper}>
-        <Form onFinish={onSubmit}>
-          <Form.Item name="platform">
-            <PlatformSelector
-              platform={PLATFORMENUM.Android}
-              onSelect={onPlatformSelect}
-            />
-          </Form.Item>
-          <Form.Item name="content">
-            <Input.TextArea autoSize={{ minRows: 15 }} />
-          </Form.Item>
-          <Form.Item label="">
-            <Button type="primary" htmlType="submit">
-              提交
-            </Button>
-          </Form.Item>
-        </Form>
+        <PlatformSelector
+          platform={PLATFORMENUM.Android}
+          onSelect={onPlatformSelect}
+        />
+        {selectPlatform === PLATFORMENUM.Android && (
+          <TextArea
+            autoSize={{ minRows: 15 }}
+            value={androidAcl}
+            onChange={(e) => setAndroidAcl(e.target.value)}
+            className={styles.textArea}
+          />
+        )}
+        {selectPlatform === PLATFORMENUM.iOS && (
+          <TextArea
+            autoSize={{ minRows: 15 }}
+            value={iosAcl}
+            onChange={(e) => setIosAcl(e.target.value)}
+            className={styles.textArea}
+          />
+        )}
+        <Button type="primary" onClick={onSubmit}>
+          提交
+        </Button>
       </div>
     </div>
   );

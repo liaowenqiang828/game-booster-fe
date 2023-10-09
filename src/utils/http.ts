@@ -35,7 +35,6 @@ http.interceptors.response.use(
     console.log("response in intercepter error", error);
     if (error.response.data.code === ErrorCode.INVALID_REQUEST) {
       message.error("请求错误，请重试");
-      return;
     }
     if (error.response.data.code === ErrorCode.AUTHORIZATION_EXPIRED) {
       message.error("登录已过期，请重新登录", 3, () => {

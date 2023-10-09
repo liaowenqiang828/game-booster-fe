@@ -3,7 +3,7 @@ import { IListDnsGroupResponse } from "../types/response";
 import http from "../utils/http";
 
 export const getDnsList = (): Promise<IListDnsGroupResponse> => {
-  return http.get("/list_dns_group");
+  return http.get("/list_dns_groups");
 };
 
 export const addDnsGroup = (request: IAddDnsGroupRequest): Promise<void> => {

@@ -6,7 +6,6 @@ import { useContext, useEffect, useState } from "react";
 import NodeConfigEditModal from "../../components/nodeConfigEditModal/NodeConfigEditModal";
 import { IBoostNode } from "../../types";
 import { convertTimestampToStr } from "../../utils/dataTime";
-import { Mode } from "../../constant";
 import { getBoostNodesList, searchBoostNodes } from "../../api/boostNode";
 import { LoadingContext } from "../../router/Router";
 import AccelerateModes from "../../components/accelerateModes/AccelerateModes";
@@ -21,7 +20,7 @@ const NodeConfig = () => {
   const [boostNodes, setBoostNodes] = useState([] as IBoostNode[]);
   const { showLoading, hideLoading } = useContext(LoadingContext);
   const [showSearchResult, setShowSearchResult] = useState(false);
-  const pageSize = 2;
+  const pageSize = 10;
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const columns: ColumnsType<IBoostNodeModel> = [
@@ -94,7 +93,7 @@ const NodeConfig = () => {
   ) => {
     showLoading();
     await getBoostNodesList({
-      start_id: pageNumber ? (pageNumber - 1) * pageSize + 1 : 0,
+      offset: pageNumber ? (pageNumber - 1) * pageSize + 1 : 0,
       cnt: pageSize,
     })
       .then((res) => {

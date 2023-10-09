@@ -34,7 +34,7 @@ const AclGroupEditModal = (props: IProps) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editAclGroupHandler = async (fieldsValue: any) => {
     showLoading();
-    await editAclGroup(fieldsValue)
+    await editAclGroup({ ...fieldsValue, id: aclGroup.id })
       .then(() => closeModal())
       .finally(() => hideLoading());
   };
@@ -58,20 +58,16 @@ const AclGroupEditModal = (props: IProps) => {
           colon={false}
           onFinish={onSubmit}
         >
-          <Form.Item
-            label="ACL组名"
-            name="aclGroupName"
-            initialValue={aclGroup.name}
-          >
+          <Form.Item label="ACL组名" name="name" initialValue={aclGroup.name}>
             <Input style={{ width: "50%" }} />
           </Form.Item>
 
-          <Form.Item label="备注" name="comment" initialValue={aclGroup.desc}>
+          <Form.Item label="备注" name="desc" initialValue={aclGroup.desc}>
             <Input style={{ width: "50%" }} />
           </Form.Item>
           <Form.Item
             label="ACL配置"
-            name="aclConfig"
+            name="content"
             initialValue={aclGroup.content}
           >
             <Input.TextArea autoSize={{ minRows: 15 }} />

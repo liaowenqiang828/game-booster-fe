@@ -102,7 +102,7 @@ const LineConfig = () => {
   ) => {
     showLoading();
     await getListBoostZones({
-      start_id: pageNumber ? (pageNumber - 1) * pageSize + 1 : 0,
+      offset: pageNumber ? (pageNumber - 1) * pageSize + 1 : 0,
       cnt: pageSize,
     })
       .then((res) => {

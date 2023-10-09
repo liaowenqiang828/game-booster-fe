@@ -10,7 +10,7 @@ export interface IGetUploadUrlRequest {
 }
 
 export interface IListBoostNodesRequest {
-  start_id: number;
+  offset: number;
   cnt: number;
 }
 
@@ -28,7 +28,7 @@ export interface IEditBoostNodeRequest {
 }
 
 export interface IListBoostZonesRequest {
-  start_id: number;
+  offset: number;
   cnt: number;
 }
 
@@ -64,12 +64,12 @@ export interface IEditBoostZoneRequest {
 
 export interface IAddDnsGroupRequest {
   name: string;
-  dns: string;
+  dns: string[];
 }
 export interface IEditDnsGroupRequest {
   id: number;
   name: string;
-  dns: string;
+  dns: string[];
 }
 
 export interface IEditGlobalAclRequest {
@@ -91,7 +91,7 @@ export interface IEditAclGroupRequest {
 }
 
 export interface IListGameRequest {
-  start_id: number;
+  offset: number;
   cnt: number;
 }
 
