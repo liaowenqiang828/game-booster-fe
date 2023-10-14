@@ -41,7 +41,6 @@ http.interceptors.response.use(
         clearLoginInfo();
         window.location.href = "/login";
       });
-      return;
     }
 
     return Promise.reject(error.response.data);

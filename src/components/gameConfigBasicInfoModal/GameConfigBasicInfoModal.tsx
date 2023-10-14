@@ -2,8 +2,14 @@ import { Button, Form, Input, Modal } from "antd";
 import styles from "./index.module.less";
 import { useContext, useRef, useState } from "react";
 import { LoadingContext } from "../../router/Router";
-import { IGame } from "../../types";
-import { addGame, editGame } from "../../api/game";
+import { IGame } from "../../types/index";
+import {
+  addGame,
+  editGame,
+  getUploadUrl,
+  putImageFileIntoTencentOSS,
+} from "../../api/game";
+import { IGetUploadUrlResponse } from "../../types/response";
 
 interface IProps {
   gameConfig: IGame;
@@ -19,6 +25,11 @@ const GameConfigBasicInfoModal = (props: IProps) => {
   const [iconUrl, setIconUrl] = useState<string>("");
   const [bannerUrl, setBannerUrl] = useState<string>("");
   const [characterUrl, setCharacterUrl] = useState<string>("");
+  const [savedImagesUrl, setSavedImagesUrl] = useState<{
+    iconSavedUrl: string;
+    bannerSavedUrl: string;
+    characterSavedUrl: string;
+  }>({} as any);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
     if (editMode) {
@@ -30,15 +41,31 @@ const GameConfigBasicInfoModal = (props: IProps) => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const addGameHandler = (fieldsValue: any) => {
-    showLoading();
-    addGame(fieldsValue)
-      .then(() => closeModal())
-      .finally(() => hideLoading());
+    // showLoading();
+    console.log("fieldsValue", fieldsValue);
+    console.log("request", {
+      ...fieldsValue,
+      enabled: false,
+      icon: savedImagesUrl.iconSavedUrl,
+      banner: savedImagesUrl.bannerSavedUrl,
+      character_pic: savedImagesUrl.characterSavedUrl,
+    });
+
+    // addGame({
+    //   ...fieldsValue,
+    //   enabled: false,
+    //   icon: savedImagesUrl.iconSavedUrl,
+    //   banner: savedImagesUrl.bannerSavedUrl,
+    //   character_pic: savedImagesUrl.characterSavedUrl,
+    // })
+    //   .then(() => closeModal())
+    //   .finally(() => hideLoading());
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editGameHandler = (fieldsValue: any) => {
     showLoading();
+    console.log("fieldsValue", fieldsValue);
     editGame(fieldsValue)
       .then(() => closeModal())
       .finally(() => hideLoading());
@@ -47,6 +74,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
   const uploadIconPicture = () => {
     iconInputRef.current?.click();
   };
+
   const uploadBannerPicture = () => {
     bannerInputRef.current?.click();
   };
@@ -55,36 +83,85 @@ const GameConfigBasicInfoModal = (props: IProps) => {
     characterInputRef.current?.click();
   };
 
-  const getIconImageData = () => {
+  // todo error handler
+  const getIconImageData = async () => {
     const files = iconInputRef.current?.files;
     if (files) {
       const fileReader = new FileReader();
       fileReader.readAsDataURL(files[0]);
-      fileReader.addEventListener("load", () =>
-        setIconUrl(fileReader.result as string)
-      );
+
+      const imageUploadResponse: IGetUploadUrlResponse = await getUploadUrl({
+        type: 0,
+        name: files[0].name,
+      });
+      await putImageFileIntoTencentOSS({
+        uplaodUrl: imageUploadResponse.upload_url,
+        file: "",
+      });
+      console.log("imageUploadResponse", imageUploadResponse);
+      setSavedImagesUrl({
+        ...savedImagesUrl,
+        iconSavedUrl: imageUploadResponse.saved_url,
+      });
+
+      fileReader.addEventListener("load", () => {
+        setIconUrl(fileReader.result as string);
+        putImageFileIntoTencentOSS({
+          uplaodUrl: imageUploadResponse.upload_url,
+          file: fileReader.result,
+        });
+      });
     }
   };
 
-  const getBannerImageData = () => {
+  const getBannerImageData = async () => {
     const files = bannerInputRef.current?.files;
     if (files) {
       const fileReader = new FileReader();
       fileReader.readAsDataURL(files[0]);
-      fileReader.addEventListener("load", () =>
-        setBannerUrl(fileReader.result as string)
-      );
+      const imageUploadResponse: IGetUploadUrlResponse = await getUploadUrl({
+        type: 0,
+        name: files[0].name,
+      });
+
+      console.log("imageUploadResponse", imageUploadResponse);
+      setSavedImagesUrl({
+        ...savedImagesUrl,
+        bannerSavedUrl: imageUploadResponse.saved_url,
+      });
+
+      fileReader.addEventListener("load", async () => {
+        setBannerUrl(fileReader.result as string);
+        await putImageFileIntoTencentOSS({
+          uplaodUrl: imageUploadResponse.upload_url,
+          file: fileReader.result,
+        });
+      });
     }
   };
 
-  const getCharacterImageData = () => {
+  const getCharacterImageData = async () => {
     const files = characterInputRef.current?.files;
     if (files) {
       const fileReader = new FileReader();
       fileReader.readAsDataURL(files[0]);
-      fileReader.addEventListener("load", () =>
-        setCharacterUrl(fileReader.result as string)
-      );
+      const imageUploadResponse: IGetUploadUrlResponse = await getUploadUrl({
+        type: 0,
+        name: files[0].name,
+      });
+
+      console.log("imageUploadResponse", imageUploadResponse);
+      setSavedImagesUrl({
+        ...savedImagesUrl,
+        characterSavedUrl: imageUploadResponse.saved_url,
+      });
+      fileReader.addEventListener("load", async () => {
+        setCharacterUrl(fileReader.result as string);
+        await putImageFileIntoTencentOSS({
+          uplaodUrl: imageUploadResponse.upload_url,
+          file: fileReader.result,
+        });
+      });
     }
   };
 
@@ -110,21 +187,21 @@ const GameConfigBasicInfoModal = (props: IProps) => {
         >
           <Form.Item
             label="游戏名"
-            name="gameName"
+            name="title"
             initialValue={gameConfig.title}
           >
             <Input />
-            <span>(该名称将在APP游戏卡中实际展示)</span>
           </Form.Item>
+          <span>(该名称将在APP游戏卡中实际展示)</span>
 
           <Form.Item
             label="简介"
-            name="description"
+            name="summary"
             initialValue={gameConfig.summary}
           >
             <Input />
           </Form.Item>
-          <Form.Item label="icon" name="icon" initialValue={gameConfig.icon}>
+          <Form.Item label="icon">
             <input
               ref={iconInputRef}
               type="file"
@@ -148,7 +225,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
               style={{ visibility: iconUrl ? "visible" : "hidden" }}
             />
           </Form.Item>
-          <Form.Item label="banner" name="banner">
+          <Form.Item label="banner">
             <input
               ref={bannerInputRef}
               type="file"
@@ -172,7 +249,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
               style={{ visibility: bannerUrl ? "visible" : "hidden" }}
             />
           </Form.Item>
-          <Form.Item label="character" name="character">
+          <Form.Item label="character">
             <input
               ref={characterInputRef}
               type="file"

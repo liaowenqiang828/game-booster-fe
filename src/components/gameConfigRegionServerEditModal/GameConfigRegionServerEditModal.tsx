@@ -1,8 +1,9 @@
-import { Button, Form, Input, Modal, Switch } from "antd";
+import { Button, Form, Input, Modal, Switch, Select, Tag } from "antd";
 import styles from "./index.module.less";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { LoadingContext } from "../../router/Router";
 import { IGameRegion } from "../../types";
+import type { CustomTagProps } from "rc-select/lib/BaseSelect";
 import {
   IAddGameRegionRequest,
   IEditGameRegionRequest,
@@ -15,19 +16,49 @@ interface IProps {
   gameName: string;
   closeModal: () => void;
   editMode: boolean;
+  gameId: number;
 }
 const GameConfigRegionServerEditModal = (props: IProps) => {
-  const { closeModal, regionServer, gameName, editMode } = props;
+  const { closeModal, regionServer, gameName, editMode, gameId } = props;
   const { showLoading, hideLoading } = useContext(LoadingContext);
+  const [currentEnabled, setCurrentEnabled] = useState(regionServer.enabled);
+
+  const dnsOptions = [
+    { value: 1, label: "google" },
+    { value: 2, label: "baidu" },
+    { value: 3, label: "bilibili" },
+    { value: 4, label: "114" },
+  ];
+
+  const boostZonesOptions = [
+    { value: 1, label: "上海日本一区" },
+    { value: 2, label: "广州日本一区" },
+    { value: 3, label: "香港日本一区" },
+    { value: 4, label: "韩国日本一区" },
+  ];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
+    const commonRequest = {
+      name: fieldsValue.name,
+      enabled: fieldsValue.enabled,
+      dns_group: fieldsValue.dns_group,
+      boost_zones: fieldsValue.boost_zones,
+    };
     if (editMode) {
-      editGameRegionHandler(fieldsValue);
+      const request: IEditGameRegionRequest = {
+        ...commonRequest,
+        id: regionServer.id,
+      };
+      editGameRegionHandler(request);
       return;
     }
 
-    addGameRegionHandler(fieldsValue);
+    const request: IAddGameRegionRequest = {
+      ...commonRequest,
+      game_id: gameId,
+    };
+    addGameRegionHandler(request);
   };
 
   const addGameRegionHandler = (request: IAddGameRegionRequest) => {
@@ -39,10 +70,31 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
 
   const editGameRegionHandler = (request: IEditGameRegionRequest) => {
     showLoading();
+    console.log("request", request);
+
     editGameRegion(request)
       .then(() => closeModal())
       .finally(() => hideLoading());
   };
+
+  const tagRender = (props: CustomTagProps) => {
+    const { label } = props;
+    const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    return (
+      <Tag
+        color="#1677ff"
+        onMouseDown={onPreventMouseDown}
+        closable={false}
+        style={{ marginRight: 3 }}
+      >
+        {label}
+      </Tag>
+    );
+  };
+
   return (
     <Modal
       centered
@@ -53,7 +105,9 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
       closable
       maskClosable={false}
     >
-      <div className={styles.formTitle}>游戏配置/新增&编辑游戏/包名&区服</div>
+      <div className={styles.formTitle}>
+        游戏配置/新增&编辑游戏/包名/新增&编辑区服
+      </div>
       <div className={styles.formWrapper}>
         <Form
           labelCol={{ flex: "110px" }}
@@ -63,37 +117,46 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
           style={{ maxWidth: 300 }}
           onFinish={onSubmit}
         >
-          <Form.Item label="游戏名" name="gameName" className={styles.formItem}>
-            <Input disabled defaultValue={gameName} />
+          <Form.Item
+            label="游戏名"
+            name="gameName"
+            className={styles.formItem}
+            initialValue={gameName}
+          >
+            <Input disabled />
           </Form.Item>
 
           <Form.Item
             label="区服名"
-            name="regionServerName"
+            name="name"
             initialValue={regionServer.name}
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            label="是否启用"
-            name="isStart"
-            initialValue={regionServer.enabled}
-          >
-            <Switch defaultChecked={regionServer.enabled} />
+          <Form.Item label="是否启用" name="enabled">
+            <Switch
+              checked={currentEnabled}
+              onChange={(checked: boolean) => setCurrentEnabled(checked)}
+            />
           </Form.Item>
           <Form.Item
             label="DNS"
-            name="dns"
+            name="dns_group"
             initialValue={regionServer.dns_group}
           >
-            <Input />
+            <Select options={dnsOptions} tagRender={tagRender} />
           </Form.Item>
           <Form.Item
-            label="加速网络"
-            name="accelerateLine"
+            label="加速路线"
+            name="boost_zones"
             initialValue={regionServer.boost_zones}
           >
-            <Input />
+            <Select
+              options={boostZonesOptions}
+              tagRender={tagRender}
+              mode="multiple"
+              style={{ width: "100%" }}
+            />
           </Form.Item>
           <Form.Item label="签名" name="signature">
             <Input />
@@ -118,7 +181,7 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
                 : convertTimestampToStr(new Date().getTime())
             }
           >
-            <Input disabled defaultValue="" />
+            <Input disabled />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

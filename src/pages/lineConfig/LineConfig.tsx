@@ -4,7 +4,7 @@ import SwitchTag from "../../components/switchTag/SwitchTag";
 import { ColumnsType } from "antd/es/table";
 import LineConfigEditModal from "../../components/lineConfigEditModal/LineConfigEditModal";
 import { useContext, useEffect, useState } from "react";
-import { IBoostZone } from "../../types";
+import { IBoostZone } from "../../types/index";
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { getListBoostZones, searchBoostZones } from "../../api/boostZones";
 import { LoadingContext } from "../../router/Router";
@@ -70,13 +70,13 @@ const LineConfig = () => {
       title: "启动时间",
       dataIndex: "created_at",
       key: "startTime",
-      render: (created_at) => convertTimestampToStr(created_at),
+      render: (created_at: number) => convertTimestampToStr(created_at),
     },
     {
       title: "更新时间",
       dataIndex: "updated_at",
       key: "updateTime",
-      render: (updated_at) => convertTimestampToStr(updated_at),
+      render: (updated_at: number) => convertTimestampToStr(updated_at),
     },
     {
       title: "操作",

@@ -8,13 +8,16 @@ import {
   IEditGamePkgRequest,
   IEditGameRegionRequest,
   IEditGameRequest,
+  IGetUploadUrlRequest,
   IListGameBoostConfigRequest,
   IListGamePkgsRequest,
   IListGameRegionRequest,
   IListGameRequest,
   ISearchGamesRequest,
+  IUploadImageRequest,
 } from "../types/request";
 import {
+  IGetUploadUrlResponse,
   IListGameBoostConfigResponse,
   IListGamePkgsResponse,
   IListGameRegionResponse,
@@ -26,7 +29,7 @@ import http from "../utils/http";
 export const getGameList = (
   request: IListGameRequest
 ): Promise<IListGameResponse> => {
-  return http.get("/list_game", {
+  return http.get("/list_games", {
     params: request,
   });
 };
@@ -34,7 +37,7 @@ export const getGameList = (
 export const searchGames = (
   request: ISearchGamesRequest
 ): Promise<ISearchGamesResponse> => {
-  return http.get("/search_game", {
+  return http.get("/search_games", {
     params: request,
   });
 };
@@ -105,4 +108,16 @@ export const editGameBoostConfig = (
   request: IEditGameBoostConfigRequest
 ): Promise<void> => {
   return http.post("/edit_game_boost_config", request);
+};
+
+export const getUploadUrl = (
+  request: IGetUploadUrlRequest
+): Promise<IGetUploadUrlResponse> => {
+  return http.get("get_upload_url", request);
+};
+
+export const putImageFileIntoTencentOSS = (
+  request: IUploadImageRequest
+): Promise<void> => {
+  return http.put(request.uplaodUrl, request.file);
 };

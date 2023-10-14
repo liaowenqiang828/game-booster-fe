@@ -7,6 +7,12 @@ export interface ILoginRequest {
 
 export interface IGetUploadUrlRequest {
   type: number;
+  name: string;
+}
+
+export interface IUploadImageRequest {
+  file: any;
+  uplaodUrl: string;
 }
 
 export interface IListBoostNodesRequest {
@@ -97,7 +103,7 @@ export interface IListGameRequest {
 
 export interface ISearchGamesRequest {
   id: number;
-  title: number;
+  title: string;
 }
 
 export interface IAddGameRequest {
@@ -116,7 +122,7 @@ export interface IEditGameRequest {
   enabled: boolean;
   icon: string;
   banner: string;
-  character_ic: string;
+  character_pic: string;
 }
 
 export interface IListGamePkgsRequest {
@@ -147,6 +153,7 @@ export interface IListGameRegionRequest {
 }
 
 export interface IAddGameRegionRequest {
+  game_id: number;
   name: string;
   enabled: boolean;
   dns_group: number;

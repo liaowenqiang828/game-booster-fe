@@ -1,19 +1,23 @@
 import { Button, Form, Input, Modal, Switch } from "antd";
 import styles from "./index.module.less";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { LoadingContext } from "../../router/Router";
-import { IGamePkg } from "../../types";
+import { IGamePkg } from "../../types/index";
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { addGamePkg, editGamePkg } from "../../api/game";
+import { IAddGamePkgRequest, IEditGamePkgRequest } from "../../types/request";
 
 interface IProps {
   packageInfo: IGamePkg;
   gameName: string;
   closeModal: () => void;
   editMode: boolean;
+  gameId: number;
 }
 const GameConfigPackageNameEditModal = (props: IProps) => {
-  const { closeModal, packageInfo, gameName, editMode } = props;
+  const { closeModal, packageInfo, gameName, editMode, gameId } = props;
+  const [currentEnabled, setCurrentEnabled] = useState(packageInfo.enabled);
+
   const { showLoading, hideLoading } = useContext(LoadingContext);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,7 +33,15 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const addGamePkgHandler = async (fieldsValue: any) => {
     showLoading();
-    await addGamePkg(fieldsValue)
+    const request: IAddGamePkgRequest = {
+      game_id: gameId,
+      name: fieldsValue.name,
+      sign: fieldsValue.sign,
+      channel: fieldsValue.channel,
+      enabled: fieldsValue.enabled,
+    };
+
+    await addGamePkg(request)
       .then(() => closeModal())
       .finally(() => hideLoading());
   };
@@ -37,7 +49,13 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editGamePkgHandler = async (fieldsValue: any) => {
     showLoading();
-    await editGamePkg(fieldsValue)
+    const request: IEditGamePkgRequest = {
+      name: fieldsValue.name,
+      sign: fieldsValue.sign,
+      channel: fieldsValue.channel,
+      enabled: fieldsValue.enabled,
+    };
+    await editGamePkg(request)
       .then(() => closeModal())
       .finally(() => hideLoading());
   };
@@ -52,7 +70,9 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
       closable
       maskClosable={false}
     >
-      <div className={styles.formTitle}>游戏配置/新增&编辑游戏/包名&区服</div>
+      <div className={styles.formTitle}>
+        游戏配置/新增&编辑游戏/新增&编辑包名
+      </div>
       <div className={styles.formWrapper}>
         <Form
           labelCol={{ flex: "110px" }}
@@ -62,41 +82,55 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
           style={{ maxWidth: 300 }}
           onFinish={onSubmit}
         >
-          <Form.Item label="游戏名" name="gameName" className={styles.formItem}>
-            <Input disabled defaultValue={gameName} />
+          <Form.Item
+            label="游戏名"
+            name="gameName"
+            className={styles.formItem}
+            initialValue={gameName}
+          >
+            <Input disabled />
           </Form.Item>
 
-          <Form.Item label="包名" name="packageName">
-            <Input defaultValue={packageInfo.name} />
+          <Form.Item label="包名" name="name" initialValue={packageInfo.name}>
+            <Input />
           </Form.Item>
-          <Form.Item label="是否启用" name="isStart">
-            <Switch checked={packageInfo.enabled} />
-          </Form.Item>
-          <Form.Item label="渠道" name="channel">
-            <Input defaultValue={packageInfo.channel} />
-          </Form.Item>
-          <Form.Item label="签名" name="signature">
-            <Input defaultValue={packageInfo.sign} />
-          </Form.Item>
-          <Form.Item label="启动时间" name="startTime">
-            <Input
-              disabled
-              defaultValue={
-                editMode
-                  ? convertTimestampToStr(packageInfo.created_at)
-                  : convertTimestampToStr(new Date().getTime())
-              }
+          <Form.Item label="是否启用" name="enabled">
+            <Switch
+              checked={currentEnabled}
+              onChange={(checked: boolean) => setCurrentEnabled(checked)}
             />
           </Form.Item>
-          <Form.Item label="更新时间" name="updateTime">
-            <Input
-              disabled
-              defaultValue={
-                editMode
-                  ? convertTimestampToStr(packageInfo.updated_at)
-                  : convertTimestampToStr(new Date().getTime())
-              }
-            />
+          <Form.Item
+            label="渠道"
+            name="channel"
+            initialValue={packageInfo.channel}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item label="签名" name="sign" initialValue={packageInfo.sign}>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="启动时间"
+            name="created_at"
+            initialValue={
+              editMode
+                ? convertTimestampToStr(packageInfo.created_at)
+                : convertTimestampToStr(new Date().getTime())
+            }
+          >
+            <Input disabled />
+          </Form.Item>
+          <Form.Item
+            label="更新时间"
+            name="update_at"
+            initialValue={
+              editMode
+                ? convertTimestampToStr(packageInfo.updated_at)
+                : convertTimestampToStr(new Date().getTime())
+            }
+          >
+            <Input disabled />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

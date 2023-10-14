@@ -1,54 +1,19 @@
 import { Button, Input } from "antd";
 import styles from "./index.module.less";
 import Table, { ColumnsType } from "antd/es/table";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ClientUpdateEditModal from "../../components/clientUpdateEditModal/ClientUpdateEditModal";
-import { IClientUpdate } from "../../types";
-
-const mockDataSource: IClientUpdate[] = [
-  {
-    id: 1,
-    ver: "v1.0.1",
-    os: 0,
-    url: "/upd/android/beta",
-    md5: "9482307293859",
-    size: 5432648,
-    must_upd: true,
-    title: "v0.1.1更新",
-    change_log: "修复了137个bug",
-    release_date: new Date().getTime(),
-  },
-  {
-    id: 2,
-    ver: "v1.0.1",
-    os: 1,
-    url: "/upd/android/beta",
-    md5: "9482307293859",
-    size: 5432648,
-    must_upd: true,
-    title: "v1.0.1更新",
-    change_log: "杀死了一个程序员祭天",
-    release_date: new Date().getTime(),
-  },
-  {
-    id: 3,
-    ver: "v1.0.1",
-    os: 2,
-    url: "/upd/android/beta",
-    md5: "9482307293859",
-    size: 5432648,
-    must_upd: false,
-    title: "v1.0.1更新",
-    change_log: "裁了一个运营当炮灰",
-    release_date: new Date().getTime(),
-  },
-];
+import { IClientUpdate, OSENUM } from "../../types/index";
+import { LoadingContext } from "../../router/Router";
+import { IListClientUpdatesResponse } from "../../types/response";
+import { getClientUpdateList } from "../../api/clientUpdate";
 
 const ClientUpdateConfig = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentClientUpdateConfig, setCurrentClientUpdateConfig] = useState(
     {} as IClientUpdate
   );
+  const [clientUpdates, setClientUpdates] = useState<IClientUpdate[]>([]);
   const columns: ColumnsType<IClientUpdate> = [
     {
       title: "版本号",
@@ -59,6 +24,7 @@ const ClientUpdateConfig = () => {
       title: "系统",
       dataIndex: "os",
       key: "system",
+      render: (os: number) => OSENUM[os],
     },
     {
       title: "下载地址",
@@ -110,13 +76,24 @@ const ClientUpdateConfig = () => {
       ),
     },
   ];
+  const { showLoading, hideLoading } = useContext(LoadingContext);
+
+  useEffect(() => {
+    const getClientUpdateListAsync = async () => {
+      showLoading();
+      const res: IListClientUpdatesResponse =
+        await getClientUpdateList().finally(() => hideLoading());
+      setClientUpdates(res.updates || []);
+    };
+    getClientUpdateListAsync();
+  }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editClientUpdateConfigHandler = (e: any, key: number) => {
     console.log(e);
     console.log(key);
     setCurrentClientUpdateConfig(
-      mockDataSource.filter((item) => item.id === key)[0] ?? {}
+      clientUpdates.filter((item) => item.id === key)[0] ?? {}
     );
     setShowModal(true);
   };
@@ -151,7 +128,7 @@ const ClientUpdateConfig = () => {
       </div>
       <Table
         columns={columns}
-        dataSource={mockDataSource}
+        dataSource={clientUpdates}
         className={styles.table}
       />
       {showModal && (

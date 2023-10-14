@@ -62,9 +62,9 @@ const ClientUpdateEditModal = (props: IProps) => {
             name="version"
             initialValue={clientUpdateConfig.ver}
           >
-            <Input />
-            <Checkbox>勾选表“更强”</Checkbox>
+            <Input placeholder="请填写版本号，如：0.1.2" />
           </Form.Item>
+          <Checkbox>勾选表“更强”</Checkbox>
 
           <Form.Item
             label="系统"
@@ -87,14 +87,17 @@ const ClientUpdateEditModal = (props: IProps) => {
             name="title"
             initialValue={clientUpdateConfig.title}
           >
-            <Input />
+            <Input placeholder="请填写版本更新弹窗标题" />
           </Form.Item>
           <Form.Item
             label="内容"
             name="content"
             initialValue={clientUpdateConfig.change_log}
           >
-            <Input.TextArea autoSize={{ minRows: 5 }} />
+            <Input.TextArea
+              placeholder="参考格式：&#13;&#10;新增｜网络测速功能&#13;&#10;新增｜移动WiFi自由切换功能&#13;&#10;优化｜加速专线网络&#13;&#10;优化｜个别游戏加速不成功"
+              autoSize={{ minRows: 5 }}
+            />
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

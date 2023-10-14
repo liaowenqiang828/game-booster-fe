@@ -87,12 +87,12 @@ const NodeConfig = () => {
     {} as IBoostNodeModel
   );
 
-  const loadingBoostNodesByPageNumberAndPageSize = async (
+  const loadingBoostNodesByPageNumberAndPageSize = (
     pageSize: number,
     pageNumber?: number
   ) => {
     showLoading();
-    await getBoostNodesList({
+    getBoostNodesList({
       offset: pageNumber ? (pageNumber - 1) * pageSize + 1 : 0,
       cnt: pageSize,
     })

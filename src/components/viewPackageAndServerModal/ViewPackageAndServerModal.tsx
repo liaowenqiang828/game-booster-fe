@@ -5,75 +5,20 @@ import SwitchTag from "../switchTag/SwitchTag";
 import GameConfigPackageNameEditModal from "../gameConfigPackageNameEditModal/GameConfigPackageNameEditModal";
 import { useContext, useEffect, useState } from "react";
 import GameConfigRegionServerEditModal from "../gameConfigRegionServerEditModal/GameConfigRegionServerEditModal";
-import { IGamePkg, IGameRegion } from "../../types";
+import { IGamePkg, IGameRegion } from "../../types/index";
 import { getGamePkgsList, getGameRegionList } from "../../api/game";
 import { LoadingContext } from "../../router/Router";
 import { convertTimestampToStr } from "../../utils/dataTime";
+import { IBoostZone } from "../../types/index";
 
 interface IProps {
   gameId: number;
   closeModal: () => void;
+  gameName: string;
 }
 
-const mockPackageData: IGamePkg[] = [
-  {
-    name: "com.beast.mi0",
-    enabled: true,
-    channel: "小米",
-    sign: "xxyabsad",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-  },
-  {
-    name: "com.beast.mi1",
-    enabled: false,
-    channel: "小米",
-    sign: "xxyabsad",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-  },
-  {
-    name: "com.beast.mi2",
-    enabled: true,
-    channel: "小米",
-    sign: "xxyabsad",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-  },
-];
-
-const mockReginServerData: IGameRegion[] = [
-  {
-    id: 1,
-    name: "日服",
-    enabled: true,
-    dns_group: 2,
-    boost_zones: [1, 2, 3],
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-  },
-  {
-    id: 2,
-    name: "日服",
-    enabled: false,
-    dns_group: 1,
-    boost_zones: [1, 2, 3],
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-  },
-  {
-    id: 3,
-    name: "日服",
-    enabled: true,
-    dns_group: 2,
-    boost_zones: [1, 2, 3],
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-  },
-];
-
 const ViewPackageAndServerModal = (props: IProps) => {
-  const { gameId, closeModal } = props;
+  const { gameId, closeModal, gameName } = props;
 
   const [showcPackageNameEditModal, setShowcPackageNameEditModal] =
     useState(false);
@@ -113,7 +58,7 @@ const ViewPackageAndServerModal = (props: IProps) => {
       title: "是否启用",
       dataIndex: "enabled",
       key: "isStart",
-      render: (enabled) => <SwitchTag check={enabled} />,
+      render: (enabled: boolean) => <SwitchTag check={enabled} />,
     },
     {
       title: "渠道",
@@ -129,22 +74,22 @@ const ViewPackageAndServerModal = (props: IProps) => {
       title: "启动时间",
       dataIndex: "created_at",
       key: "startTime",
-      render: (created_at) => convertTimestampToStr(created_at),
+      render: (created_at: number) => convertTimestampToStr(created_at),
     },
     {
       title: "更新时间",
       dataIndex: "updated_at",
       key: "updateTime",
-      render: (updated_at) => convertTimestampToStr(updated_at),
+      render: (updated_at: number) => convertTimestampToStr(updated_at),
     },
     {
       title: "操作",
       dataIndex: "",
       key: "operation",
-      render: (_, record) => (
+      render: (_: any, record: IGamePkg) => (
         <Button
           type="primary"
-          onClick={(e) => editPackageHandler(e, record.name)}
+          onClick={(e: any) => editPackageHandler(e, record.name)}
         >
           编辑
         </Button>
@@ -162,29 +107,29 @@ const ViewPackageAndServerModal = (props: IProps) => {
       title: "是否启用",
       dataIndex: "enabled",
       key: "isStart",
-      render: (enabled) => <SwitchTag check={enabled} />,
+      render: (enabled: boolean) => <SwitchTag check={enabled} />,
     },
     {
       title: "DNS(单选)",
       dataIndex: "dns_group",
       key: "dns",
-      render: (dns_group) => <Tag>{dns_group}</Tag>,
+      render: (dns_group: string) => <Tag>{dns_group}</Tag>,
     },
     {
       title: "加速路线(可多选)",
       dataIndex: "boost_zones",
       key: "accelerateLine",
-      render: (boost_zones) =>
+      render: (boost_zones: string[]) =>
         boost_zones && boost_zones.map((item: string) => <Tag>{item}</Tag>),
     },
     {
       title: "操作",
       dataIndex: "",
       key: "operation",
-      render: (_, record) => (
+      render: (_: any, record: IGameRegion) => (
         <Button
           type="primary"
-          onClick={(e) => editReginServerHandler(e, record.id)}
+          onClick={(e: any) => editReginServerHandler(e, record.id)}
         >
           编辑
         </Button>
@@ -198,8 +143,7 @@ const ViewPackageAndServerModal = (props: IProps) => {
     console.log(name);
     setPkgEditMode(true);
     setCurrentGamePkg(
-      mockPackageData.filter((item) => item.name === name)[0] ??
-        ({} as IGamePkg)
+      gamePkgs.filter((item) => item.name === name)[0] ?? ({} as IGamePkg)
     );
     setShowcPackageNameEditModal(true);
   };
@@ -210,19 +154,30 @@ const ViewPackageAndServerModal = (props: IProps) => {
     console.log(key);
     setRegionEditMode(true);
     setCurrentGameRegion(
-      mockReginServerData.filter((item) => item.id === key)[0] ??
-        ({} as IGameRegion)
+      gameRegions.filter((item) => item.id === key)[0] ?? ({} as IGameRegion)
     );
     setShowcRegionServerEditModal(true);
   };
 
-  const closePackageNameEditModal = () => {
+  const closePackageNameEditModal = async () => {
     setShowcPackageNameEditModal(false);
     setCurrentGamePkg({} as IGamePkg);
+    showLoading();
+    const gamePkgsRes = await getGamePkgsList({ game_id: gameId }).finally(() =>
+      hideLoading()
+    );
+    setGamePkgs(gamePkgsRes.pkgs);
+    hideLoading();
   };
-  const closeRegionServerEditModal = () => {
+  const closeRegionServerEditModal = async () => {
     setShowcRegionServerEditModal(false);
     setCurrentGameRegion({} as IGameRegion);
+    showLoading();
+    const gameRegionRes = await getGameRegionList({ game_id: gameId }).finally(
+      () => hideLoading()
+    );
+    setGameRegions(gameRegionRes.regions);
+    hideLoading();
   };
 
   const addNewPackageNameConfig = () => {
@@ -250,38 +205,45 @@ const ViewPackageAndServerModal = (props: IProps) => {
         <div className={styles.addLine}>
           <div>
             <label>游戏名</label>
-            <Input className={styles.leftInput} />
+            <Input className={styles.leftInput} value={gameName} />
           </div>
           <Button type="primary" onClick={addNewPackageNameConfig}>
             新增
           </Button>
         </div>
-        <Table dataSource={mockPackageData} columns={packageTableColumn} />
+        <Table
+          dataSource={gamePkgs}
+          columns={packageTableColumn}
+          rowKey="name"
+        />
       </div>
       <div className={styles.serverTable}>
         <Button type="primary" onClick={addNewRegionServerConfig}>
           新增
         </Button>
         <Table
-          dataSource={mockReginServerData}
+          dataSource={gameRegions}
           columns={regionServerTableColumn}
+          rowKey="id"
         />
       </div>
 
       {showcPackageNameEditModal && (
         <GameConfigPackageNameEditModal
-          gameName=""
+          gameName={gameName}
           packageInfo={currentGamePkg}
           closeModal={closePackageNameEditModal}
           editMode={pkgEditMode}
+          gameId={gameId}
         />
       )}
       {showcRegionServerEditModal && (
         <GameConfigRegionServerEditModal
-          gameName=""
+          gameName={gameName}
           regionServer={currentGameRegion}
           closeModal={closeRegionServerEditModal}
           editMode={regionEditMode}
+          gameId={gameId}
         />
       )}
     </Modal>

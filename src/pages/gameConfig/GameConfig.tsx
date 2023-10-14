@@ -1,53 +1,15 @@
 import { Button, Input } from "antd";
-import styles from "./index.module.less";
 import Table, { ColumnsType } from "antd/es/table";
 import SwitchTag from "../../components/switchTag/SwitchTag";
 import { useContext, useEffect, useState } from "react";
 import GameConfigBasicInfoModal from "../../components/gameConfigBasicInfoModal/GameConfigBasicInfoModal";
 import ViewPackageAndServerModal from "../../components/viewPackageAndServerModal/ViewPackageAndServerModal";
-import GameAccelerateConfigEditModal, {
-  IGameAccelerateConfig,
-} from "../../components/gameAccelerateConfigEditModal/GameAccelerateConfigEditModal";
-import { IGame } from "../../types";
+import GameAccelerateConfigEditModal from "../../components/gameAccelerateConfigEditModal/GameAccelerateConfigEditModal";
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { LoadingContext } from "../../router/Router";
-import { getGameList } from "../../api/game";
-
-const mockDataSource: IGame[] = [
-  {
-    id: 1,
-    title: "赛马娘",
-    enabled: true,
-    summary: "我只能做的...只是奔跑而已。",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    icon: "",
-    banner: "",
-    character_pic: "",
-  },
-  {
-    id: 2,
-    title: "碧蓝档案",
-    enabled: false,
-    summary: "与你的日常，就是奇迹。",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    icon: "",
-    banner: "",
-    character_pic: "",
-  },
-  {
-    id: 3,
-    title: "沉默的骑士",
-    enabled: true,
-    summary: "启程吧，以亡国之名。",
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    icon: "",
-    banner: "",
-    character_pic: "",
-  },
-];
+import { getGameList, searchGames } from "../../api/game";
+import { IGame } from "../../types/index";
+import styles from "./index.module.less";
 
 const GameConfig = () => {
   const [showBasicInfoModal, setShowBasicInfoModal] = useState(false);
@@ -55,7 +17,10 @@ const GameConfig = () => {
   const [showAccelerateConfigModal, setAccelerateConfigModal] = useState(false);
   const [currentGameConfig, setCurrentGameConfig] = useState({} as IGame);
   const [games, setGames] = useState([] as IGame[]);
-  const [gameAmount, setGameAmount] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const [showSearchResult, setShowSearchResult] = useState(false);
   const { showLoading, hideLoading } = useContext(LoadingContext);
   const [basicInfoEditMode, setBasicInfoEditMode] = useState(false);
   const columns: ColumnsType<Omit<IGame, "icon" | "banner" | "character_pic">> =
@@ -80,38 +45,38 @@ const GameConfig = () => {
         title: "创建时间",
         dataIndex: "created_at",
         key: "createTime",
-        render: (created_at) => convertTimestampToStr(created_at),
+        render: (created_at: number) => convertTimestampToStr(created_at),
       },
       {
         title: "更新时间",
         dataIndex: "updated_at",
         key: "updateTime",
-        render: (updated_at) => convertTimestampToStr(updated_at),
+        render: (updated_at: number) => convertTimestampToStr(updated_at),
       },
       {
         title: "操作",
         key: "operation",
         width: 300,
-        render: (_, record) => (
+        render: (_: any, record: IGame) => (
           <>
             <Button
               type="primary"
               className={styles.messageBtn}
-              onClick={(e) => editBasicInfoHandler(e, record.id)}
+              onClick={(e: any) => editBasicInfoHandler(e, record.id)}
             >
               基本信息
             </Button>
             <Button
               type="primary"
               className={styles.messageBtn}
-              onClick={(e) => editPacakgeNameHandler(e, record.id)}
+              onClick={(e: any) => editPacakgeNameHandler(e, record.id)}
             >
               包名&区服
             </Button>
             <Button
               type="primary"
               className={styles.messageBtn}
-              onClick={(e) => editAccelerateConfigHandler(e, record.id)}
+              onClick={(e: any) => editAccelerateConfigHandler(e, record.id)}
             >
               加速配置
             </Button>
@@ -120,17 +85,18 @@ const GameConfig = () => {
       },
     ];
 
-  useEffect(() => {
-    const getGamesListAsync = async () => {
-      showLoading();
-      const res = await getGameList({ start_id: 0, cnt: 10 }).finally(() =>
-        hideLoading()
-      );
-      setGames(res.games);
-      setGameAmount(res.total);
-    };
+  const getGamesListAsync = async (pageSize: number, pageNumber?: number) => {
+    showLoading();
+    const res = await getGameList({
+      offset: pageNumber ? (pageNumber - 1) * pageSize + 1 : 0,
+      cnt: pageSize,
+    }).finally(() => hideLoading());
+    setGames(res.games);
+    setTotal(res.total);
+  };
 
-    getGamesListAsync();
+  useEffect(() => {
+    getGamesListAsync(pageSize);
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -138,9 +104,7 @@ const GameConfig = () => {
     console.log(e);
     console.log(key);
     setBasicInfoEditMode(true);
-    setCurrentGameConfig(
-      mockDataSource.filter((item) => item.id === key)[0] ?? {}
-    );
+    setCurrentGameConfig(games.filter((item) => item.id === key)[0] ?? {});
     setShowBasicInfoModal(true);
   };
 
@@ -148,9 +112,7 @@ const GameConfig = () => {
   const editPacakgeNameHandler = (e: any, key: number) => {
     console.log(e);
     console.log(key);
-    setCurrentGameConfig(
-      mockDataSource.filter((item) => item.id === key)[0] ?? {}
-    );
+    setCurrentGameConfig(games.filter((item) => item.id === key)[0] ?? {});
     setPackageModal(true);
   };
 
@@ -158,9 +120,7 @@ const GameConfig = () => {
   const editAccelerateConfigHandler = (e: any, key: number) => {
     console.log(e);
     console.log(key);
-    setCurrentGameConfig(
-      mockDataSource.filter((item) => item.id === key)[0] ?? {}
-    );
+    setCurrentGameConfig(games.filter((item) => item.id === key)[0] ?? {});
     setAccelerateConfigModal(true);
   };
 
@@ -174,6 +134,26 @@ const GameConfig = () => {
   const closePackageModal = () => setPackageModal(false);
   const closeAccelerateConfigModal = () => setAccelerateConfigModal(false);
 
+  const onSearchGames = (value: string) => {
+    showLoading();
+    if (value === "") {
+      setShowSearchResult(false);
+      getGamesListAsync(pageSize, currentPage);
+    }
+    // todo id=0, 按照名称搜索
+    searchGames({ id: 0, title: value })
+      .then((res) => {
+        setGames(res.games);
+        setShowSearchResult(true);
+      })
+      .finally(() => hideLoading());
+  };
+
+  const onPageChange = (page: number, pageSize: number) => {
+    setCurrentPage(page);
+    getGamesListAsync(pageSize, page);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -182,6 +162,8 @@ const GameConfig = () => {
           <Input.Search
             placeholder="在此搜索游戏名"
             className={styles.search}
+            onSearch={onSearchGames}
+            allowClear
           />
           <Button
             onClick={addNewGameHandler}
@@ -194,8 +176,19 @@ const GameConfig = () => {
       </div>
       <Table
         columns={columns}
-        dataSource={mockDataSource}
+        dataSource={games}
+        rowKey="id"
         className={styles.table}
+        pagination={
+          showSearchResult
+            ? false
+            : {
+                pageSize,
+                total,
+                current: currentPage,
+                onChange: onPageChange,
+              }
+        }
       />
       {showBasicInfoModal && (
         <GameConfigBasicInfoModal
@@ -208,6 +201,7 @@ const GameConfig = () => {
         <ViewPackageAndServerModal
           gameId={currentGameConfig.id}
           closeModal={closePackageModal}
+          gameName={currentGameConfig.title}
         />
       )}
       {showAccelerateConfigModal && (
