@@ -159,25 +159,29 @@ const ViewPackageAndServerModal = (props: IProps) => {
     setShowcRegionServerEditModal(true);
   };
 
-  const closePackageNameEditModal = async () => {
+  const closePackageNameEditModal = async (needRefresh: boolean) => {
     setShowcPackageNameEditModal(false);
     setCurrentGamePkg({} as IGamePkg);
-    showLoading();
-    const gamePkgsRes = await getGamePkgsList({ game_id: gameId }).finally(() =>
-      hideLoading()
-    );
-    setGamePkgs(gamePkgsRes.pkgs);
-    hideLoading();
+    if (needRefresh) {
+      showLoading();
+      const gamePkgsRes = await getGamePkgsList({ game_id: gameId }).finally(
+        () => hideLoading()
+      );
+      setGamePkgs(gamePkgsRes.pkgs);
+      hideLoading();
+    }
   };
-  const closeRegionServerEditModal = async () => {
+  const closeRegionServerEditModal = async (needRefresh: boolean) => {
     setShowcRegionServerEditModal(false);
     setCurrentGameRegion({} as IGameRegion);
-    showLoading();
-    const gameRegionRes = await getGameRegionList({ game_id: gameId }).finally(
-      () => hideLoading()
-    );
-    setGameRegions(gameRegionRes.regions);
-    hideLoading();
+    if (needRefresh) {
+      showLoading();
+      const gameRegionRes = await getGameRegionList({
+        game_id: gameId,
+      }).finally(() => hideLoading());
+      setGameRegions(gameRegionRes.regions);
+      hideLoading();
+    }
   };
 
   const addNewPackageNameConfig = () => {
@@ -215,6 +219,7 @@ const ViewPackageAndServerModal = (props: IProps) => {
           dataSource={gamePkgs}
           columns={packageTableColumn}
           rowKey="name"
+          pagination={false}
         />
       </div>
       <div className={styles.serverTable}>
@@ -228,6 +233,7 @@ const ViewPackageAndServerModal = (props: IProps) => {
           dataSource={gameRegions}
           columns={regionServerTableColumn}
           rowKey="id"
+          pagination={false}
         />
       </div>
 

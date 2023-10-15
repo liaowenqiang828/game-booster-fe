@@ -10,7 +10,7 @@ import { IAddGamePkgRequest, IEditGamePkgRequest } from "../../types/request";
 interface IProps {
   packageInfo: IGamePkg;
   gameName: string;
-  closeModal: () => void;
+  closeModal: (needRefresh: boolean) => void;
   editMode: boolean;
   gameId: number;
 }
@@ -42,7 +42,7 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
     };
 
     await addGamePkg(request)
-      .then(() => closeModal())
+      .then(() => closeModal(true))
       .finally(() => hideLoading());
   };
 
@@ -56,7 +56,7 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
       enabled: fieldsValue.enabled,
     };
     await editGamePkg(request)
-      .then(() => closeModal())
+      .then(() => closeModal(true))
       .finally(() => hideLoading());
   };
 
@@ -65,7 +65,7 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
       centered
       open
       footer={null}
-      onCancel={closeModal}
+      onCancel={() => closeModal(false)}
       width={800}
       closable
       maskClosable={false}
@@ -88,11 +88,11 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
             className={styles.formItem}
             initialValue={gameName}
           >
-            <Input disabled />
+            <Input placeholder="请填写游戏卡片处游戏名" />
           </Form.Item>
 
           <Form.Item label="包名" name="name" initialValue={packageInfo.name}>
-            <Input />
+            <Input placeholder="请前往游戏库查询" />
           </Form.Item>
           <Form.Item label="是否启用" name="enabled">
             <Switch
@@ -105,10 +105,10 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
             name="channel"
             initialValue={packageInfo.channel}
           >
-            <Input />
+            <Input placeholder="请填写渠道名，如“小米”" />
           </Form.Item>
           <Form.Item label="签名" name="sign" initialValue={packageInfo.sign}>
-            <Input />
+            <Input placeholder="请填写游戏签名" />
           </Form.Item>
           <Form.Item
             label="启动时间"

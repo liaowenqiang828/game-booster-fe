@@ -14,7 +14,7 @@ import { convertTimestampToStr } from "../../utils/dataTime";
 interface IProps {
   regionServer: IGameRegion;
   gameName: string;
-  closeModal: () => void;
+  closeModal: (needRefresh: boolean) => void;
   editMode: boolean;
   gameId: number;
 }
@@ -64,7 +64,7 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
   const addGameRegionHandler = (request: IAddGameRegionRequest) => {
     showLoading();
     addGameRegion(request)
-      .then(() => closeModal())
+      .then(() => closeModal(true))
       .finally(() => hideLoading());
   };
 
@@ -73,7 +73,7 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
     console.log("request", request);
 
     editGameRegion(request)
-      .then(() => closeModal())
+      .then(() => closeModal(true))
       .finally(() => hideLoading());
   };
 
@@ -100,7 +100,7 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
       centered
       open
       footer={null}
-      onCancel={closeModal}
+      onCancel={() => closeModal(false)}
       width={800}
       closable
       maskClosable={false}
@@ -131,7 +131,7 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
             name="name"
             initialValue={regionServer.name}
           >
-            <Input />
+            <Input placeholder="请填写区服名" />
           </Form.Item>
           <Form.Item label="是否启用" name="enabled">
             <Switch
@@ -144,7 +144,11 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
             name="dns_group"
             initialValue={regionServer.dns_group}
           >
-            <Select options={dnsOptions} tagRender={tagRender} />
+            <Select
+              options={dnsOptions}
+              tagRender={tagRender}
+              placeholder="请选择DNS"
+            />
           </Form.Item>
           <Form.Item
             label="加速路线"
@@ -156,10 +160,11 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
               tagRender={tagRender}
               mode="multiple"
               style={{ width: "100%" }}
+              placeholder="请选择加速路线"
             />
           </Form.Item>
           <Form.Item label="签名" name="signature">
-            <Input />
+            <Input placeholder="请填写签名" />
           </Form.Item>
           <Form.Item
             label="启动时间"
@@ -170,7 +175,7 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
                 : convertTimestampToStr(new Date().getTime())
             }
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
           <Form.Item
             label="更新时间"

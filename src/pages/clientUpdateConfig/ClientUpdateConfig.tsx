@@ -7,6 +7,7 @@ import { IClientUpdate, OSENUM } from "../../types/index";
 import { LoadingContext } from "../../router/Router";
 import { IListClientUpdatesResponse } from "../../types/response";
 import { getClientUpdateList } from "../../api/clientUpdate";
+import { convertTimestampToStr } from "../../utils/dataTime";
 
 const ClientUpdateConfig = () => {
   const [showModal, setShowModal] = useState(false);
@@ -63,6 +64,7 @@ const ClientUpdateConfig = () => {
       title: "上线时间",
       dataIndex: "release_date",
       key: "release_date",
+      render: (release_date: number) => convertTimestampToStr(release_date),
     },
     {
       title: "操作",
@@ -117,10 +119,11 @@ const ClientUpdateConfig = () => {
       <div className={styles.header}>
         <div className={styles.text}>客户端升级配置</div>
         <div className={styles.operator}>
-          <Input.Search
+          {/* <Input.Search
             placeholder="在此搜索版本号"
             className={styles.search}
-          />
+            onSearch={onSearch}
+          /> */}
           <Button
             onClick={addNewClientUpdateConfigHandler}
             type="primary"
@@ -134,6 +137,7 @@ const ClientUpdateConfig = () => {
         columns={columns}
         dataSource={clientUpdates}
         className={styles.table}
+        pagination={false}
       />
       {showModal && (
         <ClientUpdateEditModal

@@ -145,6 +145,7 @@ const LineConfig = () => {
     if (value === "") {
       setShowSearchResult(false);
       loadingBoostZonesByPageNumberAndPageSize(pageSize, currentPage);
+      return;
     }
     // todo id=0, 按照名称搜索
     searchBoostZones({ id: 0, name: value })

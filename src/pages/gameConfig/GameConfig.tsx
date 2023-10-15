@@ -142,6 +142,7 @@ const GameConfig = () => {
     if (value === "") {
       setShowSearchResult(false);
       getGamesListAsync(pageSize, currentPage);
+      return;
     }
     // todo id=0, 按照名称搜索
     searchGames({ id: 0, title: value })

@@ -80,10 +80,10 @@ const DnsConfig = () => {
       <div className={styles.header}>
         <div className={styles.text}>线路配置</div>
         <div className={styles.operator}>
-          <Input.Search
+          {/* <Input.Search
             placeholder="在此搜索DNS名称"
             className={styles.search}
-          />
+          /> */}
           <Button
             onClick={addNewDnsHandler}
             type="primary"
