@@ -85,7 +85,7 @@ export interface IGameBoostConfig {
   android_acl: string;
   android_acl_rul: string;
   android_acl_md5: string;
-  ios_acl_content: string;
+  ios_acl: string;
   ios_acl_groups: number[];
   ios_acl_rul: string;
   ios_acl_md5: string;

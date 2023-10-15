@@ -71,10 +71,10 @@ const ClientUpdateEditModal = (props: IProps) => {
             name="system"
             initialValue={clientUpdateConfig.os}
           >
-            <Select options={osSelectorOptions} />
+            <Select options={osSelectorOptions} placeholder="请选择系统" />
           </Form.Item>
           <Form.Item label="安装包" name="package">
-            <Input />
+            <Input placeholder="请上传安装包" />
             <Button
               type="primary"
               style={{ position: "absolute", marginLeft: "20px" }}

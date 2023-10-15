@@ -93,7 +93,7 @@ export const editGameRegion = (
 export const getGameBoostConfigList = (
   request: IListGameBoostConfigRequest
 ): Promise<IListGameBoostConfigResponse> => {
-  return http.get("/list_game_regions", {
+  return http.get("/get_game_boost_config", {
     params: request,
   });
 };

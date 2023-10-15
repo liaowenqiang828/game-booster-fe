@@ -1,10 +1,12 @@
-import { Button, Form, Input, Modal, Select } from "antd";
+import { Button, Form, Input, Modal, Select, Tag } from "antd";
 import styles from "./index.module.less";
 import { useContext, useEffect, useState } from "react";
 import { LoadingContext } from "../../router/Router";
-import { IGameBoostConfig, PLATFORMENUM } from "../../types";
+import { IGameBoostConfig, PLATFORMENUM } from "../../types/index";
 import { editGameBoostConfig, getGameBoostConfigList } from "../../api/game";
 import PlatformSelector from "../platformSelect/PlatformSelector";
+import type { CustomTagProps } from "rc-select/lib/BaseSelect";
+import { IEditGameBoostConfigRequest } from "../../types/request";
 
 interface IProps {
   gameId: number;
@@ -13,17 +15,54 @@ interface IProps {
 }
 const GameAccelerateConfigEditModal = (props: IProps) => {
   const { closeModal, gameId, gameName } = props;
-  const [gameBoostConfig, setGameBoostConfig] = useState(
-    {} as IGameBoostConfig
-  );
+  const [gameBoostConfig, setGameBoostConfig] = useState<
+    IGameBoostConfig | undefined
+  >(undefined);
   const { showLoading, hideLoading } = useContext(LoadingContext);
   const [os, setOs] = useState(PLATFORMENUM.Android);
+  const [androidAclInfo, setAndroidAclInfo] = useState<{
+    android_acl: string;
+    android_acl_groups: number[];
+  }>({
+    android_acl: gameBoostConfig?.android_acl || "",
+    android_acl_groups: gameBoostConfig?.android_acl_groups || [],
+  });
+  const [iosAclInfo, setIosAclInfo] = useState<{
+    ios_acl: string;
+    ios_acl_groups: number[];
+  }>({
+    ios_acl: gameBoostConfig?.ios_acl || "",
+    ios_acl_groups: gameBoostConfig?.ios_acl_groups || [],
+  });
+
+  const aclGroupOptions = [
+    {
+      value: 1,
+      label: "google",
+    },
+    {
+      value: 2,
+      label: "twitter",
+    },
+    {
+      value: 3,
+      label: "facebook",
+    },
+  ];
 
   useEffect(() => {
     showLoading();
     getGameBoostConfigList({ game_id: gameId })
       .then((res) => {
         setGameBoostConfig(res.cfg);
+        setAndroidAclInfo({
+          android_acl_groups: res.cfg.android_acl_groups,
+          android_acl: res.cfg.android_acl,
+        });
+        setIosAclInfo({
+          ios_acl_groups: res.cfg.ios_acl_groups,
+          ios_acl: res.cfg.ios_acl,
+        });
       })
       .finally(() => hideLoading());
   }, []);
@@ -32,13 +71,57 @@ const GameAccelerateConfigEditModal = (props: IProps) => {
     setOs(osValue);
   };
 
+  const onAclGroupChange = (values: number[]) => {
+    console.log("value", values);
+    if (os === PLATFORMENUM.Android) {
+      setAndroidAclInfo({ ...androidAclInfo, android_acl_groups: values });
+    } else {
+      setIosAclInfo({ ...iosAclInfo, ios_acl_groups: values });
+    }
+  };
+
+  const onAclContentChange = (e: any) => {
+    if (os === PLATFORMENUM.Android) {
+      setAndroidAclInfo({ ...androidAclInfo, android_acl: e.target.value });
+    } else {
+      setIosAclInfo({ ...iosAclInfo, ios_acl: e.target.value });
+    }
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
     showLoading();
-    editGameBoostConfig(fieldsValue)
+    const request: IEditGameBoostConfigRequest = {
+      game_id: gameId,
+      boost_pkgs: Array.from(fieldsValue.boost_pkgs.split("\n")),
+      ...androidAclInfo,
+      ...iosAclInfo,
+    };
+
+    editGameBoostConfig(request)
       .then(() => closeModal())
       .finally(() => hideLoading());
   };
+
+  const tagRender = (props: CustomTagProps) => {
+    const { label } = props;
+    const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    return (
+      <Tag
+        color="#1677ff"
+        onMouseDown={onPreventMouseDown}
+        closable={false}
+        style={{ marginRight: 3 }}
+      >
+        {label}
+      </Tag>
+    );
+  };
+
+  if (!gameBoostConfig) return null;
 
   return (
     <Modal
@@ -68,41 +151,72 @@ const GameAccelerateConfigEditModal = (props: IProps) => {
             className={styles.formItem}
             initialValue={gameName}
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
 
           <Form.Item
             label="加速包名"
-            name="acceratePackageName"
-            initialValue={gameBoostConfig.boost_pkgs}
+            name="boost_pkgs"
+            initialValue={gameBoostConfig.boost_pkgs.join("\n")}
           >
             <Input.TextArea autoSize={{ minRows: 5 }} />
           </Form.Item>
           <Form.Item label="" name="system">
             <PlatformSelector platform={os} onSelect={onPlatformChange} />
           </Form.Item>
-          <Form.Item label="调用ACL组(可多选)" name="applyAclGroup">
-            <Select
-              // todo options from ?
-              // options={}
-              defaultValue={
-                os === PLATFORMENUM.Android
-                  ? gameBoostConfig.android_acl_groups
-                  : gameBoostConfig.ios_acl_groups
-              }
-            />
-          </Form.Item>
-          <Form.Item
-            label="内容"
-            name="content"
-            initialValue={
-              os === PLATFORMENUM.Android
-                ? gameBoostConfig.android_acl
-                : gameBoostConfig.ios_acl_content
-            }
-          >
-            <Input.TextArea autoSize={{ minRows: 10 }} />
-          </Form.Item>
+          {os === PLATFORMENUM.Android && (
+            <Form.Item
+              label="调用ACL组(可多选)"
+              name="andrios_acl_group"
+              initialValue={gameBoostConfig.android_acl_groups}
+            >
+              <Select
+                mode="multiple"
+                options={aclGroupOptions}
+                onChange={onAclGroupChange}
+                tagRender={tagRender}
+              />
+            </Form.Item>
+          )}
+
+          {os === PLATFORMENUM.iOS && (
+            <Form.Item
+              label="调用ACL组(可多选)"
+              name="ios_acl_group"
+              initialValue={gameBoostConfig.ios_acl_groups}
+            >
+              <Select
+                mode="multiple"
+                options={aclGroupOptions}
+                onChange={onAclGroupChange}
+                tagRender={tagRender}
+              />
+            </Form.Item>
+          )}
+          {os === PLATFORMENUM.Android && (
+            <Form.Item
+              label="内容"
+              name="android_acl"
+              initialValue={gameBoostConfig.android_acl}
+            >
+              <Input.TextArea
+                autoSize={{ minRows: 10 }}
+                onChange={onAclContentChange}
+              />
+            </Form.Item>
+          )}
+          {os === PLATFORMENUM.iOS && (
+            <Form.Item
+              label="内容"
+              name="ios_acl"
+              initialValue={gameBoostConfig.ios_acl}
+            >
+              <Input.TextArea
+                autoSize={{ minRows: 10 }}
+                onChange={onAclContentChange}
+              />
+            </Form.Item>
+          )}
           <Form.Item label="">
             <Button type="primary" htmlType="submit">
               提交

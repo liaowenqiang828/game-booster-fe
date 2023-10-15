@@ -174,22 +174,20 @@ export interface IListGameBoostConfigRequest {
 
 export interface IAddGameBoostConfigRequest {
   game_id: number;
-  enabled: boolean;
   boost_pkgs: string[];
   android_acl_groups: number[];
   android_acl: string;
   ios_acl_groups: number[];
-  ios_acl_content: string;
+  ios_acl: string;
 }
 
 export interface IEditGameBoostConfigRequest {
   game_id: number;
-  enabled: boolean;
   boost_pkgs: string[];
   android_acl_groups: number[];
   android_acl: string;
   ios_acl_groups: number[];
-  ios_acl_content: string;
+  ios_acl: string;
 }
 
 export interface IAddClientUpdateRequest {
