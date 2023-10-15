@@ -3,7 +3,7 @@ import styles from "./index.module.less";
 import Table, { ColumnsType } from "antd/es/table";
 import DnsEditModal from "../../components/dnsEditModal/DnsEditModal";
 import { useContext, useEffect, useState } from "react";
-import { IDnsGroup } from "../../types";
+import { IDnsGroup } from "../../types/index";
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { LoadingContext } from "../../router/Router";
 import { getDnsList } from "../../api/dns";
@@ -59,8 +59,6 @@ const DnsConfig = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editDnsConfigItemHandler = (e: any, key: number) => {
-    console.log(e);
-    console.log(key);
     setEditMode(true);
     setShowModal(true);
     setCurrentNodeConfig(dnsGroup.filter((item) => item.id === key)[0] ?? {});

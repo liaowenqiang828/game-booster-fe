@@ -6,7 +6,7 @@ import {
   convertTimestampToStr,
   generateDateTimeForCurrentOperation,
 } from "../../utils/dataTime";
-import { IDnsGroup } from "../../types";
+import { IDnsGroup } from "../../types/index";
 import { addDnsGroup, editDnsGroup } from "../../api/dns";
 
 interface IProps {
@@ -71,24 +71,23 @@ const DnsEditModal = (props: IProps) => {
           onFinish={onSubmit}
         >
           <Form.Item
-            label="名称"
+            label="DNS名称"
             name="name"
             className={styles.formItem}
             initialValue={editMode ? dnsConfig.name : ""}
-            rules={[{ required: true }]}
           >
-            <Input style={{ width: "190px" }} />
+            <Input style={{ width: "190px" }} placeholder="请输入DNS名称" />
           </Form.Item>
 
           <Form.Item
             label="内容"
             name="dns"
             initialValue={editMode ? dnsConfig.dns.join("\n") : ""}
-            rules={[{ required: true }]}
           >
             <Input.TextArea
               autoSize={{ minRows: 15 }}
               style={{ width: "80%" }}
+              placeholder="请逐行填写，一行一个DNS"
             />
           </Form.Item>
           <Form.Item

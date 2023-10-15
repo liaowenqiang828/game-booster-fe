@@ -14,6 +14,8 @@ const ClientUpdateConfig = () => {
     {} as IClientUpdate
   );
   const [clientUpdates, setClientUpdates] = useState<IClientUpdate[]>([]);
+  const [editMode, setEditMode] = useState(false);
+
   const columns: ColumnsType<IClientUpdate> = [
     {
       title: "版本号",
@@ -78,34 +80,36 @@ const ClientUpdateConfig = () => {
   ];
   const { showLoading, hideLoading } = useContext(LoadingContext);
 
+  const getClientUpdateListAsync = async () => {
+    showLoading();
+    const res: IListClientUpdatesResponse = await getClientUpdateList().finally(
+      () => hideLoading()
+    );
+    setClientUpdates(res.updates || []);
+  };
+
   useEffect(() => {
-    const getClientUpdateListAsync = async () => {
-      showLoading();
-      const res: IListClientUpdatesResponse =
-        await getClientUpdateList().finally(() => hideLoading());
-      setClientUpdates(res.updates || []);
-    };
     getClientUpdateListAsync();
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editClientUpdateConfigHandler = (e: any, key: number) => {
-    console.log(e);
-    console.log(key);
     setCurrentClientUpdateConfig(
       clientUpdates.filter((item) => item.id === key)[0] ?? {}
     );
+    setEditMode(true);
     setShowModal(true);
   };
 
   const addNewClientUpdateConfigHandler = () => {
-    console.log("add new line");
+    setEditMode(false);
     setShowModal(true);
   };
 
   const closeModal = () => {
     setShowModal(false);
     setCurrentClientUpdateConfig({} as IClientUpdate);
+    getClientUpdateListAsync();
   };
 
   return (
@@ -135,6 +139,7 @@ const ClientUpdateConfig = () => {
         <ClientUpdateEditModal
           clientUpdateConfig={currentClientUpdateConfig}
           closeModal={closeModal}
+          editMode={editMode}
         />
       )}
     </div>

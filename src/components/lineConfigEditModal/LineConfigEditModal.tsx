@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal, Select, Switch } from "antd";
+import { Button, Form, Input, Modal, Select, Switch, Tag } from "antd";
 import styles from "./index.module.less";
 import { useContext } from "react";
 import { LoadingContext } from "../../router/Router";
@@ -12,6 +12,7 @@ import {
   IAddBoostZoneRequest,
   IEditBoostZoneRequest,
 } from "../../types/request";
+import type { CustomTagProps } from "rc-select/lib/BaseSelect";
 
 interface IProps {
   lineConfig: IBoostZone;
@@ -49,7 +50,6 @@ const nodeAddressOptions = [
 
 const LineConfigEditModal = (props: IProps) => {
   const { lineConfig, closeModal, editMode } = props;
-  console.log("lineConfig", lineConfig);
 
   const { hideLoading, showLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -110,14 +110,10 @@ const LineConfigEditModal = (props: IProps) => {
           onFinish={onSubmit}
         >
           <Form.Item label="线路名" name="name" initialValue={lineConfig.name}>
-            <Input />
+            <Input placeholder="参考格式：上海日本一区" />
           </Form.Item>
 
-          <Form.Item
-            label="是否启用"
-            name="enabled"
-            initialValue={lineConfig.enabled}
-          >
+          <Form.Item label="是否启用" name="enabled">
             <Switch defaultChecked={lineConfig.enabled} />
           </Form.Item>
           <Form.Item
@@ -153,7 +149,7 @@ const LineConfigEditModal = (props: IProps) => {
             name="ping_addr"
             initialValue={lineConfig.ping_addr}
           >
-            <Input />
+            <Input placeholder="请前往测速软件确认格式无误" />
           </Form.Item>
           <Form.Item
             label="节点地址"

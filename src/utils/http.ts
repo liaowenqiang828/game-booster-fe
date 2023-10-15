@@ -1,10 +1,11 @@
 import axios from "axios";
-import { ErrorCode } from "../types";
+import { ErrorCode } from "../types/index";
 import { message } from "antd";
-import { clearLoginInfo } from ".";
+import { clearLoginInfo } from "./index";
+import { BASE_URL } from "../constant/index";
 
 const http = axios.create({
-  baseURL: "/admin/v1",
+  baseURL: BASE_URL,
   timeout: 60000,
 });
 

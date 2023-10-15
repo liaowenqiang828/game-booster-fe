@@ -130,7 +130,10 @@ const GameConfig = () => {
     setShowBasicInfoModal(true);
   };
 
-  const closeBasicInfoModal = () => setShowBasicInfoModal(false);
+  const closeBasicInfoModal = () => {
+    setShowBasicInfoModal(false);
+    setCurrentGameConfig({} as IGame);
+  };
   const closePackageModal = () => setPackageModal(false);
   const closeAccelerateConfigModal = () => setAccelerateConfigModal(false);
 

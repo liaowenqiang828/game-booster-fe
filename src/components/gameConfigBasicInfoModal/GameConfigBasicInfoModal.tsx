@@ -10,21 +10,31 @@ import {
   putImageFileIntoTencentOSS,
 } from "../../api/game";
 import { IGetUploadUrlResponse } from "../../types/response";
+import { IMAGE_BASE_URL } from "../../constant/index";
 
 interface IProps {
   gameConfig: IGame;
   closeModal: () => void;
   editMode: boolean;
 }
+
 const GameConfigBasicInfoModal = (props: IProps) => {
   const { gameConfig, closeModal, editMode } = props;
+  console.log("gameConfig", gameConfig);
   const { showLoading, hideLoading } = useContext(LoadingContext);
   const iconInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const characterInputRef = useRef<HTMLInputElement>(null);
-  const [iconUrl, setIconUrl] = useState<string>("");
-  const [bannerUrl, setBannerUrl] = useState<string>("");
-  const [characterUrl, setCharacterUrl] = useState<string>("");
+  const [iconUrl, setIconUrl] = useState<string>(
+    editMode ? `${IMAGE_BASE_URL}${gameConfig.icon}` : ""
+  );
+  const [bannerUrl, setBannerUrl] = useState<string>(
+    editMode ? `${IMAGE_BASE_URL}${gameConfig.banner}` : ""
+  );
+  const [characterUrl, setCharacterUrl] = useState<string>(
+    editMode ? `${IMAGE_BASE_URL}${gameConfig.character_pic}` : ""
+  );
+  const [gameTitle, setGameTitle] = useState(gameConfig.title);
   const [savedImagesUrl, setSavedImagesUrl] = useState<{
     iconSavedUrl: string;
     bannerSavedUrl: string;
@@ -46,6 +56,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
     console.log("request", {
       ...fieldsValue,
       enabled: false,
+      title: gameTitle,
       icon: savedImagesUrl.iconSavedUrl,
       banner: savedImagesUrl.bannerSavedUrl,
       character_pic: savedImagesUrl.characterSavedUrl,
@@ -165,6 +176,10 @@ const GameConfigBasicInfoModal = (props: IProps) => {
     }
   };
 
+  const onGameTitleChange = (e: any) => {
+    setGameTitle(e.target.value);
+  };
+
   return (
     <Modal
       centered
@@ -185,21 +200,21 @@ const GameConfigBasicInfoModal = (props: IProps) => {
           style={{ maxWidth: 1000 }}
           onFinish={onSubmit}
         >
-          <Form.Item
-            label="游戏名"
-            name="title"
-            initialValue={gameConfig.title}
-          >
-            <Input />
+          <Form.Item label="游戏名" name="title">
+            <Input
+              value={gameTitle}
+              onChange={onGameTitleChange}
+              placeholder="请输入游戏名称"
+            />
+            <span>(该名称将在APP游戏卡中实际展示)</span>
           </Form.Item>
-          <span>(该名称将在APP游戏卡中实际展示)</span>
 
           <Form.Item
             label="简介"
             name="summary"
             initialValue={gameConfig.summary}
           >
-            <Input />
+            <Input placeholder="此处为游戏卡片内简介" />
           </Form.Item>
           <Form.Item label="icon">
             <input

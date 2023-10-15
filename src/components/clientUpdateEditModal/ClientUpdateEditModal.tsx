@@ -1,12 +1,15 @@
 import { Button, Checkbox, Form, Input, Modal, Select } from "antd";
 import styles from "./index.module.less";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { LoadingContext } from "../../router/Router";
-import { IClientUpdate, OSENUM } from "../../types";
+import { IClientUpdate, OSENUM } from "../../types/index";
+import { IEditClientUpdateRequest } from "../../types/request";
+import { addClientUpdate, editClientUpdate } from "../../api/clientUpdate";
 
 interface IProps {
   clientUpdateConfig: IClientUpdate;
   closeModal: () => void;
+  editMode: boolean;
 }
 
 const osSelectorOptions = [
@@ -24,17 +27,43 @@ const osSelectorOptions = [
   },
 ];
 const ClientUpdateEditModal = (props: IProps) => {
-  const { clientUpdateConfig, closeModal } = props;
-
+  const { clientUpdateConfig, closeModal, editMode } = props;
   const { showLoading, hideLoading } = useContext(LoadingContext);
+  const [currentVer, setCurrentVer] = useState(clientUpdateConfig.ver);
+  const [strongCheck, setStrongCheck] = useState(false);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = (fieldsValue: any) => {
-    console.log(fieldsValue);
+  const onSubmit = async (fieldsValue: any) => {
+    const commonRequest = {
+      os: fieldsValue.os,
+      ver: currentVer,
+      // url: fieldsValue.url,
+      url: "https://a.b.c/upd/ios/aabbcc.dmp",
+      md5: "dddaaaaaaaaaaaaaaaaaaaaaaaaatest",
+      size: 45701394,
+      must_upd: strongCheck,
+      title: fieldsValue.title,
+      change_log: fieldsValue.change_log,
+    };
     showLoading();
-    setTimeout(() => {
-      hideLoading();
-      closeModal();
-    }, 2000);
+    if (editMode) {
+      const request: IEditClientUpdateRequest = {
+        ...commonRequest,
+        id: clientUpdateConfig.id,
+      };
+      await editClientUpdate(request).finally(() => hideLoading());
+    } else {
+      await addClientUpdate(commonRequest).finally(() => hideLoading());
+    }
+    closeModal();
+  };
+
+  const onCurrentVerChange = (e: any) => {
+    setCurrentVer(e.target.value);
+  };
+
+  const onStrongCheck = (e: any) => {
+    setStrongCheck(e.target.checked);
   };
 
   return (
@@ -59,21 +88,27 @@ const ClientUpdateEditModal = (props: IProps) => {
         >
           <Form.Item
             label="版本号"
-            name="version"
+            name="ver"
             initialValue={clientUpdateConfig.ver}
           >
-            <Input placeholder="请填写版本号，如：0.1.2" />
+            <Input
+              placeholder="请填写版本号，如：0.1.2"
+              value={currentVer}
+              onChange={onCurrentVerChange}
+            />
+            <Checkbox checked={strongCheck} onChange={onStrongCheck}>
+              勾选表“更强”
+            </Checkbox>
           </Form.Item>
-          <Checkbox>勾选表“更强”</Checkbox>
 
           <Form.Item
             label="系统"
-            name="system"
+            name="os"
             initialValue={clientUpdateConfig.os}
           >
             <Select options={osSelectorOptions} placeholder="请选择系统" />
           </Form.Item>
-          <Form.Item label="安装包" name="package">
+          <Form.Item label="安装包" name="url">
             <Input placeholder="请上传安装包" />
             <Button
               type="primary"
@@ -91,7 +126,7 @@ const ClientUpdateEditModal = (props: IProps) => {
           </Form.Item>
           <Form.Item
             label="内容"
-            name="content"
+            name="change_log"
             initialValue={clientUpdateConfig.change_log}
           >
             <Input.TextArea

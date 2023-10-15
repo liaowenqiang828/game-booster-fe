@@ -127,7 +127,6 @@ const NodeConfig = () => {
       loadingBoostNodesByPageNumberAndPageSize(pageSize, currentPage);
     } else {
       const res = await searchBoostNodes({ type: 0, val: value });
-      // search error handler
       setBoostNodes(res.nodes);
       setShowSearchResult(true);
     }

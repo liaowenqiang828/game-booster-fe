@@ -218,9 +218,12 @@ const ViewPackageAndServerModal = (props: IProps) => {
         />
       </div>
       <div className={styles.serverTable}>
-        <Button type="primary" onClick={addNewRegionServerConfig}>
-          新增
-        </Button>
+        <div className={styles.addBtn}>
+          <Button type="primary" onClick={addNewRegionServerConfig}>
+            新增
+          </Button>
+        </div>
+
         <Table
           dataSource={gameRegions}
           columns={regionServerTableColumn}

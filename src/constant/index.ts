@@ -9,3 +9,7 @@ export enum ModesEnum {
   download = 2,
   both = 3,
 }
+
+export const BASE_URL = "/admin/v1";
+
+export const IMAGE_BASE_URL = "https://img.et-cdn.com";

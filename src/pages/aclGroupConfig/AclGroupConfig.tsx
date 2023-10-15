@@ -68,10 +68,11 @@ const AclGroupConfig = () => {
     setShowAclGroupEditModal(true);
   };
 
-  const closeModal = () => {
+  const closeModal = (needRefresh: boolean) => {
     setCurrentAclGroup({} as IAclGroup);
     setShowAclGroupEditModal(false);
-    getAclGroupsAsync();
+
+    needRefresh && getAclGroupsAsync();
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

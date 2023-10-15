@@ -14,7 +14,6 @@ interface IProps {
 }
 const NodeConfigEditModal = (props: IProps) => {
   const { nodeConfig, closeModal } = props;
-  console.log(nodeConfig);
 
   const [isStart, setIsStart] = useState(nodeConfig.enabled);
   const { showLoading, hideLoading } = useContext(LoadingContext);
@@ -51,10 +50,6 @@ const NodeConfigEditModal = (props: IProps) => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
-    // todo prevent to change prod data
-    // todo remove when deploy to prod
-    if (nodeConfig.id !== 6 && nodeConfig.id !== 7) return;
-
     showLoading();
     editBoostNode({
       id: nodeConfig.id,
@@ -103,7 +98,7 @@ const NodeConfigEditModal = (props: IProps) => {
           </Form.Item>
 
           <Form.Item label="节点名" name="name" initialValue={nodeConfig.name}>
-            <Input />
+            <Input placeholder="参考格式：SH- JP001" />
           </Form.Item>
           <Form.Item label="是否启动" valuePropName="isStart">
             <div className={styles.switchWrapper}>
