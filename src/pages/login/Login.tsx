@@ -10,10 +10,13 @@ import { md5 } from "js-md5";
 
 const Login = () => {
   const navigator = useNavigate();
-  const [emailValue, setEmailValue] = useState("");
+  const [emailValue, setEmailValue] = useState(
+    () => localStorage.getItem("rememberAccount") || ""
+  );
   const [passwordValue, setPasswordValue] = useState("");
   const loginEnable = !!(emailValue && passwordValue);
   // const [messageApi, contextHolder] = message.useMessage();
+  const [rememberAcount, setRememberAccount] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inputEmailValue = (e: any) => {
@@ -25,6 +28,9 @@ const Login = () => {
   };
 
   const loginHandler = () => {
+    if (rememberAcount) {
+      localStorage.setItem("rememberAccount", emailValue);
+    }
     loginApi({ name: emailValue, password: md5(passwordValue) })
       .then(() => {
         navigator(ROUTER_PATH.HOME);
@@ -36,6 +42,10 @@ const Login = () => {
           message.error("账号或密码错误，请重试");
         }
       });
+  };
+
+  const onChangeRememberAcount = (e: any) => {
+    setRememberAccount(e.target.checked);
   };
 
   return (
@@ -58,7 +68,13 @@ const Login = () => {
           onChange={inputPasswordValue}
           autoComplete="off"
         />
-        <Checkbox className={styles.storeAccount}>记住账号</Checkbox>
+        <Checkbox
+          className={styles.storeAccount}
+          checked={rememberAcount}
+          onChange={onChangeRememberAcount}
+        >
+          记住账号
+        </Checkbox>
         <Button
           disabled={!loginEnable}
           className={styles.loginBtn}

@@ -88,7 +88,7 @@ const ClientUpdateEditModal = (props: IProps) => {
         uplaodUrl: pkgUploadResponse.upload_url,
         file: "",
       });
-      console.log("imageUploadResponse", pkgUploadResponse);
+      // console.log("imageUploadResponse", pkgUploadResponse);
       setSavedPkgUrl(pkgUploadResponse.saved_url);
 
       // fileReader.addEventListener("load", () => {
