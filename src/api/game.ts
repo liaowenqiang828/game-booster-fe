@@ -113,10 +113,12 @@ export const editGameBoostConfig = (
 export const getUploadUrl = (
   request: IGetUploadUrlRequest
 ): Promise<IGetUploadUrlResponse> => {
-  return http.get("get_upload_url", request);
+  return http.get("get_upload_url", {
+    params: request,
+  });
 };
 
-export const putImageFileIntoTencentOSS = (
+export const putFileIntoTencentOSS = (
   request: IUploadImageRequest
 ): Promise<void> => {
   return http.put(request.uplaodUrl, request.file);

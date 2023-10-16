@@ -49,13 +49,14 @@ const Login = () => {
           placeholder="请输入邮箱"
           value={emailValue}
           onChange={inputEmailValue}
+          autoComplete="off"
         />
         <Input.Password
           className={styles.passwordInput}
           placeholder="请输入密码"
-          // iconRender={() => undefined}
           value={passwordValue}
           onChange={inputPasswordValue}
+          autoComplete="off"
         />
         <Checkbox className={styles.storeAccount}>记住账号</Checkbox>
         <Button

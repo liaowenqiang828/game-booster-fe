@@ -1,4 +1,4 @@
-import { Button, Input, Table, Tag } from "antd";
+import { Button, Input, Table } from "antd";
 import styles from "./index.module.less";
 import type { ColumnsType } from "antd/es/table";
 import SwitchTag from "../../components/switchTag/SwitchTag";
@@ -76,7 +76,7 @@ const NodeConfig = () => {
         <Button
           type="primary"
           className={styles.editBtn}
-          onClick={(e) => editNodeConfigItemHandler(e, record.id)}
+          onClick={(e: any) => editNodeConfigItemHandler(e, record.id)}
         >
           编辑
         </Button>

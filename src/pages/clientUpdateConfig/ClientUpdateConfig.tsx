@@ -73,7 +73,7 @@ const ClientUpdateConfig = () => {
         <Button
           type="primary"
           className={styles.editBtn}
-          onClick={(e) => editClientUpdateConfigHandler(e, record.id)}
+          onClick={(e: any) => editClientUpdateConfigHandler(e, record.id)}
         >
           编辑
         </Button>
@@ -138,6 +138,7 @@ const ClientUpdateConfig = () => {
         dataSource={clientUpdates}
         className={styles.table}
         pagination={false}
+        rowKey="id"
       />
       {showModal && (
         <ClientUpdateEditModal

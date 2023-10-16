@@ -1,14 +1,16 @@
 import { Button, Checkbox, Form, Input, Modal, Select } from "antd";
 import styles from "./index.module.less";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { LoadingContext } from "../../router/Router";
 import { IClientUpdate, OSENUM } from "../../types/index";
 import { IEditClientUpdateRequest } from "../../types/request";
 import { addClientUpdate, editClientUpdate } from "../../api/clientUpdate";
+import { IGetUploadUrlResponse } from "../../types/response";
+import { getUploadUrl, putFileIntoTencentOSS } from "../../api/game";
 
 interface IProps {
   clientUpdateConfig: IClientUpdate;
-  closeModal: () => void;
+  closeModal: (needRefresh: boolean) => void;
   editMode: boolean;
 }
 
@@ -30,15 +32,16 @@ const ClientUpdateEditModal = (props: IProps) => {
   const { clientUpdateConfig, closeModal, editMode } = props;
   const { showLoading, hideLoading } = useContext(LoadingContext);
   const [currentVer, setCurrentVer] = useState(clientUpdateConfig.ver);
-  const [strongCheck, setStrongCheck] = useState(false);
+  const [strongCheck, setStrongCheck] = useState(clientUpdateConfig.must_upd);
+  const pkgUploadRef = useRef<HTMLInputElement>(null);
+  const [savedPkgUrl, setSavedPkgUrl] = useState("");
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (fieldsValue: any) => {
     const commonRequest = {
       os: fieldsValue.os,
       ver: currentVer,
-      // url: fieldsValue.url,
-      url: "https://a.b.c/upd/ios/aabbcc.dmp",
+      url: savedPkgUrl,
       md5: "dddaaaaaaaaaaaaaaaaaaaaaaaaatest",
       size: 45701394,
       must_upd: strongCheck,
@@ -55,7 +58,7 @@ const ClientUpdateEditModal = (props: IProps) => {
     } else {
       await addClientUpdate(commonRequest).finally(() => hideLoading());
     }
-    closeModal();
+    closeModal(true);
   };
 
   const onCurrentVerChange = (e: any) => {
@@ -66,12 +69,43 @@ const ClientUpdateEditModal = (props: IProps) => {
     setStrongCheck(e.target.checked);
   };
 
+  const uploadPkg = () => {
+    pkgUploadRef.current?.click();
+  };
+
+  // todo error handler
+  const getPkgUoploadData = async () => {
+    const files = pkgUploadRef.current?.files;
+    if (files) {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(files[0]);
+
+      const pkgUploadResponse: IGetUploadUrlResponse = await getUploadUrl({
+        type: 1000,
+        name: files[0].name,
+      });
+      await putFileIntoTencentOSS({
+        uplaodUrl: pkgUploadResponse.upload_url,
+        file: "",
+      });
+      console.log("imageUploadResponse", pkgUploadResponse);
+      setSavedPkgUrl(pkgUploadResponse.saved_url);
+
+      // fileReader.addEventListener("load", () => {
+      //   putImageFileIntoTencentOSS({
+      //     uplaodUrl: pkgUploadResponse.upload_url,
+      //     file: fileReader.result,
+      //   });
+      // });
+    }
+  };
+
   return (
     <Modal
       centered
       open
       footer={null}
-      onCancel={closeModal}
+      onCancel={() => closeModal(false)}
       width={800}
       closable
       maskClosable={false}
@@ -91,14 +125,16 @@ const ClientUpdateEditModal = (props: IProps) => {
             name="ver"
             initialValue={clientUpdateConfig.ver}
           >
-            <Input
-              placeholder="请填写版本号，如：0.1.2"
-              value={currentVer}
-              onChange={onCurrentVerChange}
-            />
-            <Checkbox checked={strongCheck} onChange={onStrongCheck}>
-              勾选表“更强”
-            </Checkbox>
+            <>
+              <Input
+                placeholder="请填写版本号，如：0.1.2"
+                value={currentVer}
+                onChange={onCurrentVerChange}
+              />
+              <Checkbox checked={strongCheck} onChange={onStrongCheck}>
+                勾选表“更强”
+              </Checkbox>
+            </>
           </Form.Item>
 
           <Form.Item
@@ -109,13 +145,24 @@ const ClientUpdateEditModal = (props: IProps) => {
             <Select options={osSelectorOptions} placeholder="请选择系统" />
           </Form.Item>
           <Form.Item label="安装包" name="url">
-            <Input placeholder="请上传安装包" />
-            <Button
-              type="primary"
-              style={{ position: "absolute", marginLeft: "20px" }}
-            >
-              上传
-            </Button>
+            <>
+              <input
+                ref={pkgUploadRef}
+                type={"file"}
+                accept=".app,.apk,.dmg"
+                className={styles.input}
+                onChange={getPkgUoploadData}
+              />
+              <label className={styles.label}>
+                <Button
+                  type="primary"
+                  onClick={uploadPkg}
+                  className={styles.uploadBtn}
+                >
+                  上传
+                </Button>
+              </label>
+            </>
           </Form.Item>
           <Form.Item
             label="标题"

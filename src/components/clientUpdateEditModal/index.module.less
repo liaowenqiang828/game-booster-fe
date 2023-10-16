@@ -9,7 +9,7 @@
       margin-bottom: 8px !important;
 
       .ant-row {
-        flex-wrap: row nowrap;
+        flex-flow: row nowrap;
       }
 
       .ant-checkbox-wrapper {
@@ -20,4 +20,23 @@
       }
     }
   }
+}
+
+input[type="file"]::file-selector-button {
+  display: none;
+}
+
+.input {
+  width: 175px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  margin-right: 20px;
+  padding-left: 12px;
+  line-height: 32px;
+}
+
+.label {
+  position: absolute;
+  top: 0;
+  right: -80px;
 }

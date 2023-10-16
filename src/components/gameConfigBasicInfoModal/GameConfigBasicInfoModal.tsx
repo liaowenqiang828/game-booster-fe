@@ -7,7 +7,7 @@ import {
   addGame,
   editGame,
   getUploadUrl,
-  putImageFileIntoTencentOSS,
+  putFileIntoTencentOSS,
 } from "../../api/game";
 import { IGetUploadUrlResponse } from "../../types/response";
 import { IMAGE_BASE_URL } from "../../constant/index";
@@ -105,7 +105,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
         type: 0,
         name: files[0].name,
       });
-      await putImageFileIntoTencentOSS({
+      await putFileIntoTencentOSS({
         uplaodUrl: imageUploadResponse.upload_url,
         file: "",
       });
@@ -117,7 +117,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
 
       fileReader.addEventListener("load", () => {
         setIconUrl(fileReader.result as string);
-        putImageFileIntoTencentOSS({
+        putFileIntoTencentOSS({
           uplaodUrl: imageUploadResponse.upload_url,
           file: fileReader.result,
         });
@@ -143,7 +143,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
 
       fileReader.addEventListener("load", async () => {
         setBannerUrl(fileReader.result as string);
-        await putImageFileIntoTencentOSS({
+        await putFileIntoTencentOSS({
           uplaodUrl: imageUploadResponse.upload_url,
           file: fileReader.result,
         });
@@ -168,7 +168,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
       });
       fileReader.addEventListener("load", async () => {
         setCharacterUrl(fileReader.result as string);
-        await putImageFileIntoTencentOSS({
+        await putFileIntoTencentOSS({
           uplaodUrl: imageUploadResponse.upload_url,
           file: fileReader.result,
         });
@@ -217,28 +217,30 @@ const GameConfigBasicInfoModal = (props: IProps) => {
             <Input placeholder="此处为游戏卡片内简介" />
           </Form.Item>
           <Form.Item label="icon">
-            <input
-              ref={iconInputRef}
-              type="file"
-              accept="image/jpeg,image/jpg,image/png"
-              className={styles.input}
-              onChange={getIconImageData}
-            />
-            <label>
-              <Button
-                type="primary"
-                onClick={uploadIconPicture}
-                className={styles.uploadBtn}
-              >
-                上传
-              </Button>
-            </label>
-            <img
-              src={iconUrl || ""}
-              className={styles.iconImg}
-              alt="icon"
-              style={{ visibility: iconUrl ? "visible" : "hidden" }}
-            />
+            <>
+              <input
+                ref={iconInputRef}
+                type={"file"}
+                accept="image/jpeg,image/jpg,image/png"
+                className={styles.input}
+                onChange={getIconImageData}
+              />
+              <label>
+                <Button
+                  type="primary"
+                  onClick={uploadIconPicture}
+                  className={styles.uploadBtn}
+                >
+                  上传
+                </Button>
+              </label>
+              <img
+                src={iconUrl || ""}
+                className={styles.iconImg}
+                alt="icon"
+                style={{ visibility: iconUrl ? "visible" : "hidden" }}
+              />
+            </>
           </Form.Item>
           <Form.Item label="banner">
             <input
