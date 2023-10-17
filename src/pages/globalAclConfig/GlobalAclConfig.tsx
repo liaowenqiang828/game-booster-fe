@@ -87,7 +87,7 @@ const GlobalAclConfig = () => {
           <TextArea
             autoSize={{ minRows: 15 }}
             value={androidAcl}
-            onChange={(e) => setAndroidAcl(e.target.value)}
+            onChange={(e: any) => setAndroidAcl(e.target.value)}
             className={styles.textArea}
             placeholder={aclTextAreaPlaceholder}
           />
@@ -96,7 +96,7 @@ const GlobalAclConfig = () => {
           <TextArea
             autoSize={{ minRows: 15 }}
             value={iosAcl}
-            onChange={(e) => setIosAcl(e.target.value)}
+            onChange={(e: any) => setIosAcl(e.target.value)}
             className={styles.textArea}
             placeholder={aclTextAreaPlaceholder}
           />

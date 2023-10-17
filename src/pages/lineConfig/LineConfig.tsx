@@ -1,13 +1,13 @@
-import { Button, Input, Table, Tag } from "antd";
-import styles from "./index.module.less";
-import SwitchTag from "../../components/switchTag/SwitchTag";
-import { ColumnsType } from "antd/es/table";
-import LineConfigEditModal from "../../components/lineConfigEditModal/LineConfigEditModal";
 import { useContext, useEffect, useState } from "react";
+import { Button, Input, Table, Tag } from "antd";
+import SwitchTag from "../../components/switchTag/SwitchTag";
+import LineConfigEditModal from "../../components/lineConfigEditModal/LineConfigEditModal";
 import { IBoostZone } from "../../types/index";
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { getListBoostZones, searchBoostZones } from "../../api/boostZones";
 import { LoadingContext } from "../../router/Router";
+import type { ColumnsType } from "antd/es/table";
+import styles from "./index.module.less";
 
 export type IBoostZoneModel = Omit<IBoostZone, "desc" | "nodes">;
 
@@ -20,6 +20,7 @@ const LineConfig = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [currentLineConfig, setCurrentLineConfig] = useState({} as IBoostZone);
+
   const columns: ColumnsType<IBoostZoneModel> = [
     {
       title: "线路名",
@@ -29,7 +30,7 @@ const LineConfig = () => {
     {
       title: "是否启用",
       dataIndex: "enabled",
-      key: "isStart",
+      key: "enabled",
       render: (enabled: boolean) => <SwitchTag check={enabled} />,
     },
     {

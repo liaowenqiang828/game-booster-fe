@@ -123,11 +123,7 @@ const ClientUpdateEditModal = (props: IProps) => {
           style={{ maxWidth: 300 }}
           onFinish={onSubmit}
         >
-          <Form.Item
-            label="版本号"
-            name="ver"
-            initialValue={clientUpdateConfig.ver}
-          >
+          <Form.Item label="版本号" initialValue={clientUpdateConfig.ver}>
             <>
               <Input
                 placeholder="请填写版本号，如：0.1.2"
@@ -147,7 +143,7 @@ const ClientUpdateEditModal = (props: IProps) => {
           >
             <Select options={osSelectorOptions} placeholder="请选择系统" />
           </Form.Item>
-          <Form.Item label="安装包" name="url">
+          <Form.Item label="安装包">
             <>
               <input
                 disabled
