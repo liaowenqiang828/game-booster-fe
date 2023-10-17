@@ -35,6 +35,8 @@ const ClientUpdateEditModal = (props: IProps) => {
   const [strongCheck, setStrongCheck] = useState(clientUpdateConfig.must_upd);
   const pkgUploadRef = useRef<HTMLInputElement>(null);
   const [savedPkgUrl, setSavedPkgUrl] = useState("");
+  const [fileSize, setFileSize] = useState(0);
+  const [showFileInput, setShowFileInput] = useState(!clientUpdateConfig.url);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (fieldsValue: any) => {
@@ -43,7 +45,7 @@ const ClientUpdateEditModal = (props: IProps) => {
       ver: currentVer,
       url: savedPkgUrl,
       md5: "dddaaaaaaaaaaaaaaaaaaaaaaaaatest",
-      size: 45701394,
+      size: fileSize,
       must_upd: strongCheck,
       title: fieldsValue.title,
       change_log: fieldsValue.change_log,
@@ -78,25 +80,26 @@ const ClientUpdateEditModal = (props: IProps) => {
     const files = pkgUploadRef.current?.files;
     if (files) {
       const fileReader = new FileReader();
-      fileReader.readAsDataURL(files[0]);
 
       const pkgUploadResponse: IGetUploadUrlResponse = await getUploadUrl({
         type: 1000,
         name: files[0].name,
       });
-      await putFileIntoTencentOSS({
-        uplaodUrl: pkgUploadResponse.upload_url,
-        file: "",
-      });
-      // console.log("imageUploadResponse", pkgUploadResponse);
       setSavedPkgUrl(pkgUploadResponse.saved_url);
 
-      // fileReader.addEventListener("load", () => {
-      //   putImageFileIntoTencentOSS({
-      //     uplaodUrl: pkgUploadResponse.upload_url,
-      //     file: fileReader.result,
-      //   });
-      // });
+      fileReader.readAsArrayBuffer(files[0]);
+
+      fileReader.addEventListener("load", async () => {
+        setShowFileInput(true);
+        console.log("fileReader", fileReader);
+        // @ts-ignore
+        setFileSize(fileReader.result?.byteLength);
+
+        await putFileIntoTencentOSS({
+          uplaodUrl: pkgUploadResponse.upload_url,
+          file: fileReader.result,
+        });
+      });
     }
   };
 
@@ -147,11 +150,18 @@ const ClientUpdateEditModal = (props: IProps) => {
           <Form.Item label="安装包" name="url">
             <>
               <input
+                disabled
+                className={styles.input}
+                value={clientUpdateConfig.url.split("/").pop()}
+                style={{ display: showFileInput ? "none" : "block" }}
+              />
+              <input
                 ref={pkgUploadRef}
                 type={"file"}
                 accept=".app,.apk,.dmg"
                 className={styles.input}
                 onChange={getPkgUoploadData}
+                style={{ display: showFileInput ? "block" : "none" }}
               />
               <label className={styles.label}>
                 <Button

@@ -40,6 +40,13 @@ const GameConfigBasicInfoModal = (props: IProps) => {
     bannerSavedUrl: string;
     characterSavedUrl: string;
   }>({} as any);
+  const [showIconFileInput, setShowIconFileInput] = useState(!gameConfig.icon);
+  const [showBannerFileInput, setShowBannerFileInput] = useState(
+    !gameConfig.banner
+  );
+  const [showCharacterFileInput, setShowCharacterFileInput] = useState(
+    !gameConfig.character_pic
+  );
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
     if (editMode) {
@@ -98,29 +105,30 @@ const GameConfigBasicInfoModal = (props: IProps) => {
   const getIconImageData = async () => {
     const files = iconInputRef.current?.files;
     if (files) {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(files[0]);
-
       const imageUploadResponse: IGetUploadUrlResponse = await getUploadUrl({
         type: 0,
         name: files[0].name,
       });
-      await putFileIntoTencentOSS({
-        uplaodUrl: imageUploadResponse.upload_url,
-        file: "",
-      });
+
       console.log("imageUploadResponse", imageUploadResponse);
       setSavedImagesUrl({
         ...savedImagesUrl,
         iconSavedUrl: imageUploadResponse.saved_url,
       });
 
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(files[0]);
+
       fileReader.addEventListener("load", () => {
+        setShowIconFileInput(true);
+        console.log("fileReader.result", fileReader.result);
+
         setIconUrl(fileReader.result as string);
-        putFileIntoTencentOSS({
-          uplaodUrl: imageUploadResponse.upload_url,
-          file: fileReader.result,
-        });
+
+        // putFileIntoTencentOSS({
+        //   uplaodUrl: imageUploadResponse.upload_url,
+        //   file: fileReader.result,
+        // });
       });
     }
   };
@@ -128,8 +136,6 @@ const GameConfigBasicInfoModal = (props: IProps) => {
   const getBannerImageData = async () => {
     const files = bannerInputRef.current?.files;
     if (files) {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(files[0]);
       const imageUploadResponse: IGetUploadUrlResponse = await getUploadUrl({
         type: 0,
         name: files[0].name,
@@ -141,12 +147,18 @@ const GameConfigBasicInfoModal = (props: IProps) => {
         bannerSavedUrl: imageUploadResponse.saved_url,
       });
 
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(files[0]);
+
       fileReader.addEventListener("load", async () => {
+        console.log("fileReader.result", fileReader.result);
+        setShowBannerFileInput(true);
+
         setBannerUrl(fileReader.result as string);
-        await putFileIntoTencentOSS({
-          uplaodUrl: imageUploadResponse.upload_url,
-          file: fileReader.result,
-        });
+        // await putFileIntoTencentOSS({
+        //   uplaodUrl: imageUploadResponse.upload_url,
+        //   file: fileReader.result,
+        // });
       });
     }
   };
@@ -154,8 +166,6 @@ const GameConfigBasicInfoModal = (props: IProps) => {
   const getCharacterImageData = async () => {
     const files = characterInputRef.current?.files;
     if (files) {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(files[0]);
       const imageUploadResponse: IGetUploadUrlResponse = await getUploadUrl({
         type: 0,
         name: files[0].name,
@@ -166,7 +176,13 @@ const GameConfigBasicInfoModal = (props: IProps) => {
         ...savedImagesUrl,
         characterSavedUrl: imageUploadResponse.saved_url,
       });
+
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(files[0]);
+
       fileReader.addEventListener("load", async () => {
+        setShowCharacterFileInput(true);
+        console.log("fileReader.result", fileReader.result);
         setCharacterUrl(fileReader.result as string);
         await putFileIntoTencentOSS({
           uplaodUrl: imageUploadResponse.upload_url,
@@ -219,12 +235,20 @@ const GameConfigBasicInfoModal = (props: IProps) => {
           <Form.Item label="icon">
             <>
               <input
+                disabled
+                value={gameConfig.icon.split("/").pop()}
+                className={styles.input}
+                style={{ display: showIconFileInput ? "none" : "block" }}
+              />
+              <input
                 ref={iconInputRef}
                 type={"file"}
                 accept="image/jpeg,image/jpg,image/png"
                 className={styles.input}
+                style={{ display: showIconFileInput ? "block" : "none" }}
                 onChange={getIconImageData}
               />
+
               <label>
                 <Button
                   type="primary"
@@ -244,11 +268,18 @@ const GameConfigBasicInfoModal = (props: IProps) => {
           </Form.Item>
           <Form.Item label="banner">
             <input
+              disabled
+              value={gameConfig.banner.split("/").pop()}
+              className={styles.input}
+              style={{ display: showBannerFileInput ? "none" : "block" }}
+            />
+            <input
               ref={bannerInputRef}
               type="file"
               accept="image/jpeg,image/jpg,image/png"
               className={styles.input}
               onChange={getBannerImageData}
+              style={{ display: showBannerFileInput ? "block" : "none" }}
             />
             <label>
               <Button
@@ -268,11 +299,18 @@ const GameConfigBasicInfoModal = (props: IProps) => {
           </Form.Item>
           <Form.Item label="character">
             <input
+              disabled
+              value={gameConfig.character_pic.split("/").pop()}
+              className={styles.input}
+              style={{ display: showCharacterFileInput ? "none" : "block" }}
+            />
+            <input
               ref={characterInputRef}
               type="file"
               accept="image/jpeg,image/jpg,image/png"
               className={styles.input}
               onChange={getCharacterImageData}
+              style={{ display: showCharacterFileInput ? "block" : "none" }}
             />
             <label>
               <Button

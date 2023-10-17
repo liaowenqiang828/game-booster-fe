@@ -121,5 +121,5 @@ export const getUploadUrl = (
 export const putFileIntoTencentOSS = (
   request: IUploadImageRequest
 ): Promise<void> => {
-  return http.put(request.uplaodUrl, request.file);
+  return http.put(request.uplaodUrl, { data: request.file });
 };
