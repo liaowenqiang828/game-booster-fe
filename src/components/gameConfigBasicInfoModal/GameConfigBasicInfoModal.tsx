@@ -234,12 +234,14 @@ const GameConfigBasicInfoModal = (props: IProps) => {
           </Form.Item>
           <Form.Item label="icon">
             <>
-              <input
-                disabled
-                value={gameConfig.icon.split("/").pop()}
-                className={styles.input}
-                style={{ display: showIconFileInput ? "none" : "block" }}
-              />
+              {editMode && (
+                <input
+                  disabled
+                  value={gameConfig.icon.split("/").pop()}
+                  className={styles.input}
+                  style={{ display: showIconFileInput ? "none" : "block" }}
+                />
+              )}
               <input
                 ref={iconInputRef}
                 type={"file"}
@@ -267,12 +269,14 @@ const GameConfigBasicInfoModal = (props: IProps) => {
             </>
           </Form.Item>
           <Form.Item label="banner">
-            <input
-              disabled
-              value={gameConfig.banner.split("/").pop()}
-              className={styles.input}
-              style={{ display: showBannerFileInput ? "none" : "block" }}
-            />
+            {editMode && (
+              <input
+                disabled
+                value={gameConfig.banner.split("/").pop()}
+                className={styles.input}
+                style={{ display: showBannerFileInput ? "none" : "block" }}
+              />
+            )}
             <input
               ref={bannerInputRef}
               type="file"
@@ -298,12 +302,14 @@ const GameConfigBasicInfoModal = (props: IProps) => {
             />
           </Form.Item>
           <Form.Item label="character">
-            <input
-              disabled
-              value={gameConfig.character_pic.split("/").pop()}
-              className={styles.input}
-              style={{ display: showCharacterFileInput ? "none" : "block" }}
-            />
+            {editMode && (
+              <input
+                disabled
+                value={gameConfig.character_pic.split("/").pop()}
+                className={styles.input}
+                style={{ display: showCharacterFileInput ? "none" : "block" }}
+              />
+            )}
             <input
               ref={characterInputRef}
               type="file"
