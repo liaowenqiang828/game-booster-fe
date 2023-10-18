@@ -145,12 +145,14 @@ const ClientUpdateEditModal = (props: IProps) => {
           </Form.Item>
           <Form.Item label="安装包">
             <>
-              <input
-                disabled
-                className={styles.input}
-                value={clientUpdateConfig.url.split("/").pop()}
-                style={{ display: showFileInput ? "none" : "block" }}
-              />
+              {editMode && (
+                <input
+                  disabled
+                  className={styles.input}
+                  value={clientUpdateConfig.url.split("/").pop()}
+                  style={{ display: showFileInput ? "none" : "block" }}
+                />
+              )}
               <input
                 ref={pkgUploadRef}
                 type={"file"}

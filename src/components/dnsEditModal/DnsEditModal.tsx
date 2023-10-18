@@ -87,7 +87,7 @@ const DnsEditModal = (props: IProps) => {
             <Input.TextArea
               autoSize={{ minRows: 15 }}
               style={{ width: "80%" }}
-              placeholder="请逐行填写，一行一个DNS"
+              placeholder="请逐行填写，一行一个DNS, 如：1.1.1.1"
             />
           </Form.Item>
           <Form.Item

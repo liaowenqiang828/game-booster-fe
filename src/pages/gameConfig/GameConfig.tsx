@@ -88,7 +88,8 @@ const GameConfig = () => {
   const getGamesListAsync = async (pageSize: number, pageNumber?: number) => {
     showLoading();
     const res = await getGameList({
-      offset: pageNumber ? (pageNumber - 1) * pageSize + 1 : 0,
+      offset:
+        pageNumber && pageNumber > 1 ? (pageNumber - 1) * pageSize + 1 : 0,
       cnt: pageSize,
     }).finally(() => hideLoading());
     setGames(res.games);

@@ -108,10 +108,10 @@ const ClientUpdateConfig = () => {
     setShowModal(true);
   };
 
-  const closeModal = () => {
+  const closeModal = (needRefresh: boolean) => {
     setShowModal(false);
     setCurrentClientUpdateConfig({} as IClientUpdate);
-    getClientUpdateListAsync();
+    needRefresh && getClientUpdateListAsync();
   };
 
   return (

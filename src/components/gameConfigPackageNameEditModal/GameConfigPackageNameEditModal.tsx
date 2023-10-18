@@ -88,7 +88,7 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
             className={styles.formItem}
             initialValue={gameName}
           >
-            <Input placeholder="请填写游戏卡片处游戏名" />
+            <Input placeholder="请填写游戏卡片处游戏名" disabled />
           </Form.Item>
 
           <Form.Item label="包名" name="name" initialValue={packageInfo.name}>
