@@ -17,19 +17,23 @@ import RequireAuth from "./RequireAuth";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const LoadingContext = createContext<{
-  showLoading: () => void;
+  showLoading: (tips?: string) => void;
   hideLoading: () => void;
 }>({ showLoading: () => {}, hideLoading: () => {} });
 
 const Router = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const showLoading = () => setIsLoading(true);
+  const [tips, setTips] = useState("Loading...");
+  const showLoading = (tips?: string) => {
+    tips && setTips(tips);
+    setIsLoading(true);
+  };
   const hideLoading = () => setIsLoading(false);
 
   return (
     <LoadingContext.Provider value={{ showLoading, hideLoading }}>
       <div className={styles.container}>
-        <Spin tip="Loading..." size="large" spinning={isLoading}>
+        <Spin tip={tips} size="large" spinning={isLoading}>
           <Routes>
             <Route
               path="/"

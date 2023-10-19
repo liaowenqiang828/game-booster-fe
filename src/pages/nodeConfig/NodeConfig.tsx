@@ -93,7 +93,8 @@ const NodeConfig = () => {
   ) => {
     showLoading();
     getBoostNodesList({
-      offset: pageNumber ? (pageNumber - 1) * pageSize + 1 : 0,
+      offset:
+        pageNumber && pageNumber > 1 ? (pageNumber - 1) * pageSize + 1 : 0,
       cnt: pageSize,
     })
       .then((res) => {

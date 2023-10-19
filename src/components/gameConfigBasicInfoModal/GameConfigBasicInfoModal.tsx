@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal } from "antd";
+import { Button, Form, Input, message, Modal } from "antd";
 import styles from "./index.module.less";
 import { useContext, useRef, useState } from "react";
 import { LoadingContext } from "../../router/Router";
@@ -11,6 +11,7 @@ import {
 } from "../../api/game";
 import { IGetUploadUrlResponse } from "../../types/response";
 import { IMAGE_BASE_URL } from "../../constant/index";
+import { IUploadImageRequest } from "../../types/request";
 
 interface IProps {
   gameConfig: IGame;
@@ -47,6 +48,28 @@ const GameConfigBasicInfoModal = (props: IProps) => {
   const [showCharacterFileInput, setShowCharacterFileInput] = useState(
     !gameConfig.character_pic
   );
+  const [iconUploadRequest, setIconUploadRequest] =
+    useState<IUploadImageRequest>({} as IUploadImageRequest);
+  const [bannerUploadRequest, setBannerUploadRequest] =
+    useState<IUploadImageRequest>({} as IUploadImageRequest);
+  const [characterUploadRequest, setCharacterUploadRequest] =
+    useState<IUploadImageRequest>({} as IUploadImageRequest);
+
+  const uploadImages = async () => {
+    if (
+      JSON.stringify(iconUploadRequest) === "{}" ||
+      JSON.stringify(bannerUploadRequest) === "{}" ||
+      JSON.stringify(characterUploadRequest) === "{}"
+    ) {
+      message.warning("请确保选择上传所有图片资源！");
+      return Promise.reject("请上传所有图片");
+    }
+    return Promise.all([
+      putFileIntoTencentOSS(iconUploadRequest),
+      putFileIntoTencentOSS(bannerUploadRequest),
+      putFileIntoTencentOSS(characterUploadRequest),
+    ]);
+  };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
     if (editMode) {
@@ -57,8 +80,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const addGameHandler = (fieldsValue: any) => {
-    // showLoading();
+  const addGameHandler = async (fieldsValue: any) => {
     console.log("fieldsValue", fieldsValue);
     console.log("request", {
       ...fieldsValue,
@@ -68,16 +90,26 @@ const GameConfigBasicInfoModal = (props: IProps) => {
       banner: savedImagesUrl.bannerSavedUrl,
       character_pic: savedImagesUrl.characterSavedUrl,
     });
+    try {
+      showLoading("图片上传中...");
+      await uploadImages();
+    } catch (error) {
+      hideLoading();
+      if (error === "请上传所有图片") return;
+      message.error("图片上传失败，请重试！");
+      return;
+    }
 
-    // addGame({
-    //   ...fieldsValue,
-    //   enabled: false,
-    //   icon: savedImagesUrl.iconSavedUrl,
-    //   banner: savedImagesUrl.bannerSavedUrl,
-    //   character_pic: savedImagesUrl.characterSavedUrl,
-    // })
-    //   .then(() => closeModal())
-    //   .finally(() => hideLoading());
+    showLoading();
+    addGame({
+      ...fieldsValue,
+      enabled: false,
+      icon: savedImagesUrl.iconSavedUrl,
+      banner: savedImagesUrl.bannerSavedUrl,
+      character_pic: savedImagesUrl.characterSavedUrl,
+    })
+      .then(() => closeModal())
+      .finally(() => hideLoading());
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -122,13 +154,11 @@ const GameConfigBasicInfoModal = (props: IProps) => {
       fileReader.addEventListener("load", () => {
         setShowIconFileInput(true);
         console.log("fileReader.result", fileReader.result);
-
         setIconUrl(fileReader.result as string);
-
-        // putFileIntoTencentOSS({
-        //   uplaodUrl: imageUploadResponse.upload_url,
-        //   file: fileReader.result,
-        // });
+        setIconUploadRequest({
+          uplaodUrl: imageUploadResponse.upload_url,
+          file: fileReader.result,
+        });
       });
     }
   };
@@ -155,10 +185,10 @@ const GameConfigBasicInfoModal = (props: IProps) => {
         setShowBannerFileInput(true);
 
         setBannerUrl(fileReader.result as string);
-        // await putFileIntoTencentOSS({
-        //   uplaodUrl: imageUploadResponse.upload_url,
-        //   file: fileReader.result,
-        // });
+        setBannerUploadRequest({
+          uplaodUrl: imageUploadResponse.upload_url,
+          file: fileReader.result,
+        });
       });
     }
   };
@@ -184,7 +214,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
         setShowCharacterFileInput(true);
         console.log("fileReader.result", fileReader.result);
         setCharacterUrl(fileReader.result as string);
-        await putFileIntoTencentOSS({
+        setCharacterUploadRequest({
           uplaodUrl: imageUploadResponse.upload_url,
           file: fileReader.result,
         });
@@ -217,12 +247,14 @@ const GameConfigBasicInfoModal = (props: IProps) => {
           onFinish={onSubmit}
         >
           <Form.Item label="游戏名" name="title">
-            <Input
-              value={gameTitle}
-              onChange={onGameTitleChange}
-              placeholder="请输入游戏名称"
-            />
-            <span>(该名称将在APP游戏卡中实际展示)</span>
+            <>
+              <Input
+                value={gameTitle}
+                onChange={onGameTitleChange}
+                placeholder="请输入游戏名称"
+              />
+              <span>(该名称将在APP游戏卡中实际展示)</span>
+            </>
           </Form.Item>
 
           <Form.Item
@@ -269,71 +301,75 @@ const GameConfigBasicInfoModal = (props: IProps) => {
             </>
           </Form.Item>
           <Form.Item label="banner">
-            {editMode && (
+            <>
+              {editMode && (
+                <input
+                  disabled
+                  value={gameConfig.banner.split("/").pop()}
+                  className={styles.input}
+                  style={{ display: showBannerFileInput ? "none" : "block" }}
+                />
+              )}
               <input
-                disabled
-                value={gameConfig.banner.split("/").pop()}
+                ref={bannerInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png"
                 className={styles.input}
-                style={{ display: showBannerFileInput ? "none" : "block" }}
+                onChange={getBannerImageData}
+                style={{ display: showBannerFileInput ? "block" : "none" }}
               />
-            )}
-            <input
-              ref={bannerInputRef}
-              type="file"
-              accept="image/jpeg,image/jpg,image/png"
-              className={styles.input}
-              onChange={getBannerImageData}
-              style={{ display: showBannerFileInput ? "block" : "none" }}
-            />
-            <label>
-              <Button
-                type="primary"
-                onClick={uploadBannerPicture}
-                className={styles.uploadBtn}
-              >
-                上传
-              </Button>
-            </label>
-            <img
-              src={bannerUrl || ""}
-              alt="banner"
-              className={styles.iconImg}
-              style={{ visibility: bannerUrl ? "visible" : "hidden" }}
-            />
+              <label>
+                <Button
+                  type="primary"
+                  onClick={uploadBannerPicture}
+                  className={styles.uploadBtn}
+                >
+                  上传
+                </Button>
+              </label>
+              <img
+                src={bannerUrl || ""}
+                alt="banner"
+                className={styles.iconImg}
+                style={{ visibility: bannerUrl ? "visible" : "hidden" }}
+              />
+            </>
           </Form.Item>
           <Form.Item label="character">
-            {editMode && (
+            <>
+              {editMode && (
+                <input
+                  disabled
+                  value={gameConfig.character_pic.split("/").pop()}
+                  className={styles.input}
+                  style={{ display: showCharacterFileInput ? "none" : "block" }}
+                />
+              )}
               <input
-                disabled
-                value={gameConfig.character_pic.split("/").pop()}
+                ref={characterInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png"
                 className={styles.input}
-                style={{ display: showCharacterFileInput ? "none" : "block" }}
+                onChange={getCharacterImageData}
+                style={{ display: showCharacterFileInput ? "block" : "none" }}
               />
-            )}
-            <input
-              ref={characterInputRef}
-              type="file"
-              accept="image/jpeg,image/jpg,image/png"
-              className={styles.input}
-              onChange={getCharacterImageData}
-              style={{ display: showCharacterFileInput ? "block" : "none" }}
-            />
-            <label>
-              <Button
-                type="primary"
-                onClick={uploadCharacterPicture}
-                className={styles.uploadBtn}
-              >
-                上传
-              </Button>
-            </label>
+              <label>
+                <Button
+                  type="primary"
+                  onClick={uploadCharacterPicture}
+                  className={styles.uploadBtn}
+                >
+                  上传
+                </Button>
+              </label>
 
-            <img
-              src={characterUrl || ""}
-              alt="character"
-              className={styles.characterImg}
-              style={{ visibility: characterUrl ? "visible" : "hidden" }}
-            />
+              <img
+                src={characterUrl || ""}
+                alt="character"
+                className={styles.characterImg}
+                style={{ visibility: characterUrl ? "visible" : "hidden" }}
+              />
+            </>
           </Form.Item>
           <Form.Item label="">
             <Button type="primary" htmlType="submit">

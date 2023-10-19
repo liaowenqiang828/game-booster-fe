@@ -15,8 +15,9 @@ const Login = () => {
   );
   const [passwordValue, setPasswordValue] = useState("");
   const loginEnable = !!(emailValue && passwordValue);
-  // const [messageApi, contextHolder] = message.useMessage();
-  const [rememberAcount, setRememberAccount] = useState(false);
+  const [rememberAcount, setRememberAccount] = useState(
+    !!localStorage.getItem("rememberAccount")
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inputEmailValue = (e: any) => {
@@ -30,11 +31,12 @@ const Login = () => {
   const loginHandler = () => {
     if (rememberAcount) {
       localStorage.setItem("rememberAccount", emailValue);
+    } else {
+      localStorage.removeItem("rememberAccount");
     }
     loginApi({ name: emailValue, password: md5(passwordValue) })
       .then(() => {
         navigator(ROUTER_PATH.HOME);
-        // todo replace nameValue
         window.localStorage.setItem("userName", emailValue);
       })
       .catch((error) => {
@@ -50,7 +52,6 @@ const Login = () => {
 
   return (
     <div className={styles.container}>
-      {/* {contextHolder} */}
       <div className={styles.left}>
         <h2 className={styles.loginHeader}>账号登陆</h2>
         <Input
