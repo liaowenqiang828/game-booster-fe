@@ -8,8 +8,11 @@ import GameAccelerateConfigEditModal from "../../components/gameAccelerateConfig
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { LoadingContext } from "../../router/Router";
 import { getGameList, searchGames } from "../../api/game";
-import { IGame } from "../../types/index";
+import { IAclGroup, IBoostZone, IDnsGroup, IGame } from "../../types/index";
 import styles from "./index.module.less";
+import { getDnsList } from "../../api/dns";
+import { getListBoostZones } from "../../api/boostZones";
+import { getAclGroupList } from "../../api/groupAcl";
 
 const GameConfig = () => {
   const [showBasicInfoModal, setShowBasicInfoModal] = useState(false);
@@ -23,6 +26,9 @@ const GameConfig = () => {
   const [showSearchResult, setShowSearchResult] = useState(false);
   const { showLoading, hideLoading } = useContext(LoadingContext);
   const [basicInfoEditMode, setBasicInfoEditMode] = useState(false);
+  const [dnsGroup, setDnsGroup] = useState([] as IDnsGroup[]);
+  const [boostZones, setBoostZones] = useState([] as IBoostZone[]);
+  const [aclGroups, setAclGroups] = useState([] as IAclGroup[]);
   const columns: ColumnsType<Omit<IGame, "icon" | "banner" | "character_pic">> =
     [
       {
@@ -96,8 +102,33 @@ const GameConfig = () => {
     setTotal(res.total);
   };
 
+  const getDnsListAsync = async () => {
+    showLoading();
+    const res = await getDnsList().finally(() => hideLoading());
+    setDnsGroup(res.groups);
+  };
+
+  const getListBoostZonesAsync = () => {
+    showLoading();
+    // comment cnt: 500 for get all boostZones values
+    getListBoostZones({ offset: 0, cnt: 500 })
+      .then((res) => {
+        setBoostZones(res.zones);
+      })
+      .finally(() => hideLoading());
+  };
+
+  const getAclGroupsAsync = async () => {
+    showLoading();
+    const res = await getAclGroupList().finally(() => hideLoading());
+    setAclGroups(res.groups);
+  };
+
   useEffect(() => {
     getGamesListAsync(pageSize);
+    getDnsListAsync();
+    getListBoostZonesAsync();
+    getAclGroupsAsync();
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -207,6 +238,8 @@ const GameConfig = () => {
           gameId={currentGameConfig.id}
           closeModal={closePackageModal}
           gameName={currentGameConfig.title}
+          dnsGroup={dnsGroup}
+          boostZones={boostZones}
         />
       )}
       {showAccelerateConfigModal && (
@@ -214,6 +247,7 @@ const GameConfig = () => {
           gameId={currentGameConfig.id}
           gameName={currentGameConfig.title}
           closeModal={closeAccelerateConfigModal}
+          aclGroups={aclGroups}
         />
       )}
     </div>

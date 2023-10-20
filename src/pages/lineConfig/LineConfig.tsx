@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Button, Input, Table, Tag } from "antd";
 import SwitchTag from "../../components/switchTag/SwitchTag";
 import LineConfigEditModal from "../../components/lineConfigEditModal/LineConfigEditModal";
-import { IBoostNode, IBoostZone } from "../../types/index";
+import { IBoostZone } from "../../types/index";
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { getListBoostZones, searchBoostZones } from "../../api/boostZones";
 import { LoadingContext } from "../../router/Router";

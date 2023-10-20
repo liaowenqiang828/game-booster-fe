@@ -5,21 +5,26 @@ import SwitchTag from "../switchTag/SwitchTag";
 import GameConfigPackageNameEditModal from "../gameConfigPackageNameEditModal/GameConfigPackageNameEditModal";
 import { useContext, useEffect, useState } from "react";
 import GameConfigRegionServerEditModal from "../gameConfigRegionServerEditModal/GameConfigRegionServerEditModal";
-import { IGamePkg, IGameRegion } from "../../types/index";
+import {
+  IBoostZone,
+  IDnsGroup,
+  IGamePkg,
+  IGameRegion,
+} from "../../types/index";
 import { getGamePkgsList, getGameRegionList } from "../../api/game";
 import { LoadingContext } from "../../router/Router";
 import { convertTimestampToStr } from "../../utils/dataTime";
-import { IBoostZone } from "../../types/index";
 
 interface IProps {
   gameId: number;
   closeModal: () => void;
   gameName: string;
+  dnsGroup: IDnsGroup[];
+  boostZones: IBoostZone[];
 }
 
 const ViewPackageAndServerModal = (props: IProps) => {
-  const { gameId, closeModal, gameName } = props;
-
+  const { gameId, closeModal, gameName, dnsGroup, boostZones } = props;
   const [showcPackageNameEditModal, setShowcPackageNameEditModal] =
     useState(false);
   const [showcRegionServerEditModal, setShowcRegionServerEditModal] =
@@ -87,12 +92,20 @@ const ViewPackageAndServerModal = (props: IProps) => {
       dataIndex: "",
       key: "operation",
       render: (_: any, record: IGamePkg) => (
-        <Button
-          type="primary"
-          onClick={(e: any) => editPackageHandler(e, record.name)}
-        >
-          编辑
-        </Button>
+        <>
+          <Button
+            type="primary"
+            onClick={(e: any) => editPackageHandler(e, record.name)}
+          >
+            编辑
+          </Button>
+          <Button
+            type="primary"
+            onClick={(e: any) => deletePackageHandler(e, record.name)}
+          >
+            删除
+          </Button>
+        </>
       ),
     },
   ];
@@ -113,26 +126,40 @@ const ViewPackageAndServerModal = (props: IProps) => {
       title: "DNS(单选)",
       dataIndex: "dns_group",
       key: "dns",
-      render: (dns_group: string) => <Tag>{dns_group}</Tag>,
+      render: (dns_group: number) =>
+        dnsGroup
+          .find((dns) => dns.id === dns_group)
+          ?.dns.map((item) => <Tag>{item}</Tag>),
     },
     {
       title: "加速路线(可多选)",
       dataIndex: "boost_zones",
       key: "accelerateLine",
-      render: (boost_zones: string[]) =>
-        boost_zones && boost_zones.map((item: string) => <Tag>{item}</Tag>),
+      render: (boost_zones: number[]) =>
+        boost_zones &&
+        boostZones
+          .filter((zone) => boost_zones.includes(zone.id))
+          .map((item: IBoostZone) => <Tag>{item.name}</Tag>),
     },
     {
       title: "操作",
       dataIndex: "",
       key: "operation",
       render: (_: any, record: IGameRegion) => (
-        <Button
-          type="primary"
-          onClick={(e: any) => editReginServerHandler(e, record.id)}
-        >
-          编辑
-        </Button>
+        <>
+          <Button
+            type="primary"
+            onClick={(e: any) => editReginServerHandler(e, record.id)}
+          >
+            编辑
+          </Button>
+          <Button
+            type="primary"
+            onClick={(e: any) => deleteReginServerHandler(e, record.id)}
+          >
+            删除
+          </Button>
+        </>
       ),
     },
   ];
@@ -149,7 +176,29 @@ const ViewPackageAndServerModal = (props: IProps) => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const deletePackageHandler = (e: any, name: string) => {
+    console.log(e);
+    console.log(name);
+    setPkgEditMode(true);
+    setCurrentGamePkg(
+      gamePkgs.filter((item) => item.name === name)[0] ?? ({} as IGamePkg)
+    );
+    setShowcPackageNameEditModal(true);
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editReginServerHandler = (e: any, key: number) => {
+    console.log(e);
+    console.log(key);
+    setRegionEditMode(true);
+    setCurrentGameRegion(
+      gameRegions.filter((item) => item.id === key)[0] ?? ({} as IGameRegion)
+    );
+    setShowcRegionServerEditModal(true);
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const deleteReginServerHandler = (e: any, key: number) => {
     console.log(e);
     console.log(key);
     setRegionEditMode(true);
@@ -253,6 +302,8 @@ const ViewPackageAndServerModal = (props: IProps) => {
           closeModal={closeRegionServerEditModal}
           editMode={regionEditMode}
           gameId={gameId}
+          dnsGroup={dnsGroup}
+          boostZones={boostZones}
         />
       )}
     </Modal>

@@ -2,7 +2,7 @@ import { Button, Form, Input, Modal, Select, Tag } from "antd";
 import styles from "./index.module.less";
 import { useContext, useEffect, useState } from "react";
 import { LoadingContext } from "../../router/Router";
-import { IGameBoostConfig, PLATFORMENUM } from "../../types/index";
+import { IAclGroup, IGameBoostConfig, PLATFORMENUM } from "../../types/index";
 import { editGameBoostConfig, getGameBoostConfigList } from "../../api/game";
 import PlatformSelector from "../platformSelect/PlatformSelector";
 import type { CustomTagProps } from "rc-select/lib/BaseSelect";
@@ -12,9 +12,10 @@ interface IProps {
   gameId: number;
   gameName: string;
   closeModal: () => void;
+  aclGroups: IAclGroup[];
 }
 const GameAccelerateConfigEditModal = (props: IProps) => {
-  const { closeModal, gameId, gameName } = props;
+  const { closeModal, gameId, gameName, aclGroups } = props;
   const [gameBoostConfig, setGameBoostConfig] = useState<
     IGameBoostConfig | undefined
   >(undefined);
@@ -35,20 +36,10 @@ const GameAccelerateConfigEditModal = (props: IProps) => {
     ios_acl_groups: gameBoostConfig?.ios_acl_groups || [],
   });
 
-  const aclGroupOptions = [
-    {
-      value: 1,
-      label: "google",
-    },
-    {
-      value: 2,
-      label: "twitter",
-    },
-    {
-      value: 3,
-      label: "facebook",
-    },
-  ];
+  const aclGroupOptions = aclGroups.map((item) => ({
+    value: item.id,
+    label: item.name,
+  }));
 
   useEffect(() => {
     showLoading();

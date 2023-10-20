@@ -2,7 +2,7 @@ import { Button, Form, Input, Modal, Switch, Select, Tag } from "antd";
 import styles from "./index.module.less";
 import { useContext, useState } from "react";
 import { LoadingContext } from "../../router/Router";
-import { IGameRegion } from "../../types";
+import { IBoostZone, IDnsGroup, IGameRegion } from "../../types";
 import type { CustomTagProps } from "rc-select/lib/BaseSelect";
 import {
   IAddGameRegionRequest,
@@ -17,25 +17,31 @@ interface IProps {
   closeModal: (needRefresh: boolean) => void;
   editMode: boolean;
   gameId: number;
+  dnsGroup: IDnsGroup[];
+  boostZones: IBoostZone[];
 }
 const GameConfigRegionServerEditModal = (props: IProps) => {
-  const { closeModal, regionServer, gameName, editMode, gameId } = props;
+  const {
+    closeModal,
+    regionServer,
+    gameName,
+    editMode,
+    gameId,
+    dnsGroup,
+    boostZones,
+  } = props;
   const { showLoading, hideLoading } = useContext(LoadingContext);
   const [currentEnabled, setCurrentEnabled] = useState(regionServer.enabled);
 
-  const dnsOptions = [
-    { value: 1, label: "google" },
-    { value: 2, label: "baidu" },
-    { value: 3, label: "bilibili" },
-    { value: 4, label: "114" },
-  ];
+  const dnsOptions = dnsGroup.map((item) => ({
+    value: item.id,
+    label: item.name,
+  }));
 
-  const boostZonesOptions = [
-    { value: 1, label: "上海日本一区" },
-    { value: 2, label: "广州日本一区" },
-    { value: 3, label: "香港日本一区" },
-    { value: 4, label: "韩国日本一区" },
-  ];
+  const boostZonesOptions = boostZones.map((item) => ({
+    value: item.id,
+    label: item.name,
+  }));
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
@@ -162,9 +168,6 @@ const GameConfigRegionServerEditModal = (props: IProps) => {
               style={{ width: "100%" }}
               placeholder="请选择加速路线"
             />
-          </Form.Item>
-          <Form.Item label="签名" name="signature">
-            <Input placeholder="请填写签名" />
           </Form.Item>
           <Form.Item
             label="启动时间"
