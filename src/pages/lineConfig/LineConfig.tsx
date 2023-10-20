@@ -2,12 +2,13 @@ import { useContext, useEffect, useState } from "react";
 import { Button, Input, Table, Tag } from "antd";
 import SwitchTag from "../../components/switchTag/SwitchTag";
 import LineConfigEditModal from "../../components/lineConfigEditModal/LineConfigEditModal";
-import { IBoostZone } from "../../types/index";
+import { IBoostNode, IBoostZone } from "../../types/index";
 import { convertTimestampToStr } from "../../utils/dataTime";
 import { getListBoostZones, searchBoostZones } from "../../api/boostZones";
 import { LoadingContext } from "../../router/Router";
 import type { ColumnsType } from "antd/es/table";
 import styles from "./index.module.less";
+import { getBoostNodesList } from "../../api/boostNode";
 
 export type IBoostZoneModel = Omit<IBoostZone, "desc" | "nodes">;
 
@@ -20,6 +21,7 @@ const LineConfig = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [currentLineConfig, setCurrentLineConfig] = useState({} as IBoostZone);
+  const [boostNodes, setBoostNodes] = useState<string[]>([]);
 
   const columns: ColumnsType<IBoostZoneModel> = [
     {
@@ -112,6 +114,10 @@ const LineConfig = () => {
         setTotal(res.total);
       })
       .finally(() => hideLoading());
+
+    getBoostNodesList({ offset: 0, cnt: 100 }).then((res) => {
+      setBoostNodes(res.nodes.map((node) => node.public_addr));
+    });
   };
 
   useEffect(() => {
@@ -204,6 +210,7 @@ const LineConfig = () => {
           lineConfig={currentLineConfig}
           closeModal={closeModal}
           editMode={editMode}
+          boostNodes={boostNodes}
         />
       )}
     </div>

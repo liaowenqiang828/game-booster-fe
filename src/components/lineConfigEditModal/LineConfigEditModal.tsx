@@ -1,6 +1,6 @@
 import { Button, Form, Input, message, Modal, Select, Switch, Tag } from "antd";
 import styles from "./index.module.less";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { LoadingContext } from "../../router/Router";
 import {
   convertTimestampToStr,
@@ -12,45 +12,52 @@ import {
   IAddBoostZoneRequest,
   IEditBoostZoneRequest,
 } from "../../types/request";
-import type { CustomTagProps } from "rc-select/lib/BaseSelect";
 
 interface IProps {
   lineConfig: IBoostZone;
   closeModal: (needRefresh: boolean) => void;
   editMode: boolean;
+  boostNodes: string[];
 }
 
 const countryOptions = [
   { value: "中国", label: "中国" },
   { value: "日本", label: "日本" },
+  { value: "韩国", label: "韩国" },
+  { value: "美国", label: "美国" },
+  { value: "中国香港", label: "中国香港" },
+  { value: "中国台湾", label: "中国台湾" },
   { value: "新加坡", label: "新加坡" },
+  { value: "欧洲", label: "欧洲" },
 ];
 const regionOptions = [
   { value: "上海", label: "上海" },
   { value: "广州", label: "广州" },
   { value: "深圳", label: "深圳" },
+  { value: "北京", label: "北京" },
+  { value: "杭州", label: "杭州" },
+  { value: "南京", label: "南京" },
+  { value: "成都", label: "成都" },
+  { value: "重庆", label: "重庆" },
+  { value: "武汉", label: "武汉" },
 ];
-const entryOptions = [
-  { value: "CN", label: "CN" },
-  { value: "HK", label: "HK" },
-];
+const entryOptions = [{ value: "CN", label: "CN" }];
 const exitOptions = [
   { value: "JP", label: "JP" },
+  { value: "KR", label: "KR" },
+  { value: "US", label: "US" },
   { value: "HK", label: "HK" },
-];
-
-const nodeAddressOptions = [
-  { value: "192.168.5.5", label: "192.168.5.5" },
-  { value: "192.168.1.1", label: "192.168.1.1" },
-  { value: "1.1.1.1", label: "1.1.1.1" },
-  { value: "2.2.2.2", label: "2.2.2.2" },
-  { value: "4.4.4.4", label: "4.4.4.4" },
-  { value: "9.9.9.9", label: "9.9.9.9" },
+  { value: "TW", label: "TW" },
+  { value: "SG", label: "SG" },
+  { value: "CN", label: "CN" },
+  { value: "EU", label: "EU" },
 ];
 
 const LineConfigEditModal = (props: IProps) => {
-  const { lineConfig, closeModal, editMode } = props;
-
+  const { lineConfig, closeModal, editMode, boostNodes } = props;
+  const nodeAddressOptions = useMemo(() => {
+    return boostNodes.map((node) => ({ value: node, label: node }));
+  }, [boostNodes]);
   const { hideLoading, showLoading } = useContext(LoadingContext);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (fieldsValue: any) => {
@@ -160,6 +167,7 @@ const LineConfigEditModal = (props: IProps) => {
               options={nodeAddressOptions}
               mode="multiple"
               style={{ width: "190px" }}
+              showSearch
             />
           </Form.Item>
           <Form.Item
