@@ -11,15 +11,9 @@ import {
   IGamePkg,
   IGameRegion,
 } from "../../types/index";
-import {
-  delGamePkg,
-  delGameRegion,
-  getGamePkgsList,
-  getGameRegionList,
-} from "../../api/game";
+import { delGamePkg, getGamePkgsList, getGameRegionList } from "../../api/game";
 import { LoadingContext } from "../../router/Router";
 import { convertTimestampToStr } from "../../utils/dataTime";
-import confirm from "antd/es/modal/confirm";
 
 interface IProps {
   gameId: number;
@@ -112,12 +106,7 @@ const ViewPackageAndServerModal = (props: IProps) => {
             okText="确认"
             cancelText="取消"
           >
-            <Button
-              type="primary"
-              onClick={(e: any) => deletePackageHandler(e, record.name)}
-            >
-              删除
-            </Button>
+            <Button type="primary">删除</Button>
           </Popconfirm>
         </>
       ),
@@ -167,34 +156,10 @@ const ViewPackageAndServerModal = (props: IProps) => {
           >
             编辑
           </Button>
-          <Popconfirm
-            title={null}
-            description="确定要删除当前区服吗?"
-            onConfirm={(e) => confirmDeleteGameRegion(e, record.id)}
-            okText="确认"
-            cancelText="取消"
-          >
-            <Button
-              type="primary"
-              onClick={(e: any) => deleteReginServerHandler(e, record.id)}
-            >
-              删除
-            </Button>
-          </Popconfirm>
         </>
       ),
     },
   ];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const deletePackageHandler = (e: any, name: string) => {
-    confirm;
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const deleteReginServerHandler = (e: any, key: number) => {
-    console.log(e);
-    console.log(key);
-  };
 
   const confirmDeleteGamePkg = async (
     e: React.MouseEvent<HTMLElement>,
@@ -203,25 +168,13 @@ const ViewPackageAndServerModal = (props: IProps) => {
     showLoading();
     try {
       await delGamePkg({ name });
-      const gamePkgsRes = await getGamePkgsList({ game_id: gameId });
-      setGamePkgs(gamePkgsRes.pkgs);
     } catch (error) {
+      return;
+    } finally {
       hideLoading();
     }
-  };
-
-  const confirmDeleteGameRegion = async (
-    e: React.MouseEvent<HTMLElement>,
-    id: number
-  ) => {
-    showLoading();
-    try {
-      await delGameRegion({ id });
-      const gameRegionsRes = await getGameRegionList({ game_id: gameId });
-      setGameRegions(gameRegionsRes.regions);
-    } catch (error) {
-      hideLoading();
-    }
+    const gamePkgsRes = await getGamePkgsList({ game_id: gameId });
+    setGamePkgs(gamePkgsRes.pkgs);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
