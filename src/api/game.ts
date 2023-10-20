@@ -4,6 +4,7 @@ import {
   IAddGameRegionRequest,
   IAddGameRequest,
   IDelGamePkgRequest,
+  IDelGameRegionRequest,
   IEditGameBoostConfigRequest,
   IEditGamePkgRequest,
   IEditGameRegionRequest,
@@ -70,6 +71,12 @@ export const delGamePkg = (request: IDelGamePkgRequest): Promise<void> => {
   return http.post("/del_game_pkg", request);
 };
 
+export const delGameRegion = (
+  request: IDelGameRegionRequest
+): Promise<void> => {
+  return http.post("/del_game_region", request);
+};
+
 export const getGameRegionList = (
   request: IListGameRegionRequest
 ): Promise<IListGameRegionResponse> => {
@@ -121,5 +128,16 @@ export const getUploadUrl = (
 export const putFileIntoTencentOSS = (
   request: IUploadImageRequest
 ): Promise<void> => {
-  return http.put(request.uplaodUrl, { data: request.file });
+  console.log("request", request);
+  console.log(typeof request.file);
+
+  const form = new FormData();
+  form.append("file", "data");
+
+  return http.put(request.uplaodUrl, {
+    data: request.file,
+    headers: {
+      "content-type": "multipart/form-data",
+    },
+  });
 };

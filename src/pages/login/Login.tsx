@@ -21,7 +21,7 @@ const Login = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inputEmailValue = (e: any) => {
-    setEmailValue(e.target.value);
+    setEmailValue(e.target.value.trim());
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inputPasswordValue = (e: any) => {

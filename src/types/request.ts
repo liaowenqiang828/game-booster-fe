@@ -148,6 +148,10 @@ export interface IDelGamePkgRequest {
   name: string;
 }
 
+export interface IDelGameRegionRequest {
+  id: number;
+}
+
 export interface IListGameRegionRequest {
   game_id: number;
 }

@@ -1,4 +1,4 @@
-import { Button, Input, Modal, Table, Tag } from "antd";
+import { Button, Input, Modal, Popconfirm, Table, Tag } from "antd";
 import styles from "./index.module.less";
 import type { ColumnsType } from "antd/es/table";
 import SwitchTag from "../switchTag/SwitchTag";
@@ -11,9 +11,15 @@ import {
   IGamePkg,
   IGameRegion,
 } from "../../types/index";
-import { getGamePkgsList, getGameRegionList } from "../../api/game";
+import {
+  delGamePkg,
+  delGameRegion,
+  getGamePkgsList,
+  getGameRegionList,
+} from "../../api/game";
 import { LoadingContext } from "../../router/Router";
 import { convertTimestampToStr } from "../../utils/dataTime";
+import confirm from "antd/es/modal/confirm";
 
 interface IProps {
   gameId: number;
@@ -99,12 +105,20 @@ const ViewPackageAndServerModal = (props: IProps) => {
           >
             编辑
           </Button>
-          <Button
-            type="primary"
-            onClick={(e: any) => deletePackageHandler(e, record.name)}
+          <Popconfirm
+            title={null}
+            description="确定要删除当前包吗?"
+            onConfirm={(e) => confirmDeleteGamePkg(e, record.name)}
+            okText="确认"
+            cancelText="取消"
           >
-            删除
-          </Button>
+            <Button
+              type="primary"
+              onClick={(e: any) => deletePackageHandler(e, record.name)}
+            >
+              删除
+            </Button>
+          </Popconfirm>
         </>
       ),
     },
@@ -153,16 +167,62 @@ const ViewPackageAndServerModal = (props: IProps) => {
           >
             编辑
           </Button>
-          <Button
-            type="primary"
-            onClick={(e: any) => deleteReginServerHandler(e, record.id)}
+          <Popconfirm
+            title={null}
+            description="确定要删除当前区服吗?"
+            onConfirm={(e) => confirmDeleteGameRegion(e, record.id)}
+            okText="确认"
+            cancelText="取消"
           >
-            删除
-          </Button>
+            <Button
+              type="primary"
+              onClick={(e: any) => deleteReginServerHandler(e, record.id)}
+            >
+              删除
+            </Button>
+          </Popconfirm>
         </>
       ),
     },
   ];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const deletePackageHandler = (e: any, name: string) => {
+    confirm;
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const deleteReginServerHandler = (e: any, key: number) => {
+    console.log(e);
+    console.log(key);
+  };
+
+  const confirmDeleteGamePkg = async (
+    e: React.MouseEvent<HTMLElement>,
+    name: string
+  ) => {
+    showLoading();
+    try {
+      await delGamePkg({ name });
+      const gamePkgsRes = await getGamePkgsList({ game_id: gameId });
+      setGamePkgs(gamePkgsRes.pkgs);
+    } catch (error) {
+      hideLoading();
+    }
+  };
+
+  const confirmDeleteGameRegion = async (
+    e: React.MouseEvent<HTMLElement>,
+    id: number
+  ) => {
+    showLoading();
+    try {
+      await delGameRegion({ id });
+      const gameRegionsRes = await getGameRegionList({ game_id: gameId });
+      setGameRegions(gameRegionsRes.regions);
+    } catch (error) {
+      hideLoading();
+    }
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editPackageHandler = (e: any, name: string) => {
@@ -176,29 +236,7 @@ const ViewPackageAndServerModal = (props: IProps) => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const deletePackageHandler = (e: any, name: string) => {
-    console.log(e);
-    console.log(name);
-    setPkgEditMode(true);
-    setCurrentGamePkg(
-      gamePkgs.filter((item) => item.name === name)[0] ?? ({} as IGamePkg)
-    );
-    setShowcPackageNameEditModal(true);
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editReginServerHandler = (e: any, key: number) => {
-    console.log(e);
-    console.log(key);
-    setRegionEditMode(true);
-    setCurrentGameRegion(
-      gameRegions.filter((item) => item.id === key)[0] ?? ({} as IGameRegion)
-    );
-    setShowcRegionServerEditModal(true);
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const deleteReginServerHandler = (e: any, key: number) => {
     console.log(e);
     console.log(key);
     setRegionEditMode(true);

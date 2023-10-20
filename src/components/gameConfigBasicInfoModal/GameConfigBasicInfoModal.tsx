@@ -57,18 +57,24 @@ const GameConfigBasicInfoModal = (props: IProps) => {
 
   const uploadImages = async () => {
     if (
-      JSON.stringify(iconUploadRequest) === "{}" ||
-      JSON.stringify(bannerUploadRequest) === "{}" ||
-      JSON.stringify(characterUploadRequest) === "{}"
+      !editMode &&
+      (JSON.stringify(iconUploadRequest) === "{}" ||
+        JSON.stringify(bannerUploadRequest) === "{}" ||
+        JSON.stringify(characterUploadRequest) === "{}")
     ) {
       message.warning("请确保选择上传所有图片资源！");
       return Promise.reject("请上传所有图片");
     }
-    return Promise.all([
-      putFileIntoTencentOSS(iconUploadRequest),
-      putFileIntoTencentOSS(bannerUploadRequest),
-      putFileIntoTencentOSS(characterUploadRequest),
-    ]);
+
+    const promiseArray = [];
+    JSON.stringify(iconUploadRequest) !== "{}" &&
+      promiseArray.push(putFileIntoTencentOSS(iconUploadRequest));
+    JSON.stringify(bannerUploadRequest) !== "{}" &&
+      promiseArray.push(putFileIntoTencentOSS(bannerUploadRequest));
+    JSON.stringify(characterUploadRequest) !== "{}" &&
+      promiseArray.push(putFileIntoTencentOSS(characterUploadRequest));
+
+    return Promise.all(promiseArray);
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (fieldsValue: any) => {
@@ -81,15 +87,15 @@ const GameConfigBasicInfoModal = (props: IProps) => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const addGameHandler = async (fieldsValue: any) => {
-    console.log("fieldsValue", fieldsValue);
-    console.log("request", {
-      ...fieldsValue,
-      enabled: false,
-      title: gameTitle,
-      icon: savedImagesUrl.iconSavedUrl,
-      banner: savedImagesUrl.bannerSavedUrl,
-      character_pic: savedImagesUrl.characterSavedUrl,
-    });
+    // console.log("fieldsValue", fieldsValue);
+    // console.log("request", {
+    //   ...fieldsValue,
+    //   enabled: false,
+    //   title: gameTitle,
+    //   icon: savedImagesUrl.iconSavedUrl,
+    //   banner: savedImagesUrl.bannerSavedUrl,
+    //   character_pic: savedImagesUrl.characterSavedUrl,
+    // });
     try {
       showLoading("图片上传中...");
       await uploadImages();
@@ -104,6 +110,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
     addGame({
       ...fieldsValue,
       enabled: false,
+      title: gameTitle,
       icon: savedImagesUrl.iconSavedUrl,
       banner: savedImagesUrl.bannerSavedUrl,
       character_pic: savedImagesUrl.characterSavedUrl,
@@ -113,10 +120,41 @@ const GameConfigBasicInfoModal = (props: IProps) => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editGameHandler = (fieldsValue: any) => {
+  const editGameHandler = async (fieldsValue: any) => {
     showLoading();
     console.log("fieldsValue", fieldsValue);
-    editGame(fieldsValue)
+    console.log({
+      id: gameConfig.id,
+      ...fieldsValue,
+      enabled: gameConfig.enabled,
+      title: gameTitle,
+      icon: savedImagesUrl.iconSavedUrl,
+      banner: savedImagesUrl.bannerSavedUrl,
+      character_pic: savedImagesUrl.characterSavedUrl,
+    });
+
+    try {
+      showLoading("图片上传中...");
+      await uploadImages();
+    } catch (error) {
+      hideLoading();
+      if (error === "请上传所有图片") return;
+      message.error("图片上传失败，请重试！");
+      return;
+    }
+
+    editGame({
+      id: gameConfig.id,
+      ...fieldsValue,
+      enabled: gameConfig.enabled,
+      title: gameTitle,
+      icon: savedImagesUrl.iconSavedUrl || `${IMAGE_BASE_URL}gameConfig.icon`,
+      banner:
+        savedImagesUrl.bannerSavedUrl || `${IMAGE_BASE_URL}gameConfig.banner`,
+      character_pic:
+        savedImagesUrl.characterSavedUrl ||
+        `${IMAGE_BASE_URL}gameConfig.character_pic`,
+    })
       .then(() => closeModal())
       .finally(() => hideLoading());
   };
@@ -148,8 +186,20 @@ const GameConfigBasicInfoModal = (props: IProps) => {
         iconSavedUrl: imageUploadResponse.saved_url,
       });
 
+      // const fileReader = new FileReader();
+      // fileReader.readAsBinaryString(files[0]);
+
+      // setShowIconFileInput(true);
+      // console.log("fileReader.result", fileReader.result);
+      // setIconUrl(fileReader.result as string);
+
+      // setIconUploadRequest({
+      //   uplaodUrl: imageUploadResponse.upload_url,
+      //   file: files[0],
+      // });
+
       const fileReader = new FileReader();
-      fileReader.readAsDataURL(files[0]);
+      fileReader.readAsBinaryString(files[0]);
 
       fileReader.addEventListener("load", () => {
         setShowIconFileInput(true);
@@ -277,7 +327,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
               <input
                 ref={iconInputRef}
                 type={"file"}
-                accept="image/jpeg,image/jpg,image/png"
+                accept="image/*"
                 className={styles.input}
                 style={{ display: showIconFileInput ? "block" : "none" }}
                 onChange={getIconImageData}
@@ -313,7 +363,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
               <input
                 ref={bannerInputRef}
                 type="file"
-                accept="image/jpeg,image/jpg,image/png"
+                accept="image/*"
                 className={styles.input}
                 onChange={getBannerImageData}
                 style={{ display: showBannerFileInput ? "block" : "none" }}
@@ -348,7 +398,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
               <input
                 ref={characterInputRef}
                 type="file"
-                accept="image/jpeg,image/jpg,image/png"
+                accept="image/*"
                 className={styles.input}
                 onChange={getCharacterImageData}
                 style={{ display: showCharacterFileInput ? "block" : "none" }}
