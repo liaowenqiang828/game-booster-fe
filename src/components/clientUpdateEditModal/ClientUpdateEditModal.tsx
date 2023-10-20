@@ -6,7 +6,7 @@ import { IClientUpdate, OSENUM } from "../../types/index";
 import { IEditClientUpdateRequest } from "../../types/request";
 import { addClientUpdate, editClientUpdate } from "../../api/clientUpdate";
 import { IGetUploadUrlResponse } from "../../types/response";
-import { getUploadUrl, putFileIntoTencentOSS } from "../../api/game";
+import { getUploadUrl, putPkgIntoTencentOSS } from "../../api/game";
 
 interface IProps {
   clientUpdateConfig: IClientUpdate;
@@ -34,8 +34,8 @@ const ClientUpdateEditModal = (props: IProps) => {
   const [currentVer, setCurrentVer] = useState(clientUpdateConfig.ver);
   const [strongCheck, setStrongCheck] = useState(clientUpdateConfig.must_upd);
   const pkgUploadRef = useRef<HTMLInputElement>(null);
-  const [savedPkgUrl, setSavedPkgUrl] = useState("");
-  const [fileSize, setFileSize] = useState(0);
+  const [savedPkgUrl, setSavedPkgUrl] = useState(clientUpdateConfig.url || "");
+  const [fileSize, setFileSize] = useState(clientUpdateConfig.size || 0);
   const [showFileInput, setShowFileInput] = useState(!clientUpdateConfig.url);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -95,7 +95,7 @@ const ClientUpdateEditModal = (props: IProps) => {
         // @ts-ignore
         setFileSize(fileReader.result?.byteLength);
 
-        await putFileIntoTencentOSS({
+        await putPkgIntoTencentOSS({
           uplaodUrl: pkgUploadResponse.upload_url,
           file: fileReader.result,
         });
@@ -156,7 +156,7 @@ const ClientUpdateEditModal = (props: IProps) => {
               <input
                 ref={pkgUploadRef}
                 type={"file"}
-                accept=".app,.apk,.dmg"
+                accept=".app,.apk,.dmg,.zip"
                 className={styles.input}
                 onChange={getPkgUoploadData}
                 style={{ display: showFileInput ? "block" : "none" }}

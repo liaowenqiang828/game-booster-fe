@@ -10,7 +10,7 @@ export interface IGetUploadUrlRequest {
   name: string;
 }
 
-export interface IUploadImageRequest {
+export interface IUploadFileRequest {
   file: any;
   uplaodUrl: string;
 }

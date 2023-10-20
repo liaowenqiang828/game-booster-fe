@@ -14,7 +14,7 @@ import {
   IListGameRegionRequest,
   IListGameRequest,
   ISearchGamesRequest,
-  IUploadImageRequest,
+  IUploadFileRequest,
 } from "../types/request";
 import {
   IGetUploadUrlResponse,
@@ -25,7 +25,6 @@ import {
   ISearchGamesResponse,
 } from "../types/response";
 import http from "../utils/http";
-// const fs = require("fs");
 
 export const getGameList = (
   request: IListGameRequest
@@ -120,12 +119,8 @@ export const getUploadUrl = (
 };
 
 export const putFileIntoTencentOSS = (
-  request: IUploadImageRequest
+  request: IUploadFileRequest
 ): Promise<void> => {
-  console.log("request", request);
-  console.log(typeof request.file);
-  // const data = fs.readFileSync("/Users/zhouweixin/Downloads/IMG_3563.JPG");
-
   return http.put(request.uplaodUrl, request.file, {
     headers: {
       "Content-Type": "image/png",
@@ -134,36 +129,13 @@ export const putFileIntoTencentOSS = (
   });
 };
 
-// 下载地址：https://etalient-1304742805.cos.ap-shanghai.myqcloud.com/game/2b9b90532a61429f932dac4195c83a36.png
-// 上传文本没问题，可以正常下载
-// axios.put("https://etalient-1304742805.cos.ap-shanghai.myqcloud.com/game/2b9b90532a61429f932dac4195c83a36.png?q-sign-algorithm=sha1&q-ak=AKIDa6Tgh3Qt4NVfx86zslXCbvMnHdolbPCq&q-sign-time=1697804112%3B1697807712&q-key-time=1697804112%3B1697807712&q-header-list=host&q-url-param-list=&q-signature=7c0b30671ecaa24c0686c69090d560b1dabe6e8d",
-//     "helloworld",
-//     {
-//         headers: {
-//             Authorization: "W8RLZNb31tVSN9SsyPpu82_fezYW9fu4utaRkmJ5lmRTxnPeFuEeTBOYEf0",
-//             "Content-Type": "text/plain",
-//             "Content-Disposition": "attachment; filename=a.txt",
-//         }
-//     },
-// ).then(resp => {
-//     console.log(resp.status);
-// })
-
-// const data = fs.readFileSync("/Users/zhouweixin/Downloads/IMG_3563.JPG");
-
-// axios
-//   .put(
-//     "https://etalient-1304742805.cos.ap-shanghai.myqcloud.com/game/2b9b90532a61429f932dac4195c83a36.png?q-sign-algorithm=sha1&q-ak=AKIDa6Tgh3Qt4NVfx86zslXCbvMnHdolbPCq&q-sign-time=1697804112%3B1697807712&q-key-time=1697804112%3B1697807712&q-header-list=host&q-url-param-list=&q-signature=7c0b30671ecaa24c0686c69090d560b1dabe6e8d",
-//     data,
-//     {
-//       headers: {
-//         Authorization:
-//           "W8RLZNb31tVSN9SsyPpu82_fezYW9fu4utaRkmJ5lmRTxnPeFuEeTBOYEf0",
-//         "Content-Type": "image/png",
-//         "Content-Disposition": "attachment; filename=a.png",
-//       },
-//     }
-//   )
-//   .then((resp) => {
-//     console.log(resp.status);
-//   });
+export const putPkgIntoTencentOSS = (
+  request: IUploadFileRequest
+): Promise<void> => {
+  return http.put(request.uplaodUrl, request.file, {
+    headers: {
+      "Content-Type": "application/octet-stream",
+    },
+    responseType: "arraybuffer",
+  });
+};

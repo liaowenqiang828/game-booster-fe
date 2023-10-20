@@ -12,7 +12,6 @@ const http = axios.create({
 // 请求拦截器
 http.interceptors.request.use(
   (config) => {
-    console.log(config);
     const authorization = window.localStorage.getItem("authorization");
     if (authorization) {
       config.headers.authorization = authorization;
