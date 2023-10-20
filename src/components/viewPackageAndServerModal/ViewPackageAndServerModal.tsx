@@ -129,10 +129,9 @@ const ViewPackageAndServerModal = (props: IProps) => {
       title: "DNS(单选)",
       dataIndex: "dns_group",
       key: "dns",
-      render: (dns_group: number) =>
-        dnsGroup
-          .find((dns) => dns.id === dns_group)
-          ?.dns.map((item) => <Tag>{item}</Tag>),
+      render: (dns_group: number) => (
+        <Tag>{dnsGroup.find((dns) => dns.id === dns_group)?.name || ""}</Tag>
+      ),
     },
     {
       title: "加速路线(可多选)",
