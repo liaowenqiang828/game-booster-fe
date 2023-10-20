@@ -92,7 +92,7 @@ const GameConfigPackageNameEditModal = (props: IProps) => {
           </Form.Item>
 
           <Form.Item label="包名" name="name" initialValue={packageInfo.name}>
-            <Input placeholder="请前往游戏库查询" disabled />
+            <Input placeholder="请前往游戏库查询" disabled={editMode} />
           </Form.Item>
           <Form.Item label="是否启用" name="enabled">
             <Switch

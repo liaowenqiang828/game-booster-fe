@@ -162,9 +162,10 @@ const GameConfig = () => {
     setShowBasicInfoModal(true);
   };
 
-  const closeBasicInfoModal = () => {
+  const closeBasicInfoModal = (needRefresh: boolean) => {
     setShowBasicInfoModal(false);
     setCurrentGameConfig({} as IGame);
+    needRefresh && getGamesListAsync(pageSize, currentPage);
   };
   const closePackageModal = () => setPackageModal(false);
   const closeAccelerateConfigModal = () => setAccelerateConfigModal(false);

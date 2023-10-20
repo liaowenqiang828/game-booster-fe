@@ -12,16 +12,16 @@ import {
 import { IGetUploadUrlResponse } from "../../types/response";
 import { IMAGE_BASE_URL } from "../../constant/index";
 import { IUploadImageRequest } from "../../types/request";
+import { convertArrayBufferToBase64 } from "../../utils";
 
 interface IProps {
   gameConfig: IGame;
-  closeModal: () => void;
+  closeModal: (needRefresh: boolean) => void;
   editMode: boolean;
 }
 
 const GameConfigBasicInfoModal = (props: IProps) => {
   const { gameConfig, closeModal, editMode } = props;
-  console.log("gameConfig", gameConfig);
   const { showLoading, hideLoading } = useContext(LoadingContext);
   const iconInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -87,15 +87,6 @@ const GameConfigBasicInfoModal = (props: IProps) => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const addGameHandler = async (fieldsValue: any) => {
-    // console.log("fieldsValue", fieldsValue);
-    // console.log("request", {
-    //   ...fieldsValue,
-    //   enabled: false,
-    //   title: gameTitle,
-    //   icon: savedImagesUrl.iconSavedUrl,
-    //   banner: savedImagesUrl.bannerSavedUrl,
-    //   character_pic: savedImagesUrl.characterSavedUrl,
-    // });
     try {
       showLoading("图片上传中...");
       await uploadImages();
@@ -115,24 +106,13 @@ const GameConfigBasicInfoModal = (props: IProps) => {
       banner: savedImagesUrl.bannerSavedUrl,
       character_pic: savedImagesUrl.characterSavedUrl,
     })
-      .then(() => closeModal())
+      .then(() => closeModal(true))
       .finally(() => hideLoading());
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editGameHandler = async (fieldsValue: any) => {
     showLoading();
-    console.log("fieldsValue", fieldsValue);
-    console.log({
-      id: gameConfig.id,
-      ...fieldsValue,
-      enabled: gameConfig.enabled,
-      title: gameTitle,
-      icon: savedImagesUrl.iconSavedUrl,
-      banner: savedImagesUrl.bannerSavedUrl,
-      character_pic: savedImagesUrl.characterSavedUrl,
-    });
-
     try {
       showLoading("图片上传中...");
       await uploadImages();
@@ -148,14 +128,16 @@ const GameConfigBasicInfoModal = (props: IProps) => {
       ...fieldsValue,
       enabled: gameConfig.enabled,
       title: gameTitle,
-      icon: savedImagesUrl.iconSavedUrl || `${IMAGE_BASE_URL}gameConfig.icon`,
+      icon:
+        savedImagesUrl.iconSavedUrl || `${IMAGE_BASE_URL}${gameConfig.icon}`,
       banner:
-        savedImagesUrl.bannerSavedUrl || `${IMAGE_BASE_URL}gameConfig.banner`,
+        savedImagesUrl.bannerSavedUrl ||
+        `${IMAGE_BASE_URL}${gameConfig.banner}`,
       character_pic:
         savedImagesUrl.characterSavedUrl ||
-        `${IMAGE_BASE_URL}gameConfig.character_pic`,
+        `${IMAGE_BASE_URL}${gameConfig.character_pic}`,
     })
-      .then(() => closeModal())
+      .then(() => closeModal(true))
       .finally(() => hideLoading());
   };
 
@@ -180,31 +162,18 @@ const GameConfigBasicInfoModal = (props: IProps) => {
         name: files[0].name,
       });
 
-      console.log("imageUploadResponse", imageUploadResponse);
       setSavedImagesUrl({
         ...savedImagesUrl,
         iconSavedUrl: imageUploadResponse.saved_url,
       });
 
-      // const fileReader = new FileReader();
-      // fileReader.readAsBinaryString(files[0]);
-
-      // setShowIconFileInput(true);
-      // console.log("fileReader.result", fileReader.result);
-      // setIconUrl(fileReader.result as string);
-
-      // setIconUploadRequest({
-      //   uplaodUrl: imageUploadResponse.upload_url,
-      //   file: files[0],
-      // });
-
       const fileReader = new FileReader();
-      fileReader.readAsBinaryString(files[0]);
-
+      fileReader.readAsArrayBuffer(files[0]);
       fileReader.addEventListener("load", () => {
         setShowIconFileInput(true);
-        console.log("fileReader.result", fileReader.result);
-        setIconUrl(fileReader.result as string);
+        setIconUrl(
+          convertArrayBufferToBase64(fileReader.result as ArrayBuffer)
+        );
         setIconUploadRequest({
           uplaodUrl: imageUploadResponse.upload_url,
           file: fileReader.result,
@@ -221,20 +190,19 @@ const GameConfigBasicInfoModal = (props: IProps) => {
         name: files[0].name,
       });
 
-      console.log("imageUploadResponse", imageUploadResponse);
       setSavedImagesUrl({
         ...savedImagesUrl,
         bannerSavedUrl: imageUploadResponse.saved_url,
       });
 
       const fileReader = new FileReader();
-      fileReader.readAsDataURL(files[0]);
+      fileReader.readAsArrayBuffer(files[0]);
 
       fileReader.addEventListener("load", async () => {
-        console.log("fileReader.result", fileReader.result);
         setShowBannerFileInput(true);
-
-        setBannerUrl(fileReader.result as string);
+        setBannerUrl(
+          convertArrayBufferToBase64(fileReader.result as ArrayBuffer)
+        );
         setBannerUploadRequest({
           uplaodUrl: imageUploadResponse.upload_url,
           file: fileReader.result,
@@ -251,19 +219,18 @@ const GameConfigBasicInfoModal = (props: IProps) => {
         name: files[0].name,
       });
 
-      console.log("imageUploadResponse", imageUploadResponse);
       setSavedImagesUrl({
         ...savedImagesUrl,
         characterSavedUrl: imageUploadResponse.saved_url,
       });
 
       const fileReader = new FileReader();
-      fileReader.readAsDataURL(files[0]);
-
+      fileReader.readAsArrayBuffer(files[0]);
       fileReader.addEventListener("load", async () => {
         setShowCharacterFileInput(true);
-        console.log("fileReader.result", fileReader.result);
-        setCharacterUrl(fileReader.result as string);
+        setCharacterUrl(
+          convertArrayBufferToBase64(fileReader.result as ArrayBuffer)
+        );
         setCharacterUploadRequest({
           uplaodUrl: imageUploadResponse.upload_url,
           file: fileReader.result,
@@ -281,7 +248,7 @@ const GameConfigBasicInfoModal = (props: IProps) => {
       centered
       open
       footer={null}
-      onCancel={closeModal}
+      onCancel={() => closeModal(false)}
       width={800}
       closable
       maskClosable={false}
