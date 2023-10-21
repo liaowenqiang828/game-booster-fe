@@ -102,7 +102,7 @@ const ViewPackageAndServerModal = (props: IProps) => {
           <Popconfirm
             title={null}
             description="确定要删除当前包吗?"
-            onConfirm={(e) => confirmDeleteGamePkg(e, record.name)}
+            onConfirm={() => confirmDeleteGamePkg(record.name)}
             okText="确认"
             cancelText="取消"
           >
@@ -160,10 +160,7 @@ const ViewPackageAndServerModal = (props: IProps) => {
     },
   ];
 
-  const confirmDeleteGamePkg = async (
-    e: React.MouseEvent<HTMLElement>,
-    name: string
-  ) => {
+  const confirmDeleteGamePkg = async (name: string) => {
     showLoading();
     try {
       await delGamePkg({ name });

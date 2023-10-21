@@ -63,7 +63,10 @@ const GameConfig = () => {
         title: "操作",
         key: "operation",
         width: 300,
-        render: (_: any, record: IGame) => (
+        render: (
+          _: any,
+          record: Omit<IGame, "icon" | "banner" | "character_pic">
+        ) => (
           <>
             <Button
               type="primary"

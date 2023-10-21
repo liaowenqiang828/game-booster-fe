@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Breadcrumb, Button, Input, Table } from "antd";
+import { Breadcrumb, Button, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import styles from "./index.module.less";
 import AclGroupEditModal from "../../components/aclGroupEditModal/AclGroupEditModal";
@@ -44,7 +44,7 @@ const AclGroupConfig = () => {
       render: (_, record) => (
         <Button
           className={styles.editBtn}
-          onClick={(e) => editAclGroup(e, record.id)}
+          onClick={() => editAclGroup(record.id)}
           type="primary"
         >
           编辑
@@ -76,8 +76,7 @@ const AclGroupConfig = () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editAclGroup = (e: any, key: number) => {
-    console.log(e, key);
+  const editAclGroup = (key: number) => {
     setEditMode(true);
     setCurrentAclGroup(
       aclGroups.filter((Item) => Item.id === key)[0] ?? ({} as IAclGroup)

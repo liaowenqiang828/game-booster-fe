@@ -89,7 +89,7 @@ const LineConfig = () => {
         <Button
           type="primary"
           className={styles.editBtn}
-          onClick={(e) => editLineConfigItemHandler(e, record.id)}
+          onClick={() => editLineConfigItemHandler(record.id)}
         >
           编辑
         </Button>
@@ -125,9 +125,7 @@ const LineConfig = () => {
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editLineConfigItemHandler = (e: any, key: number) => {
-    console.log(e);
-    console.log(key);
+  const editLineConfigItemHandler = (key: number) => {
     setCurrentLineConfig(
       boostZones.filter((item) => item.id === key)[0] ?? ({} as IBoostZone)
     );

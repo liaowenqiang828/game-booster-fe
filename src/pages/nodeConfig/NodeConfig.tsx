@@ -76,7 +76,7 @@ const NodeConfig = () => {
         <Button
           type="primary"
           className={styles.editBtn}
-          onClick={(e: any) => editNodeConfigItemHandler(e, record.id)}
+          onClick={() => editNodeConfigItemHandler(record.id)}
         >
           编辑
         </Button>
@@ -114,7 +114,7 @@ const NodeConfig = () => {
       loadingBoostNodesByPageNumberAndPageSize(pageSize, currentPage);
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editNodeConfigItemHandler = (e: any, key: number) => {
+  const editNodeConfigItemHandler = (key: number) => {
     setCurrentNodeConfig(
       boostNodes.filter((item) => item.id === key)[0] ?? ({} as IBoostNodeModel)
     );

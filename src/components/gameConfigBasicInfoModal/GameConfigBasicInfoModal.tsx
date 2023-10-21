@@ -11,8 +11,8 @@ import {
 } from "../../api/game";
 import { IGetUploadUrlResponse } from "../../types/response";
 import { IMAGE_BASE_URL } from "../../constant/index";
-import { IUploadImageRequest } from "../../types/request";
 import { convertArrayBufferToBase64 } from "../../utils";
+import { IUploadFileRequest } from "../../types/request";
 
 interface IProps {
   gameConfig: IGame;
@@ -49,11 +49,11 @@ const GameConfigBasicInfoModal = (props: IProps) => {
     !gameConfig.character_pic
   );
   const [iconUploadRequest, setIconUploadRequest] =
-    useState<IUploadImageRequest>({} as IUploadImageRequest);
+    useState<IUploadFileRequest>({} as IUploadFileRequest);
   const [bannerUploadRequest, setBannerUploadRequest] =
-    useState<IUploadImageRequest>({} as IUploadImageRequest);
+    useState<IUploadFileRequest>({} as IUploadFileRequest);
   const [characterUploadRequest, setCharacterUploadRequest] =
-    useState<IUploadImageRequest>({} as IUploadImageRequest);
+    useState<IUploadFileRequest>({} as IUploadFileRequest);
 
   const uploadImages = async () => {
     if (

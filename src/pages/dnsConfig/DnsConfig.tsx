@@ -1,4 +1,4 @@
-import { Button, Input } from "antd";
+import { Button } from "antd";
 import styles from "./index.module.less";
 import Table, { ColumnsType } from "antd/es/table";
 import DnsEditModal from "../../components/dnsEditModal/DnsEditModal";
@@ -49,7 +49,7 @@ const DnsConfig = () => {
         <Button
           type="primary"
           className={styles.editBtn}
-          onClick={(e) => editDnsConfigItemHandler(e, record.id)}
+          onClick={() => editDnsConfigItemHandler(record.id)}
         >
           编辑
         </Button>
@@ -58,7 +58,7 @@ const DnsConfig = () => {
   ];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editDnsConfigItemHandler = (e: any, key: number) => {
+  const editDnsConfigItemHandler = (key: number) => {
     setEditMode(true);
     setShowModal(true);
     setCurrentNodeConfig(dnsGroup.filter((item) => item.id === key)[0] ?? {});

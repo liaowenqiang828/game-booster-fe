@@ -1,4 +1,4 @@
-import { Button, Input } from "antd";
+import { Button } from "antd";
 import styles from "./index.module.less";
 import Table, { ColumnsType } from "antd/es/table";
 import { useContext, useEffect, useState } from "react";
@@ -73,7 +73,7 @@ const ClientUpdateConfig = () => {
         <Button
           type="primary"
           className={styles.editBtn}
-          onClick={(e: any) => editClientUpdateConfigHandler(e, record.id)}
+          onClick={() => editClientUpdateConfigHandler(record.id)}
         >
           编辑
         </Button>
@@ -95,7 +95,7 @@ const ClientUpdateConfig = () => {
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const editClientUpdateConfigHandler = (e: any, key: number) => {
+  const editClientUpdateConfigHandler = (key: number) => {
     setCurrentClientUpdateConfig(
       clientUpdates.filter((item) => item.id === key)[0] ?? {}
     );
