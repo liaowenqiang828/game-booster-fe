@@ -1,6 +1,6 @@
 import { Button, Form, Input, message, Modal, Select, Switch, Tag } from "antd";
 import styles from "./index.module.less";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useState } from "react";
 import { LoadingContext } from "../../router/Router";
 import {
   convertTimestampToStr,
@@ -59,14 +59,18 @@ const LineConfigEditModal = (props: IProps) => {
     return boostNodes.map((node) => ({ value: node, label: node }));
   }, [boostNodes]);
   const { hideLoading, showLoading } = useContext(LoadingContext);
+  const [enabled, setEnabled] = useState(!!lineConfig.enabled);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (fieldsValue: any) => {
     delete fieldsValue.created_at;
     delete fieldsValue.updated_at;
+    console.log(fieldsValue);
+
     if (editMode) {
       await editBoostZoneHandler({
         id: lineConfig.id,
         ...fieldsValue,
+        enabled,
         desc: lineConfig.desc,
       });
       return;
@@ -74,7 +78,8 @@ const LineConfigEditModal = (props: IProps) => {
 
     await addBoostZoneHandler({
       ...fieldsValue,
-      desc: "3333",
+      enabled,
+      desc: "",
     });
   };
 
@@ -91,9 +96,13 @@ const LineConfigEditModal = (props: IProps) => {
     showLoading();
     await addBoostZone(addRequest)
       .then(() => {
-        closeModal(false);
+        closeModal(true);
       })
       .finally(() => hideLoading());
+  };
+
+  const updateEnabledStatus = (checked: boolean) => {
+    setEnabled(checked);
   };
 
   return (
@@ -120,8 +129,8 @@ const LineConfigEditModal = (props: IProps) => {
             <Input placeholder="参考格式：上海日本一区" />
           </Form.Item>
 
-          <Form.Item label="是否启用" name="enabled">
-            <Switch defaultChecked={lineConfig.enabled} />
+          <Form.Item label="是否启用">
+            <Switch checked={enabled} onChange={updateEnabledStatus} />
           </Form.Item>
           <Form.Item
             label="国家"

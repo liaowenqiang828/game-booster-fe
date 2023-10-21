@@ -106,7 +106,7 @@ const LineConfig = () => {
     showLoading();
     await getListBoostZones({
       offset:
-        pageNumber && currentPage > 1 ? (pageNumber - 1) * pageSize + 1 : 0,
+        pageNumber && pageNumber > 1 ? (pageNumber - 1) * pageSize + 1 : 0,
       cnt: pageSize,
     })
       .then((res) => {
@@ -166,6 +166,8 @@ const LineConfig = () => {
 
   const onPageChange = (page: number, pageSize: number) => {
     setCurrentPage(page);
+    console.log("page", page);
+
     loadingBoostZonesByPageNumberAndPageSize(pageSize, page);
   };
 
