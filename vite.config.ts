@@ -6,7 +6,7 @@ export default ({ mode }) =>
   defineConfig({
     plugins: [react()],
     server: {
-      port: 8080,
+      port: 3000,
       proxy: {
         "/admin/v1": {
           target: loadEnv(mode, process.cwd()).VITE_APP_API_HOST,
